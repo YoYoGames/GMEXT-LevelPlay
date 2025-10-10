@@ -11,6 +11,14 @@ ANDROID SOURCE:
 IOS SOURCE:
 `source/LevelPlay_gml/extensions/levelplay/iOSSource/`
 
+---
+
+## Important
+
+Do not download from the **main branch** this branch is a work in place branch and probably has features that might be broken or not working properly, please download from the releases panel (right side instead).
+
+---
+
 ## Documentation
 
 * Check [the documentation](../../wiki)
