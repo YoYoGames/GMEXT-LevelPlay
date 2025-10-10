@@ -436,7 +436,7 @@
 // Modules
 
 /**
- * @module levelplay
+ * @module home
  * @title LevelPlay
  * @desc This is the LevelPlay extension, which allows you to add Unity LevelPlay functionality to your GameMaker game.
  * 
