@@ -1,0 +1,196 @@
+// ##### extgen :: Auto-generated file do not edit!! #####
+
+package ${YYAndroidPackageName};
+
+import java.nio.ByteBuffer;
+import java.util.*;
+import ${YYAndroidPackageName}.GMExtWire;
+import ${YYAndroidPackageName}.GMExtWire.GMFunction;
+import ${YYAndroidPackageName}.GMExtWire.GMValue;
+import ${YYAndroidPackageName}.records.*;
+import ${YYAndroidPackageName}.codecs.*;
+import ${YYAndroidPackageName}.enums.*;
+
+public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLevelPlayInterface {
+
+    private final GMExtWire.DispatchQueue __dispatch_queue = new GMExtWire.DispatchQueue();
+    public double __EXT_NATIVE__GMLevelPlay_invocation_handler(ByteBuffer __ret_buffer, double __ret_buffer_length)
+    {
+        return __dispatch_queue.fetch(__ret_buffer);
+    }
+
+    public double __EXT_NATIVE__levelplay_init(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: callback, type: Function
+        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+
+        levelplay_init(callback);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_is_initialized()
+    {
+        boolean __result = levelplay_is_initialized();
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_set_consent(double enable)
+    {
+        levelplay_set_consent(enable != 0);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_set_metadata(String key, String value)
+    {
+        levelplay_set_metadata(key, value);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_set_dynamic_user_id(String user_id)
+    {
+        levelplay_set_dynamic_user_id(user_id);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_launch_test_suite()
+    {
+        levelplay_launch_test_suite();
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_interstitial_init(String ad_unit_id)
+    {
+        levelplay_interstitial_init(ad_unit_id);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_interstitial_load()
+    {
+        boolean __result = levelplay_interstitial_load();
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_interstitial_is_ready()
+    {
+        boolean __result = levelplay_interstitial_is_ready();
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_interstitial_is_placement_capped(String placement_id)
+    {
+        boolean __result = levelplay_interstitial_is_placement_capped(placement_id);
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_interstitial_show(String placement_id)
+    {
+        boolean __result = levelplay_interstitial_show(placement_id);
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_interstitial_callback_subscribe(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: callback, type: Function
+        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+
+        levelplay_interstitial_callback_subscribe(callback);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_video_init(String ad_unit_id)
+    {
+        levelplay_rewarded_video_init(ad_unit_id);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_video_load()
+    {
+        boolean __result = levelplay_rewarded_video_load();
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_video_is_ready()
+    {
+        boolean __result = levelplay_rewarded_video_is_ready();
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_video_is_placement_capped(String placement_id)
+    {
+        boolean __result = levelplay_rewarded_video_is_placement_capped(placement_id);
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_video_show(String placement_id)
+    {
+        boolean __result = levelplay_rewarded_video_show(placement_id);
+        return __result ? 1.0 : 0.0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_callback_subscribe(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: callback, type: Function
+        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+
+        levelplay_rewarded_callback_subscribe(callback);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_banner_create(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: ad_unit_id, type: String
+        String ad_unit_id = GMExtWire.readString(__arg_buffer);
+
+        // field: size, type: enum LevelPlayBannerSize
+        LevelPlayBannerSize size = LevelPlayBannerSize.from(GMExtWire.readI32(__arg_buffer));
+
+        // field: align_h, type: enum LevelPlayBannerAlignH
+        LevelPlayBannerAlignH align_h = LevelPlayBannerAlignH.from(GMExtWire.readI32(__arg_buffer));
+
+        // field: align_v, type: enum LevelPlayBannerAlignV
+        LevelPlayBannerAlignV align_v = LevelPlayBannerAlignV.from(GMExtWire.readI32(__arg_buffer));
+
+        levelplay_banner_create(ad_unit_id, size, align_h, align_v);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_banner_move(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: align_h, type: enum LevelPlayBannerAlignH
+        LevelPlayBannerAlignH align_h = LevelPlayBannerAlignH.from(GMExtWire.readI32(__arg_buffer));
+
+        // field: align_v, type: enum LevelPlayBannerAlignV
+        LevelPlayBannerAlignV align_v = LevelPlayBannerAlignV.from(GMExtWire.readI32(__arg_buffer));
+
+        levelplay_banner_move(align_h, align_v);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_banner_destroy()
+    {
+        levelplay_banner_destroy();
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_banner_callback_subscribe(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: callback, type: Function
+        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+
+        levelplay_banner_callback_subscribe(callback);
+        return 0;
+    }
+
+}

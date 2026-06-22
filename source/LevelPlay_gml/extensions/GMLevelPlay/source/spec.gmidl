@@ -1,0 +1,189 @@
+[gml_api]
+module GMLevelPlay;
+
+
+// =============================================================================
+// Classes — callback payload object shapes
+// =============================================================================
+
+[global]
+class `[[LevelPlayInitEvent]]` prototype Object
+{
+    [field] property type : string { get; set; }
+    [field] property success : bool { get; set; }
+    [field, type_hint = `string?`]
+    property message : gmval { get; set; }
+}
+
+[global]
+class `[[LevelPlayAdError]]` prototype Object
+{
+    [field] property message : string { get; set; }
+    [field] property error_code : int32 { get; set; }
+    [field] property error_message : string { get; set; }
+}
+
+[global]
+class `[[LevelPlayAdInfo]]` prototype Object
+{
+    [field] property width : int32 { get; set; }
+    [field] property height : int32 { get; set; }
+    [field] property format : string { get; set; }
+    [field] property network : string { get; set; }
+    [field] property unit_id : string { get; set; }
+    [field] property unit_name : string { get; set; }
+    [field] property placement_name : string { get; set; }
+    [field] property country : string { get; set; }
+    [field] property precision : string { get; set; }
+    [field] property revenue : real { get; set; }
+}
+
+[global]
+class `[[LevelPlayReward]]` prototype Object
+{
+    [field] property name : string { get; set; }
+    [field] property amount : int32 { get; set; }
+}
+
+/// Generic event object delivered by banner/interstitial/rewarded callbacks.
+/// Fields are present only when relevant to the event.
+[global]
+class `[[LevelPlayAdEvent]]` prototype Object
+{
+    [field] property type : string { get; set; }
+    [field, type_hint = `string?`]
+    property message : gmval { get; set; }
+    [field, type_hint = `LevelPlayAdInfo?`]
+    property ad_info : gmval { get; set; }
+    [field, type_hint = `LevelPlayAdError?`]
+    property error : gmval { get; set; }
+    [field, type_hint = `LevelPlayReward?`]
+    property reward : gmval { get; set; }
+}
+
+// -----------------------------------------------------------------------------
+// Init / settings
+// -----------------------------------------------------------------------------
+
+/// Callback receives [[LevelPlayInitEvent]].
+[global, bind = typed_gml]
+function levelplay_init(callback: func): unit;
+
+[global, bind = typed_gml]
+function levelplay_is_initialized(): bool;
+
+[global, bind = typed_gml]
+function levelplay_set_consent(enable: bool): unit;
+
+[global, bind = typed_gml]
+function levelplay_set_metadata(key: string, value: string): unit;
+
+[global, bind = typed_gml]
+function levelplay_set_dynamic_user_id(user_id: string): unit;
+
+[global, bind = typed_gml]
+function levelplay_launch_test_suite(): unit;
+
+// -----------------------------------------------------------------------------
+// Interstitial
+// -----------------------------------------------------------------------------
+
+[global, bind = typed_gml]
+function levelplay_interstitial_init(ad_unit_id: string): unit;
+
+[global, bind = typed_gml]
+function levelplay_interstitial_load(): bool;
+
+[global, bind = typed_gml]
+function levelplay_interstitial_is_ready(): bool;
+
+[global, bind = typed_gml]
+function levelplay_interstitial_is_placement_capped(placement_id: string): bool;
+
+[global, bind = typed_gml]
+function levelplay_interstitial_show(placement_id: string): bool;
+
+/// Callback receives [[LevelPlayAdEvent]].
+[global, bind = typed_gml]
+function levelplay_interstitial_callback_subscribe(callback: func): unit;
+
+// -----------------------------------------------------------------------------
+// Rewarded video
+// -----------------------------------------------------------------------------
+
+[global, bind = typed_gml]
+function levelplay_rewarded_video_init(ad_unit_id: string): unit;
+
+[global, bind = typed_gml]
+function levelplay_rewarded_video_load(): bool;
+
+[global, bind = typed_gml]
+function levelplay_rewarded_video_is_ready(): bool;
+
+[global, bind = typed_gml]
+function levelplay_rewarded_video_is_placement_capped(placement_id: string): bool;
+
+[global, bind = typed_gml]
+function levelplay_rewarded_video_show(placement_id: string): bool;
+
+/// Callback receives [[LevelPlayAdEvent]].
+[global, bind = typed_gml]
+function levelplay_rewarded_callback_subscribe(callback: func): unit;
+
+// -----------------------------------------------------------------------------
+// Banner
+// -----------------------------------------------------------------------------
+
+[global, bind = typed_gml]
+function levelplay_banner_create(ad_unit_id: string, [type_hint=`LevelPlayBannerSize`] size, [type_hint=`LevelPlayBannerAlignH`] align_h, [type_hint=`LevelPlayBannerAlignV`] align_v): unit;
+
+[global, bind = typed_gml]
+function levelplay_banner_move([type_hint=`LevelPlayBannerAlignH`] align_h, [type_hint=`LevelPlayBannerAlignV`] align_v): unit;
+
+[global, bind = typed_gml]
+function levelplay_banner_destroy(): unit;
+
+/// Callback receives [[LevelPlayAdEvent]].
+[global, bind = typed_gml]
+function levelplay_banner_callback_subscribe(callback: func): unit;
+
+[global, bind = typed_gml]
+enum LevelPlayBannerSize:uint32
+{
+    Banner,
+    Large,
+    MediumRectangle,
+    Adaptive,
+}
+
+[global, bind = typed_gml]
+enum LevelPlayBannerAlignH:uint32
+{
+    Left,
+    Center,
+    Right,
+}
+
+[global, bind = typed_gml]
+enum LevelPlayBannerAlignV:uint32
+{
+    Top,
+    Center,
+    Bottom,
+}
+
+[global, bind = typed_gml]
+enum LevelPlayCallbackEvent:uint32
+{
+    Loaded,
+    LoadFailed,
+    Displayed,
+    DisplayFailed,
+    Closed,
+    Clicked,
+    InfoChanged,
+    Rewarded,
+    Expanded,
+    Collapsed,
+    LeftApplication,
+}

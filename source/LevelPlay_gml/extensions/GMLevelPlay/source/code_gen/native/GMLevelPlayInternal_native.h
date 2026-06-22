@@ -1,0 +1,281 @@
+// ##### extgen :: Auto-generated file do not edit!! #####
+
+#pragma once
+#include <cstdint>
+#include <string_view>
+#include <vector>
+#include <array>
+#include <optional>
+#include "core/GMExtWire.h"
+
+namespace gm_consts
+{
+}
+
+
+namespace gm_enums
+{
+    enum class LevelPlayBannerSize : std::uint32_t
+    {
+        Banner = 0,
+        Large = 1,
+        MediumRectangle = 2,
+        Adaptive = 3
+    };
+
+    enum class LevelPlayBannerAlignH : std::uint32_t
+    {
+        Left = 0,
+        Center = 1,
+        Right = 2
+    };
+
+    enum class LevelPlayBannerAlignV : std::uint32_t
+    {
+        Top = 0,
+        Center = 1,
+        Bottom = 2
+    };
+
+    enum class LevelPlayCallbackEvent : std::uint32_t
+    {
+        Loaded = 0,
+        LoadFailed = 1,
+        Displayed = 2,
+        DisplayFailed = 3,
+        Closed = 4,
+        Clicked = 5,
+        InfoChanged = 6,
+        Rewarded = 7,
+        Expanded = 8,
+        Collapsed = 9,
+        LeftApplication = 10
+    };
+
+}
+
+
+namespace gm_structs
+{
+    struct LevelPlayInitEvent;
+    struct LevelPlayAdError;
+    struct LevelPlayAdInfo;
+    struct LevelPlayReward;
+    struct LevelPlayAdEvent;
+
+    struct LevelPlayInitEvent
+    {
+        std::string type;
+        bool success;
+        std::optional<std::string> message;
+    };
+
+    struct LevelPlayAdError
+    {
+        std::string message;
+        std::int32_t error_code;
+        std::string error_message;
+    };
+
+    struct LevelPlayAdInfo
+    {
+        std::int32_t width;
+        std::int32_t height;
+        std::string format;
+        std::string network;
+        std::string unit_id;
+        std::string unit_name;
+        std::string placement_name;
+        std::string country;
+        std::string precision;
+        double revenue;
+    };
+
+    struct LevelPlayReward
+    {
+        std::string name;
+        std::int32_t amount;
+    };
+
+    struct LevelPlayAdEvent
+    {
+        std::string type;
+        std::optional<std::string> message;
+        std::optional<gm_structs::LevelPlayAdInfo> ad_info;
+        std::optional<gm_structs::LevelPlayAdError> error;
+        std::optional<gm_structs::LevelPlayReward> reward;
+    };
+
+}
+
+namespace gm::wire::codec
+{
+    template<>
+    inline void writeValue<gm_structs::LevelPlayInitEvent>(gm::byteio::IByteWriter& _buf, const gm_structs::LevelPlayInitEvent& obj)
+    {
+        gm::wire::codec::writeValue(_buf, obj.type);
+        gm::wire::codec::writeValue(_buf, obj.success);
+        gm::wire::codec::writeValue(_buf, obj.message);
+    }
+
+    template<>
+    inline gm_structs::LevelPlayInitEvent readValue<gm_structs::LevelPlayInitEvent>(gm::byteio::BufferReader& _buf)
+    {
+        gm_structs::LevelPlayInitEvent obj;
+        obj.type = gm::wire::codec::readValue<std::string>(_buf);
+        obj.success = gm::wire::codec::readValue<bool>(_buf);
+        obj.message = gm::wire::codec::readOptional<std::string>(_buf);
+        return obj;
+    }
+
+    template<>
+    inline void writeValue<gm_structs::LevelPlayAdError>(gm::byteio::IByteWriter& _buf, const gm_structs::LevelPlayAdError& obj)
+    {
+        gm::wire::codec::writeValue(_buf, obj.message);
+        gm::wire::codec::writeValue(_buf, obj.error_code);
+        gm::wire::codec::writeValue(_buf, obj.error_message);
+    }
+
+    template<>
+    inline gm_structs::LevelPlayAdError readValue<gm_structs::LevelPlayAdError>(gm::byteio::BufferReader& _buf)
+    {
+        gm_structs::LevelPlayAdError obj;
+        obj.message = gm::wire::codec::readValue<std::string>(_buf);
+        obj.error_code = gm::wire::codec::readValue<std::int32_t>(_buf);
+        obj.error_message = gm::wire::codec::readValue<std::string>(_buf);
+        return obj;
+    }
+
+    template<>
+    inline void writeValue<gm_structs::LevelPlayAdInfo>(gm::byteio::IByteWriter& _buf, const gm_structs::LevelPlayAdInfo& obj)
+    {
+        gm::wire::codec::writeValue(_buf, obj.width);
+        gm::wire::codec::writeValue(_buf, obj.height);
+        gm::wire::codec::writeValue(_buf, obj.format);
+        gm::wire::codec::writeValue(_buf, obj.network);
+        gm::wire::codec::writeValue(_buf, obj.unit_id);
+        gm::wire::codec::writeValue(_buf, obj.unit_name);
+        gm::wire::codec::writeValue(_buf, obj.placement_name);
+        gm::wire::codec::writeValue(_buf, obj.country);
+        gm::wire::codec::writeValue(_buf, obj.precision);
+        gm::wire::codec::writeValue(_buf, obj.revenue);
+    }
+
+    template<>
+    inline gm_structs::LevelPlayAdInfo readValue<gm_structs::LevelPlayAdInfo>(gm::byteio::BufferReader& _buf)
+    {
+        gm_structs::LevelPlayAdInfo obj;
+        obj.width = gm::wire::codec::readValue<std::int32_t>(_buf);
+        obj.height = gm::wire::codec::readValue<std::int32_t>(_buf);
+        obj.format = gm::wire::codec::readValue<std::string>(_buf);
+        obj.network = gm::wire::codec::readValue<std::string>(_buf);
+        obj.unit_id = gm::wire::codec::readValue<std::string>(_buf);
+        obj.unit_name = gm::wire::codec::readValue<std::string>(_buf);
+        obj.placement_name = gm::wire::codec::readValue<std::string>(_buf);
+        obj.country = gm::wire::codec::readValue<std::string>(_buf);
+        obj.precision = gm::wire::codec::readValue<std::string>(_buf);
+        obj.revenue = gm::wire::codec::readValue<double>(_buf);
+        return obj;
+    }
+
+    template<>
+    inline void writeValue<gm_structs::LevelPlayReward>(gm::byteio::IByteWriter& _buf, const gm_structs::LevelPlayReward& obj)
+    {
+        gm::wire::codec::writeValue(_buf, obj.name);
+        gm::wire::codec::writeValue(_buf, obj.amount);
+    }
+
+    template<>
+    inline gm_structs::LevelPlayReward readValue<gm_structs::LevelPlayReward>(gm::byteio::BufferReader& _buf)
+    {
+        gm_structs::LevelPlayReward obj;
+        obj.name = gm::wire::codec::readValue<std::string>(_buf);
+        obj.amount = gm::wire::codec::readValue<std::int32_t>(_buf);
+        return obj;
+    }
+
+    template<>
+    inline void writeValue<gm_structs::LevelPlayAdEvent>(gm::byteio::IByteWriter& _buf, const gm_structs::LevelPlayAdEvent& obj)
+    {
+        gm::wire::codec::writeValue(_buf, obj.type);
+        gm::wire::codec::writeValue(_buf, obj.message);
+        gm::wire::codec::writeValue(_buf, obj.ad_info);
+        gm::wire::codec::writeValue(_buf, obj.error);
+        gm::wire::codec::writeValue(_buf, obj.reward);
+    }
+
+    template<>
+    inline gm_structs::LevelPlayAdEvent readValue<gm_structs::LevelPlayAdEvent>(gm::byteio::BufferReader& _buf)
+    {
+        gm_structs::LevelPlayAdEvent obj;
+        obj.type = gm::wire::codec::readValue<std::string>(_buf);
+        obj.message = gm::wire::codec::readOptional<std::string>(_buf);
+        obj.ad_info = gm::wire::codec::readOptional<gm_structs::LevelPlayAdInfo>(_buf);
+        obj.error = gm::wire::codec::readOptional<gm_structs::LevelPlayAdError>(_buf);
+        obj.reward = gm::wire::codec::readOptional<gm_structs::LevelPlayReward>(_buf);
+        return obj;
+    }
+
+}
+
+namespace gm::wire::details
+{
+    template<>
+    struct gm_struct_traits<gm_structs::LevelPlayInitEvent>
+    {
+        static constexpr bool is_gm_struct = true;
+        static constexpr std::uint32_t codec_id = 0;
+    };
+
+    template<>
+    struct gm_struct_traits<gm_structs::LevelPlayAdError>
+    {
+        static constexpr bool is_gm_struct = true;
+        static constexpr std::uint32_t codec_id = 1;
+    };
+
+    template<>
+    struct gm_struct_traits<gm_structs::LevelPlayAdInfo>
+    {
+        static constexpr bool is_gm_struct = true;
+        static constexpr std::uint32_t codec_id = 2;
+    };
+
+    template<>
+    struct gm_struct_traits<gm_structs::LevelPlayReward>
+    {
+        static constexpr bool is_gm_struct = true;
+        static constexpr std::uint32_t codec_id = 3;
+    };
+
+    template<>
+    struct gm_struct_traits<gm_structs::LevelPlayAdEvent>
+    {
+        static constexpr bool is_gm_struct = true;
+        static constexpr std::uint32_t codec_id = 4;
+    };
+
+}
+
+void levelplay_init(const gm::wire::GMFunction& callback);
+bool levelplay_is_initialized();
+void levelplay_set_consent(bool enable);
+void levelplay_set_metadata(std::string_view key, std::string_view value);
+void levelplay_set_dynamic_user_id(std::string_view user_id);
+void levelplay_launch_test_suite();
+void levelplay_interstitial_init(std::string_view ad_unit_id);
+bool levelplay_interstitial_load();
+bool levelplay_interstitial_is_ready();
+bool levelplay_interstitial_is_placement_capped(std::string_view placement_id);
+bool levelplay_interstitial_show(std::string_view placement_id);
+void levelplay_interstitial_callback_subscribe(const gm::wire::GMFunction& callback);
+void levelplay_rewarded_video_init(std::string_view ad_unit_id);
+bool levelplay_rewarded_video_load();
+bool levelplay_rewarded_video_is_ready();
+bool levelplay_rewarded_video_is_placement_capped(std::string_view placement_id);
+bool levelplay_rewarded_video_show(std::string_view placement_id);
+void levelplay_rewarded_callback_subscribe(const gm::wire::GMFunction& callback);
+void levelplay_banner_create(std::string_view ad_unit_id, gm_enums::LevelPlayBannerSize size, gm_enums::LevelPlayBannerAlignH align_h, gm_enums::LevelPlayBannerAlignV align_v);
+void levelplay_banner_move(gm_enums::LevelPlayBannerAlignH align_h, gm_enums::LevelPlayBannerAlignV align_v);
+void levelplay_banner_destroy();
+void levelplay_banner_callback_subscribe(const gm::wire::GMFunction& callback);

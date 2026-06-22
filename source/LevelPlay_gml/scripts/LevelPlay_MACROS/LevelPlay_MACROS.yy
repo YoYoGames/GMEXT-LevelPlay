@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"LevelPlay_MACROS",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"LevelPlay_MACROS",
+  "parent":{
+    "name":"GMLevelPlay",
+    "path":"folders/GMLevelPlay.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

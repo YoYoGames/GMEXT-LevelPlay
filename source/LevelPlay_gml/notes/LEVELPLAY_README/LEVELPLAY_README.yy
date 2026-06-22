@@ -1,0 +1,11 @@
+{
+  "$GMNotes":"v1",
+  "%Name":"LEVELPLAY_README",
+  "name":"LEVELPLAY_README",
+  "parent":{
+    "name":"GMLevelPlay",
+    "path":"folders/GMLevelPlay.yy",
+  },
+  "resourceType":"GMNotes",
+  "resourceVersion":"2.0",
+}

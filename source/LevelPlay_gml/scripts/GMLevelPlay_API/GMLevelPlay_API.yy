@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"GMLevelPlay_API",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"GMLevelPlay_API",
+  "parent":{
+    "name":"GMLevelPlay",
+    "path":"folders/GMLevelPlay.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
