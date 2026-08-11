@@ -20,7 +20,7 @@ public final class LevelPlayRewardCodec {
         return new LevelPlayReward(name, amount);
     }
 
-    public static void write(ByteBuffer b, LevelPlayReward obj)
+    public static void write(GMExtWire.IByteWriter b, LevelPlayReward obj)
     {
         GMExtWire.writeString(b, obj.name());
 

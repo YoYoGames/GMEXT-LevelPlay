@@ -49,11 +49,6 @@ static std::string StringFromNSError(NSError *error)
     return StringFromNSString(message);
 }
 
-static std::string StringFromCString(const char *value)
-{
-    return value != nullptr ? std::string(value) : std::string();
-}
-
 static NSString *LevelPlayAppKey(void)
 {
     std::string appKey = gm::ExtUtils::GetExtensionOption("GMLevelPlay", "iOSAppKey");
@@ -121,30 +116,27 @@ static NSString *LevelPlayAppKey(void)
 - (void)moveBannerOnMainThreadWithAlignH:(gm_enums::LevelPlayBannerAlignH)align_h
                                   alignV:(gm_enums::LevelPlayBannerAlignV)align_v;
 
-- (gm::wire::StructStream)adInfoStream:(LPMAdInfo *)adInfo;
-- (gm::wire::StructStream)errorStream:(NSError *)error fallbackMessage:(NSString *)fallbackMessage;
-- (gm::wire::StructStream)rewardStream:(LPMReward *)reward;
-- (gm::wire::StructStream)eventStream:(const char *)type
-                               message:(NSString *)message
-                                adInfo:(LPMAdInfo *)adInfo
-                                 error:(NSError *)error
-                                reward:(LPMReward *)reward;
+- (gm_structs::LevelPlayAdInfo)adInfoStream:(LPMAdInfo *)adInfo;
+- (gm_structs::LevelPlayReward)rewardStream:(LPMReward *)reward;
+- (gm_structs::LevelPlayResult)resultStream:(bool)success message:(NSString *)message;
+- (gm_structs::LevelPlayResult)resultStream:(gm_enums::LevelPlayCallbackEvent)type error:(NSError *)error;
 
-- (void)sendBannerEvent:(const char *)type
-                message:(NSString *)message
-                 adInfo:(LPMAdInfo *)adInfo
-                  error:(NSError *)error;
+- (void)sendBannerEvent:(gm_enums::LevelPlayCallbackEvent)type
+                  adInfo:(LPMAdInfo *)adInfo
+                   error:(NSError *)error;
 
-- (void)sendInterstitialEvent:(const char *)type
-                      message:(NSString *)message
-                       adInfo:(LPMAdInfo *)adInfo
-                        error:(NSError *)error;
+- (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
+                        adInfo:(LPMAdInfo *)adInfo
+                         error:(NSError *)error;
 
-- (void)sendRewardedEvent:(const char *)type
-                  message:(NSString *)message
-                   adInfo:(LPMAdInfo *)adInfo
-                    error:(NSError *)error
-                   reward:(LPMReward *)reward;
+- (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
+                    adInfo:(LPMAdInfo *)adInfo
+                     error:(NSError *)error
+                    reward:(LPMReward *)reward;
+
+// The one deliberate exception to "guard failures skip the callback" -- see
+// levelplay_banner_create's root-view-unavailable path.
+- (void)sendBannerFailure:(NSString *)message;
 
 @end
 
@@ -161,22 +153,22 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)didLoadAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:"loaded" message:nil adInfo:adInfo error:nil];
+    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Loaded adInfo:adInfo error:nil];
 }
 
 - (void)didFailToLoadAdWithAdUnitId:(NSString *)adUnitId error:(NSError *)error
 {
-    [self.owner sendInterstitialEvent:"load_failed" message:error.localizedDescription adInfo:nil error:error];
+    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed adInfo:nil error:error];
 }
 
 - (void)didDisplayAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:"displayed" message:nil adInfo:adInfo error:nil];
+    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Displayed adInfo:adInfo error:nil];
 }
 
 - (void)didFailToDisplayAdWithAdInfo:(LPMAdInfo *)adInfo error:(NSError *)error
 {
-    [self.owner sendInterstitialEvent:"display_failed" message:error.localizedDescription adInfo:adInfo error:error];
+    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error];
 
     //Audio_DeviceResume();
     //AudioResumeAll();
@@ -187,17 +179,17 @@ static NSString *LevelPlayAppKey(void)
     //Audio_DeviceResume();
     //AudioResumeAll();
 
-    [self.owner sendInterstitialEvent:"closed" message:nil adInfo:adInfo error:nil];
+    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Closed adInfo:adInfo error:nil];
 }
 
 - (void)didClickAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:"clicked" message:nil adInfo:adInfo error:nil];
+    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Clicked adInfo:adInfo error:nil];
 }
 
 - (void)didChangeAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:"info_changed" message:nil adInfo:adInfo error:nil];
+    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::InfoChanged adInfo:adInfo error:nil];
 }
 
 @end
@@ -215,22 +207,22 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)didLoadAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:"loaded" message:nil adInfo:adInfo error:nil reward:nil];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Loaded adInfo:adInfo error:nil reward:nil];
 }
 
 - (void)didFailToLoadAdWithAdUnitId:(NSString *)adUnitId error:(NSError *)error
 {
-    [self.owner sendRewardedEvent:"load_failed" message:error.localizedDescription adInfo:nil error:error reward:nil];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed adInfo:nil error:error reward:nil];
 }
 
 - (void)didDisplayAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:"displayed" message:nil adInfo:adInfo error:nil reward:nil];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Displayed adInfo:adInfo error:nil reward:nil];
 }
 
 - (void)didFailToDisplayAdWithAdInfo:(LPMAdInfo *)adInfo error:(NSError *)error
 {
-    [self.owner sendRewardedEvent:"display_failed" message:error.localizedDescription adInfo:adInfo error:error reward:nil];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error reward:nil];
 
     //Audio_DeviceResume();
     //AudioResumeAll();
@@ -241,22 +233,22 @@ static NSString *LevelPlayAppKey(void)
     //Audio_DeviceResume();
     //AudioResumeAll();
 
-    [self.owner sendRewardedEvent:"closed" message:nil adInfo:adInfo error:nil reward:nil];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Closed adInfo:adInfo error:nil reward:nil];
 }
 
 - (void)didClickAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:"clicked" message:nil adInfo:adInfo error:nil reward:nil];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Clicked adInfo:adInfo error:nil reward:nil];
 }
 
 - (void)didChangeAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:"info_changed" message:nil adInfo:adInfo error:nil reward:nil];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::InfoChanged adInfo:adInfo error:nil reward:nil];
 }
 
 - (void)didRewardAdWithAdInfo:(LPMAdInfo *)adInfo reward:(LPMReward *)reward
 {
-    [self.owner sendRewardedEvent:"rewarded" message:nil adInfo:adInfo error:nil reward:reward];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Rewarded adInfo:adInfo error:nil reward:reward];
 }
 
 @end
@@ -274,42 +266,42 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)didLoadAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendBannerEvent:"loaded" message:nil adInfo:adInfo error:nil];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::Loaded adInfo:adInfo error:nil];
 }
 
 - (void)didFailToLoadAdWithAdUnitId:(NSString *)adUnitId error:(NSError *)error
 {
-    [self.owner sendBannerEvent:"load_failed" message:error.localizedDescription adInfo:nil error:error];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed adInfo:nil error:error];
 }
 
 - (void)didDisplayAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendBannerEvent:"displayed" message:nil adInfo:adInfo error:nil];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::Displayed adInfo:adInfo error:nil];
 }
 
 - (void)didFailToDisplayAdWithAdInfo:(LPMAdInfo *)adInfo error:(NSError *)error
 {
-    [self.owner sendBannerEvent:"display_failed" message:error.localizedDescription adInfo:adInfo error:error];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error];
 }
 
 - (void)didClickAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendBannerEvent:"clicked" message:nil adInfo:adInfo error:nil];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::Clicked adInfo:adInfo error:nil];
 }
 
 - (void)didExpandAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendBannerEvent:"expanded" message:nil adInfo:adInfo error:nil];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::Expanded adInfo:adInfo error:nil];
 }
 
 - (void)didCollapseAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendBannerEvent:"collapsed" message:nil adInfo:adInfo error:nil];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::Collapsed adInfo:adInfo error:nil];
 }
 
 - (void)didLeaveAppWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendBannerEvent:"left_application" message:nil adInfo:adInfo error:nil];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::LeftApplication adInfo:adInfo error:nil];
 }
 
 @end
@@ -334,7 +326,37 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)dealloc
 {
-    [self destroyBannerOnMainThread];
+    if ([NSThread isMainThread]) {
+        if (self.bannerConstraints != nil && self.bannerConstraints.count > 0) {
+            [NSLayoutConstraint deactivateConstraints:self.bannerConstraints];
+        }
+
+        if (self.bannerAdView != nil) {
+            [self.bannerAdView setDelegate:nil];
+            [self.bannerAdView destroy];
+            [self.bannerAdView removeFromSuperview];
+        }
+    } else {
+        // dealloc can run off the main thread; do not capture self in the hop below
+        // (self's retain count is already zero here), just the plain UIKit objects needed.
+        LPMBannerAdView *bannerAdView = [self.bannerAdView retain];
+        NSArray<NSLayoutConstraint *> *bannerConstraints = [self.bannerConstraints retain];
+
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            if (bannerConstraints != nil && bannerConstraints.count > 0) {
+                [NSLayoutConstraint deactivateConstraints:bannerConstraints];
+            }
+
+            if (bannerAdView != nil) {
+                [bannerAdView setDelegate:nil];
+                [bannerAdView destroy];
+                [bannerAdView removeFromSuperview];
+            }
+        });
+
+        [bannerAdView release];
+        [bannerConstraints release];
+    }
 
     self.interstitialAd.delegate = nil;
     self.rewardedAd.delegate = nil;
@@ -392,20 +414,14 @@ static NSString *LevelPlayAppKey(void)
     }
 }
 
-- (void)levelplay_init:(gm::wire::GMFunction)callback
+- (gm_enums::LevelPlayError)levelplay_init:(gm::wire::GMFunction)callback
 {
     mInitCallback = callback;
 
     NSString *appKey = LevelPlayAppKey();
 
     if (appKey.length == 0) {
-        gm::wire::StructStream event;
-        event.add("type", std::string("init"));
-        event.add("success", false);
-        event.add("message", std::string("Missing extension option: GMLevelPlay / iOSAppKey."));
-
-        mInitCallback.call(event);
-        return;
+        return gm_enums::LevelPlayError::MissingAppKey;
     }
 
     LPMInitRequestBuilder *requestBuilder = [[LPMInitRequestBuilder alloc] initWithAppKey:appKey];
@@ -422,25 +438,26 @@ static NSString *LevelPlayAppKey(void)
         NSError *safeError = [error retain];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            gm::wire::StructStream event;
-            event.add("type", std::string("init"));
+            gm_structs::LevelPlayResult result{};
 
             if (safeError != nil) {
                 blockSelf.levelPlayInitialized = NO;
-                event.add("success", false);
-                event.add("message", StringFromNSError(safeError));
+                result.success = false;
+                result.error_message = StringFromNSError(safeError);
             } else {
                 blockSelf.levelPlayInitialized = YES;
-                event.add("success", true);
+                result.success = true;
             }
 
             if (blockSelf->mInitCallback) {
-                blockSelf->mInitCallback.call(event);
+                blockSelf->mInitCallback.call(result);
             }
 
             [safeError release];
         });
     }];
+
+    return gm_enums::LevelPlayError::Ok;
 }
 
 - (bool)levelplay_is_initialized
@@ -483,26 +500,18 @@ static NSString *LevelPlayAppKey(void)
     self.interstitialAd.delegate = self.interstitialDelegate;
 }
 
-- (bool)levelplay_interstitial_load
+- (gm_enums::LevelPlayError)levelplay_interstitial_load
 {
     if (!self.levelPlayInitialized) {
-        [self sendInterstitialEvent:"load_failed"
-                            message:@"LevelPlay SDK is not initialized."
-                             adInfo:nil
-                              error:nil];
-        return false;
+        return gm_enums::LevelPlayError::NotInitialized;
     }
 
     if (self.interstitialAd == nil) {
-        [self sendInterstitialEvent:"load_failed"
-                            message:@"Interstitial ad was not initialized."
-                             adInfo:nil
-                              error:nil];
-        return false;
+        return gm_enums::LevelPlayError::AdNotInitialized;
     }
 
     [self.interstitialAd loadAd];
-    return true;
+    return gm_enums::LevelPlayError::Ok;
 }
 
 - (bool)levelplay_interstitial_is_ready
@@ -521,42 +530,26 @@ static NSString *LevelPlayAppKey(void)
     return [LPMInterstitialAd isPlacementCapped:placement];
 }
 
-- (bool)levelplay_interstitial_show:(std::string_view)placement_id
+- (gm_enums::LevelPlayError)levelplay_interstitial_show:(std::string_view)placement_id
 {
     UIViewController *controller = [self rootViewController];
 
     if (controller == nil) {
-        [self sendInterstitialEvent:"display_failed"
-                            message:@"Current iOS view controller is unavailable."
-                             adInfo:nil
-                              error:nil];
-        return false;
+        return gm_enums::LevelPlayError::ActivityUnavailable;
     }
 
     if (self.interstitialAd == nil) {
-        [self sendInterstitialEvent:"display_failed"
-                            message:@"Interstitial ad was not initialized."
-                             adInfo:nil
-                              error:nil];
-        return false;
+        return gm_enums::LevelPlayError::AdNotInitialized;
     }
 
     if (![self.interstitialAd isAdReady]) {
-        [self sendInterstitialEvent:"display_failed"
-                            message:@"Interstitial ad is not ready."
-                             adInfo:nil
-                              error:nil];
-        return false;
+        return gm_enums::LevelPlayError::AdNotReady;
     }
 
     NSString *placement = NSStringFromStringView(placement_id);
 
     if (placement.length > 0 && [LPMInterstitialAd isPlacementCapped:placement]) {
-        [self sendInterstitialEvent:"display_failed"
-                            message:@"Interstitial placement is capped."
-                             adInfo:nil
-                              error:nil];
-        return false;
+        return gm_enums::LevelPlayError::PlacementCapped;
     }
 
     //AudioPauseAll(false);
@@ -565,7 +558,7 @@ static NSString *LevelPlayAppKey(void)
     [self.interstitialAd showAdWithViewController:controller
                                     placementName:placement.length > 0 ? placement : nil];
 
-    return true;
+    return gm_enums::LevelPlayError::Ok;
 }
 
 - (void)levelplay_interstitial_callback_subscribe:(gm::wire::GMFunction)callback
@@ -579,28 +572,18 @@ static NSString *LevelPlayAppKey(void)
     self.rewardedAd.delegate = self.rewardedDelegate;
 }
 
-- (bool)levelplay_rewarded_video_load
+- (gm_enums::LevelPlayError)levelplay_rewarded_video_load
 {
     if (!self.levelPlayInitialized) {
-        [self sendRewardedEvent:"load_failed"
-                        message:@"LevelPlay SDK is not initialized."
-                         adInfo:nil
-                          error:nil
-                         reward:nil];
-        return false;
+        return gm_enums::LevelPlayError::NotInitialized;
     }
 
     if (self.rewardedAd == nil) {
-        [self sendRewardedEvent:"load_failed"
-                        message:@"Rewarded ad was not initialized."
-                         adInfo:nil
-                          error:nil
-                         reward:nil];
-        return false;
+        return gm_enums::LevelPlayError::AdNotInitialized;
     }
 
     [self.rewardedAd loadAd];
-    return true;
+    return gm_enums::LevelPlayError::Ok;
 }
 
 - (bool)levelplay_rewarded_video_is_ready
@@ -619,46 +602,26 @@ static NSString *LevelPlayAppKey(void)
     return [LPMRewardedAd isPlacementCapped:placement];
 }
 
-- (bool)levelplay_rewarded_video_show:(std::string_view)placement_id
+- (gm_enums::LevelPlayError)levelplay_rewarded_video_show:(std::string_view)placement_id
 {
     UIViewController *controller = [self rootViewController];
 
     if (controller == nil) {
-        [self sendRewardedEvent:"display_failed"
-                        message:@"Current iOS view controller is unavailable."
-                         adInfo:nil
-                          error:nil
-                         reward:nil];
-        return false;
+        return gm_enums::LevelPlayError::ActivityUnavailable;
     }
 
     if (self.rewardedAd == nil) {
-        [self sendRewardedEvent:"display_failed"
-                        message:@"Rewarded ad was not initialized."
-                         adInfo:nil
-                          error:nil
-                         reward:nil];
-        return false;
+        return gm_enums::LevelPlayError::AdNotInitialized;
     }
 
     if (![self.rewardedAd isAdReady]) {
-        [self sendRewardedEvent:"display_failed"
-                        message:@"Rewarded ad is not ready."
-                         adInfo:nil
-                          error:nil
-                         reward:nil];
-        return false;
+        return gm_enums::LevelPlayError::AdNotReady;
     }
 
     NSString *placement = NSStringFromStringView(placement_id);
 
     if (placement.length > 0 && [LPMRewardedAd isPlacementCapped:placement]) {
-        [self sendRewardedEvent:"display_failed"
-                        message:@"Rewarded placement is capped."
-                         adInfo:nil
-                          error:nil
-                         reward:nil];
-        return false;
+        return gm_enums::LevelPlayError::PlacementCapped;
     }
 
     //AudioPauseAll(false);
@@ -667,7 +630,7 @@ static NSString *LevelPlayAppKey(void)
     [self.rewardedAd showAdWithViewController:controller
                                 placementName:placement.length > 0 ? placement : nil];
 
-    return true;
+    return gm_enums::LevelPlayError::Ok;
 }
 
 - (void)levelplay_rewarded_callback_subscribe:(gm::wire::GMFunction)callback
@@ -675,12 +638,20 @@ static NSString *LevelPlayAppKey(void)
     mRewardedCallback = callback;
 }
 
-- (void)levelplay_banner_create:(std::string_view)ad_unit_id
+- (gm_enums::LevelPlayError)levelplay_banner_create:(std::string_view)ad_unit_id
                            size:(gm_enums::LevelPlayBannerSize)size
                         align_h:(gm_enums::LevelPlayBannerAlignH)align_h
                         align_v:(gm_enums::LevelPlayBannerAlignV)align_v
 {
-/*    NSString *adUnitId = NSStringFromStringView(ad_unit_id);
+    if (!self.levelPlayInitialized) {
+        return gm_enums::LevelPlayError::NotInitialized;
+    }
+
+    if ([self rootViewController] == nil) {
+        return gm_enums::LevelPlayError::ActivityUnavailable;
+    }
+
+    NSString *adUnitId = NSStringFromStringView(ad_unit_id);
 
     dispatch_async(dispatch_get_main_queue(), ^{
         [self destroyBannerOnMainThread];
@@ -688,18 +659,25 @@ static NSString *LevelPlayAppKey(void)
         UIView *rootView = [self rootView];
         UIViewController *controller = [self rootViewController];
 
-        if (rootView == nil || controller == nil) {
-            [self sendBannerEvent:"load_failed"
-                          message:@"Current iOS root view is unavailable."
-                           adInfo:nil
-                            error:nil];
+        if (controller == nil) {
+            // Controller vanished between the synchronous guard above and this main-thread hop;
+            // there is no return channel left at this point, fall back to the callback.
+            [self sendBannerFailure:@"Current iOS view controller is unavailable."];
+            return;
+        }
+
+        if (rootView == nil) {
+            // Root-view unavailability can only be discovered here, on the main thread, after
+            // levelplay_banner_create's synchronous LevelPlayError return already reached GML --
+            // the one deliberate exception to "guard failures skip the callback".
+            [self sendBannerFailure:@"Current iOS root view is unavailable."];
             return;
         }
 
         self.bannerSize = [self adSizeFromEnum:size];
 
         self.bannerAdView = [[[LPMBannerAdView alloc] initWithAdUnitId:adUnitId] autorelease];
-        //[self.bannerAdView setAdSize:self.bannerSize];
+        [self.bannerAdView setAdSize:self.bannerSize];
         [self.bannerAdView setDelegate:self.bannerDelegate];
 
         self.bannerAdView.translatesAutoresizingMaskIntoConstraints = NO;
@@ -709,28 +687,29 @@ static NSString *LevelPlayAppKey(void)
         [self moveBannerOnMainThreadWithAlignH:align_h alignV:align_v];
 
         [self.bannerAdView loadAdWithViewController:controller];
-    });*/
+    });
+
+    return gm_enums::LevelPlayError::Ok;
 }
 
 - (void)levelplay_banner_move:(gm_enums::LevelPlayBannerAlignH)align_h
                       align_v:(gm_enums::LevelPlayBannerAlignV)align_v
 {
-    /*
     dispatch_async(dispatch_get_main_queue(), ^{
         [self moveBannerOnMainThreadWithAlignH:align_h alignV:align_v];
-    });*/
+    });
 }
 
 - (void)levelplay_banner_destroy
-{/*
+{
     dispatch_async(dispatch_get_main_queue(), ^{
         [self destroyBannerOnMainThread];
-    });*/
+    });
 }
 
 - (void)levelplay_banner_callback_subscribe:(gm::wire::GMFunction)callback
 {
-//    mBannerCallback = callback;
+    mBannerCallback = callback;
 }
 
 - (void)destroyBannerOnMainThread
@@ -830,126 +809,110 @@ static NSString *LevelPlayAppKey(void)
     [NSLayoutConstraint activateConstraints:self.bannerConstraints];
 }
 
-- (gm::wire::StructStream)adInfoStream:(LPMAdInfo *)adInfo
+- (gm_structs::LevelPlayAdInfo)adInfoStream:(LPMAdInfo *)adInfo
 {
-    gm::wire::StructStream stream;
+    gm_structs::LevelPlayAdInfo info{};
 
     if (adInfo == nil) {
-        return stream;
+        return info;
     }
 
     if (adInfo.adSize != nil) {
-        stream.add("width", static_cast<std::int32_t>(adInfo.adSize.width));
-        stream.add("height", static_cast<std::int32_t>(adInfo.adSize.height));
-    } else {
-        stream.add("width", static_cast<std::int32_t>(0));
-        stream.add("height", static_cast<std::int32_t>(0));
+        info.width = static_cast<std::int32_t>(adInfo.adSize.width);
+        info.height = static_cast<std::int32_t>(adInfo.adSize.height);
     }
 
-    stream.add("format", StringFromNSString(adInfo.adFormat));
-    stream.add("network", StringFromNSString(adInfo.adNetwork));
-    stream.add("unit_id", StringFromNSString(adInfo.adUnitId));
-    stream.add("unit_name", StringFromNSString(adInfo.adUnitName));
-    stream.add("placement_name", StringFromNSString(adInfo.placementName));
-    stream.add("country", StringFromNSString(adInfo.country));
+    if (adInfo.adFormat != nil) {
+        info.format = StringFromNSString(adInfo.adFormat);
+    }
+
+    if (adInfo.adNetwork != nil) {
+        info.network = StringFromNSString(adInfo.adNetwork);
+    }
+
+    if (adInfo.adUnitId != nil) {
+        info.unit_id = StringFromNSString(adInfo.adUnitId);
+    }
+
+    if (adInfo.adUnitName != nil) {
+        info.unit_name = StringFromNSString(adInfo.adUnitName);
+    }
+
+    if (adInfo.placementName != nil) {
+        info.placement_name = StringFromNSString(adInfo.placementName);
+    }
+
+    if (adInfo.country != nil) {
+        info.country = StringFromNSString(adInfo.country);
+    }
 
     if (adInfo.precision != nil) {
-        stream.add("precision", StringFromNSString([adInfo.precision description]));
-    } else {
-        stream.add("precision", std::string(""));
+        info.precision = StringFromNSString([adInfo.precision description]);
     }
 
     if (adInfo.revenue != nil) {
-        stream.add("revenue", [adInfo.revenue doubleValue]);
-    } else {
-        stream.add("revenue", 0.0);
+        info.revenue = [adInfo.revenue doubleValue];
     }
 
-    return stream;
+    return info;
 }
 
-- (gm::wire::StructStream)errorStream:(NSError *)error fallbackMessage:(NSString *)fallbackMessage
+- (gm_structs::LevelPlayReward)rewardStream:(LPMReward *)reward
 {
-    gm::wire::StructStream stream;
-
-    NSString *message = nil;
-
-    if (error != nil && error.localizedDescription != nil && error.localizedDescription.length > 0) {
-        message = error.localizedDescription;
-    } else if (fallbackMessage != nil) {
-        message = fallbackMessage;
-    } else {
-        message = @"";
-    }
-
-    stream.add("message", StringFromNSString(message));
-    stream.add("error_code", static_cast<std::int32_t>(error != nil ? error.code : 0));
-    stream.add("error_message", StringFromNSString(message));
-
-    return stream;
-}
-
-- (gm::wire::StructStream)rewardStream:(LPMReward *)reward
-{
-    gm::wire::StructStream stream;
+    gm_structs::LevelPlayReward r{};
 
     if (reward == nil) {
-        return stream;
+        return r;
     }
 
-    stream.add("name", StringFromNSString(reward.name));
-    stream.add("amount", static_cast<std::int32_t>(reward.amount));
+    r.name = StringFromNSString(reward.name);
+    r.amount = static_cast<std::int32_t>(reward.amount);
 
-    return stream;
+    return r;
 }
 
-- (gm::wire::StructStream)eventStream:(const char *)type
-                               message:(NSString *)message
-                                adInfo:(LPMAdInfo *)adInfo
-                                 error:(NSError *)error
-                                reward:(LPMReward *)reward
+- (gm_structs::LevelPlayResult)resultStream:(bool)success message:(NSString *)message
 {
-    gm::wire::StructStream stream;
-
-    stream.add("type", StringFromCString(type));
+    gm_structs::LevelPlayResult result{};
+    result.success = success;
 
     if (message != nil && message.length > 0) {
-        stream.add("message", StringFromNSString(message));
+        result.error_message = StringFromNSString(message);
     }
 
-    if (adInfo != nil) {
-        stream.add("ad_info", [self adInfoStream:adInfo]);
-    }
-
-    if (error != nil) {
-        stream.add("error", [self errorStream:error fallbackMessage:message]);
-    }
-
-    if (reward != nil) {
-        stream.add("reward", [self rewardStream:reward]);
-    }
-
-    return stream;
+    return result;
 }
 
-- (void)sendBannerEvent:(const char *)type
-                message:(NSString *)message
-                 adInfo:(LPMAdInfo *)adInfo
-                  error:(NSError *)error
+- (gm_structs::LevelPlayResult)resultStream:(gm_enums::LevelPlayCallbackEvent)type error:(NSError *)error
+{
+    gm_structs::LevelPlayResult result{};
+    result.success = (type != gm_enums::LevelPlayCallbackEvent::LoadFailed
+                       && type != gm_enums::LevelPlayCallbackEvent::DisplayFailed);
+
+    if (error != nil) {
+        if (error.localizedDescription != nil && error.localizedDescription.length > 0) {
+            result.error_message = StringFromNSString(error.localizedDescription);
+        }
+
+        result.sdk_error_code = static_cast<std::int32_t>(error.code);
+    }
+
+    return result;
+}
+
+- (void)sendBannerEvent:(gm_enums::LevelPlayCallbackEvent)type
+                  adInfo:(LPMAdInfo *)adInfo
+                   error:(NSError *)error
 {
     if (![NSThread isMainThread]) {
-        std::string typeCopy = StringFromCString(type);
-        NSString *messageCopy = [message copy];
         LPMAdInfo *adInfoCopy = [adInfo retain];
         NSError *errorCopy = [error retain];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self sendBannerEvent:typeCopy.c_str()
-                           message:messageCopy
+            [self sendBannerEvent:type
                             adInfo:adInfoCopy
                              error:errorCopy];
 
-            [messageCopy release];
             [adInfoCopy release];
             [errorCopy release];
         });
@@ -960,33 +923,26 @@ static NSString *LevelPlayAppKey(void)
         return;
     }
 
-    gm::wire::StructStream event = [self eventStream:type
-                                             message:message
-                                              adInfo:adInfo
-                                               error:error
-                                              reward:nil];
+    gm_structs::LevelPlayResult result = [self resultStream:type error:error];
+    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt =
+        adInfo != nil ? std::optional<gm_structs::LevelPlayAdInfo>([self adInfoStream:adInfo]) : std::nullopt;
 
-    mBannerCallback.call(event);
+    mBannerCallback.call(result, type, adInfoOpt);
 }
 
-- (void)sendInterstitialEvent:(const char *)type
-                      message:(NSString *)message
-                       adInfo:(LPMAdInfo *)adInfo
-                        error:(NSError *)error
+- (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
+                        adInfo:(LPMAdInfo *)adInfo
+                         error:(NSError *)error
 {
     if (![NSThread isMainThread]) {
-        std::string typeCopy = StringFromCString(type);
-        NSString *messageCopy = [message copy];
         LPMAdInfo *adInfoCopy = [adInfo retain];
         NSError *errorCopy = [error retain];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self sendInterstitialEvent:typeCopy.c_str()
-                                message:messageCopy
-                                 adInfo:adInfoCopy
-                                  error:errorCopy];
+            [self sendInterstitialEvent:type
+                                  adInfo:adInfoCopy
+                                   error:errorCopy];
 
-            [messageCopy release];
             [adInfoCopy release];
             [errorCopy release];
         });
@@ -997,36 +953,29 @@ static NSString *LevelPlayAppKey(void)
         return;
     }
 
-    gm::wire::StructStream event = [self eventStream:type
-                                             message:message
-                                              adInfo:adInfo
-                                               error:error
-                                              reward:nil];
+    gm_structs::LevelPlayResult result = [self resultStream:type error:error];
+    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt =
+        adInfo != nil ? std::optional<gm_structs::LevelPlayAdInfo>([self adInfoStream:adInfo]) : std::nullopt;
 
-    mInterstitialCallback.call(event);
+    mInterstitialCallback.call(result, type, adInfoOpt);
 }
 
-- (void)sendRewardedEvent:(const char *)type
-                  message:(NSString *)message
-                   adInfo:(LPMAdInfo *)adInfo
-                    error:(NSError *)error
-                   reward:(LPMReward *)reward
+- (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
+                    adInfo:(LPMAdInfo *)adInfo
+                     error:(NSError *)error
+                    reward:(LPMReward *)reward
 {
     if (![NSThread isMainThread]) {
-        std::string typeCopy = StringFromCString(type);
-        NSString *messageCopy = [message copy];
         LPMAdInfo *adInfoCopy = [adInfo retain];
         NSError *errorCopy = [error retain];
         LPMReward *rewardCopy = [reward retain];
 
         dispatch_async(dispatch_get_main_queue(), ^{
-            [self sendRewardedEvent:typeCopy.c_str()
-                             message:messageCopy
+            [self sendRewardedEvent:type
                               adInfo:adInfoCopy
                                error:errorCopy
                               reward:rewardCopy];
 
-            [messageCopy release];
             [adInfoCopy release];
             [errorCopy release];
             [rewardCopy release];
@@ -1038,13 +987,25 @@ static NSString *LevelPlayAppKey(void)
         return;
     }
 
-    gm::wire::StructStream event = [self eventStream:type
-                                             message:message
-                                              adInfo:adInfo
-                                               error:error
-                                              reward:reward];
+    gm_structs::LevelPlayResult result = [self resultStream:type error:error];
+    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt =
+        adInfo != nil ? std::optional<gm_structs::LevelPlayAdInfo>([self adInfoStream:adInfo]) : std::nullopt;
+    std::optional<gm_structs::LevelPlayReward> rewardOpt =
+        reward != nil ? std::optional<gm_structs::LevelPlayReward>([self rewardStream:reward]) : std::nullopt;
 
-    mRewardedCallback.call(event);
+    mRewardedCallback.call(result, type, adInfoOpt, rewardOpt);
+}
+
+- (void)sendBannerFailure:(NSString *)message
+{
+    if (!mBannerCallback) {
+        return;
+    }
+
+    gm_structs::LevelPlayResult result = [self resultStream:false message:message];
+
+    mBannerCallback.call(result, gm_enums::LevelPlayCallbackEvent::LoadFailed,
+                          std::optional<gm_structs::LevelPlayAdInfo>(std::nullopt));
 }
 
 @end

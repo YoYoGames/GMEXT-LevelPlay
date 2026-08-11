@@ -15,14 +15,18 @@ GMEXPORT double __EXT_NATIVE__GMLevelPlay_invocation_handler(char* __ret_buffer,
     return __dispatch_queue.fetch(__bw);
 }
 
-GMEXPORT double __EXT_NATIVE__levelplay_init(char* __arg_buffer, double __arg_buffer_length)
+GMEXPORT double __EXT_NATIVE__levelplay_init(char* __arg_buffer, double __arg_buffer_length, char* __ret_buffer, double __ret_buffer_length)
 {
     gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
 
     // field: callback, type: Function
     gm::wire::GMFunction callback = gm::wire::codec::readFunction(__br, &__dispatch_queue);
 
-    levelplay_init(callback);
+    auto&& __result = levelplay_init(callback);
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: enum LevelPlayError
+    gm::wire::codec::writeValue(__bw, __result);
     return 0;
 }
 
@@ -62,10 +66,14 @@ GMEXPORT double __EXT_NATIVE__levelplay_interstitial_init(char* ad_unit_id)
     return 0;
 }
 
-GMEXPORT double __EXT_NATIVE__levelplay_interstitial_load()
+GMEXPORT double __EXT_NATIVE__levelplay_interstitial_load(char* __ret_buffer, double __ret_buffer_length)
 {
     auto&& __result = levelplay_interstitial_load();
-    return static_cast<double>(__result);
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: enum LevelPlayError
+    gm::wire::codec::writeValue(__bw, __result);
+    return 0;
 }
 
 GMEXPORT double __EXT_NATIVE__levelplay_interstitial_is_ready()
@@ -80,10 +88,14 @@ GMEXPORT double __EXT_NATIVE__levelplay_interstitial_is_placement_capped(char* p
     return static_cast<double>(__result);
 }
 
-GMEXPORT double __EXT_NATIVE__levelplay_interstitial_show(char* placement_id)
+GMEXPORT double __EXT_NATIVE__levelplay_interstitial_show(char* placement_id, char* __ret_buffer, double __ret_buffer_length)
 {
     auto&& __result = levelplay_interstitial_show(placement_id);
-    return static_cast<double>(__result);
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: enum LevelPlayError
+    gm::wire::codec::writeValue(__bw, __result);
+    return 0;
 }
 
 GMEXPORT double __EXT_NATIVE__levelplay_interstitial_callback_subscribe(char* __arg_buffer, double __arg_buffer_length)
@@ -103,10 +115,14 @@ GMEXPORT double __EXT_NATIVE__levelplay_rewarded_video_init(char* ad_unit_id)
     return 0;
 }
 
-GMEXPORT double __EXT_NATIVE__levelplay_rewarded_video_load()
+GMEXPORT double __EXT_NATIVE__levelplay_rewarded_video_load(char* __ret_buffer, double __ret_buffer_length)
 {
     auto&& __result = levelplay_rewarded_video_load();
-    return static_cast<double>(__result);
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: enum LevelPlayError
+    gm::wire::codec::writeValue(__bw, __result);
+    return 0;
 }
 
 GMEXPORT double __EXT_NATIVE__levelplay_rewarded_video_is_ready()
@@ -121,10 +137,14 @@ GMEXPORT double __EXT_NATIVE__levelplay_rewarded_video_is_placement_capped(char*
     return static_cast<double>(__result);
 }
 
-GMEXPORT double __EXT_NATIVE__levelplay_rewarded_video_show(char* placement_id)
+GMEXPORT double __EXT_NATIVE__levelplay_rewarded_video_show(char* placement_id, char* __ret_buffer, double __ret_buffer_length)
 {
     auto&& __result = levelplay_rewarded_video_show(placement_id);
-    return static_cast<double>(__result);
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: enum LevelPlayError
+    gm::wire::codec::writeValue(__bw, __result);
+    return 0;
 }
 
 GMEXPORT double __EXT_NATIVE__levelplay_rewarded_callback_subscribe(char* __arg_buffer, double __arg_buffer_length)
@@ -138,7 +158,7 @@ GMEXPORT double __EXT_NATIVE__levelplay_rewarded_callback_subscribe(char* __arg_
     return 0;
 }
 
-GMEXPORT double __EXT_NATIVE__levelplay_banner_create(char* __arg_buffer, double __arg_buffer_length)
+GMEXPORT double __EXT_NATIVE__levelplay_banner_create(char* __arg_buffer, double __arg_buffer_length, char* __ret_buffer, double __ret_buffer_length)
 {
     gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
 
@@ -154,7 +174,11 @@ GMEXPORT double __EXT_NATIVE__levelplay_banner_create(char* __arg_buffer, double
     // field: align_v, type: enum LevelPlayBannerAlignV
     gm_enums::LevelPlayBannerAlignV align_v = gm::wire::codec::readValue<gm_enums::LevelPlayBannerAlignV>(__br);
 
-    levelplay_banner_create(ad_unit_id, size, align_h, align_v);
+    auto&& __result = levelplay_banner_create(ad_unit_id, size, align_h, align_v);
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: enum LevelPlayError
+    gm::wire::codec::writeValue(__bw, __result);
     return 0;
 }
 

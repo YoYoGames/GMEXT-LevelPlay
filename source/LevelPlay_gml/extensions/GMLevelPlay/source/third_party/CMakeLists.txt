@@ -104,7 +104,7 @@ if(APPLE)
 
     if(NOT EXISTS "${_SLICE_DIR}")
       message(FATAL_ERROR
-        "[third_party] Could not find a suitable OpAdxSdk slice.\n"
+        "[third_party] Could not find a suitable IronSource slice.\n"
         "XCFramework: ${IRONSOURCE_XCFRAMEWORK}\n"
         "Tried slice: ${_SLICE_DIR}\n"
         "Sysroot: ${CMAKE_OSX_SYSROOT}"
@@ -127,10 +127,10 @@ if(APPLE)
 
     # Link framework by name
     target_link_libraries(ext_third_party INTERFACE
-      "-framework" "OpAdxSdk"
+      "-framework" "IronSource"
     )
 
-    # If OpAdxSdk requires other Apple frameworks, add them here too:
+    # If IronSource requires other Apple frameworks, add them here too:
     # target_link_libraries(ext_third_party INTERFACE "-framework" "AdSupport")
 
   # ----------------------

@@ -19,14 +19,20 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return __dispatch_queue.fetch(__ret_buffer);
     }
 
-    public double __EXT_NATIVE__levelplay_init(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    public double __EXT_NATIVE__levelplay_init(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
         GMExtWire.order(__arg_buffer);
 
         // field: callback, type: Function
         GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
 
-        levelplay_init(callback);
+        LevelPlayError __result = levelplay_init(callback);
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: enum LevelPlayError
+        GMExtWire.writeI32(__ret_buffer_writer, __result.value());
+
         return 0;
     }
 
@@ -66,10 +72,16 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return 0;
     }
 
-    public double __EXT_NATIVE__levelplay_interstitial_load()
+    public double __EXT_NATIVE__levelplay_interstitial_load(ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        boolean __result = levelplay_interstitial_load();
-        return __result ? 1.0 : 0.0;
+        LevelPlayError __result = levelplay_interstitial_load();
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: enum LevelPlayError
+        GMExtWire.writeI32(__ret_buffer_writer, __result.value());
+
+        return 0;
     }
 
     public double __EXT_NATIVE__levelplay_interstitial_is_ready()
@@ -84,10 +96,16 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return __result ? 1.0 : 0.0;
     }
 
-    public double __EXT_NATIVE__levelplay_interstitial_show(String placement_id)
+    public double __EXT_NATIVE__levelplay_interstitial_show(String placement_id, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        boolean __result = levelplay_interstitial_show(placement_id);
-        return __result ? 1.0 : 0.0;
+        LevelPlayError __result = levelplay_interstitial_show(placement_id);
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: enum LevelPlayError
+        GMExtWire.writeI32(__ret_buffer_writer, __result.value());
+
+        return 0;
     }
 
     public double __EXT_NATIVE__levelplay_interstitial_callback_subscribe(ByteBuffer __arg_buffer, double __arg_buffer_length)
@@ -107,10 +125,16 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return 0;
     }
 
-    public double __EXT_NATIVE__levelplay_rewarded_video_load()
+    public double __EXT_NATIVE__levelplay_rewarded_video_load(ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        boolean __result = levelplay_rewarded_video_load();
-        return __result ? 1.0 : 0.0;
+        LevelPlayError __result = levelplay_rewarded_video_load();
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: enum LevelPlayError
+        GMExtWire.writeI32(__ret_buffer_writer, __result.value());
+
+        return 0;
     }
 
     public double __EXT_NATIVE__levelplay_rewarded_video_is_ready()
@@ -125,10 +149,16 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return __result ? 1.0 : 0.0;
     }
 
-    public double __EXT_NATIVE__levelplay_rewarded_video_show(String placement_id)
+    public double __EXT_NATIVE__levelplay_rewarded_video_show(String placement_id, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        boolean __result = levelplay_rewarded_video_show(placement_id);
-        return __result ? 1.0 : 0.0;
+        LevelPlayError __result = levelplay_rewarded_video_show(placement_id);
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: enum LevelPlayError
+        GMExtWire.writeI32(__ret_buffer_writer, __result.value());
+
+        return 0;
     }
 
     public double __EXT_NATIVE__levelplay_rewarded_callback_subscribe(ByteBuffer __arg_buffer, double __arg_buffer_length)
@@ -142,7 +172,7 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return 0;
     }
 
-    public double __EXT_NATIVE__levelplay_banner_create(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    public double __EXT_NATIVE__levelplay_banner_create(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
         GMExtWire.order(__arg_buffer);
 
@@ -158,7 +188,13 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         // field: align_v, type: enum LevelPlayBannerAlignV
         LevelPlayBannerAlignV align_v = LevelPlayBannerAlignV.from(GMExtWire.readI32(__arg_buffer));
 
-        levelplay_banner_create(ad_unit_id, size, align_h, align_v);
+        LevelPlayError __result = levelplay_banner_create(ad_unit_id, size, align_h, align_v);
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: enum LevelPlayError
+        GMExtWire.writeI32(__ret_buffer_writer, __result.value());
+
         return 0;
     }
 

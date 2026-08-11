@@ -6,12 +6,13 @@ import ${YYAndroidPackageName}.GMExtWire;
 import ${YYAndroidPackageName}.codecs.*;
 
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
-public record LevelPlayAdInfo(int width, int height, String format, String network, String unit_id, String unit_name, String placement_name, String country, String precision, double revenue) implements GMExtWire.ITypedStruct
+public record LevelPlayAdInfo(int width, int height, java.util.Optional<String> format, java.util.Optional<String> network, java.util.Optional<String> unit_id, java.util.Optional<String> unit_name, java.util.Optional<String> placement_name, java.util.Optional<String> country, java.util.Optional<String> precision, java.util.Optional<Double> revenue) implements GMExtWire.ITypedStruct
 {
-    public static final int CODEC_ID = 2;
+    public static final int CODEC_ID = 1;
     @Override
-    public void encode(ByteBuffer b)
+    public void encode(GMExtWire.IByteWriter b)
     {
         LevelPlayAdInfoCodec.write(b, this);
     }

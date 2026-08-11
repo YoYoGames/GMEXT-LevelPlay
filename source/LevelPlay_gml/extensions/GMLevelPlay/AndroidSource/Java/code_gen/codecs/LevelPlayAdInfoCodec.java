@@ -5,6 +5,7 @@ package ${YYAndroidPackageName}.codecs;
 import java.nio.ByteBuffer;
 
 import ${YYAndroidPackageName}.GMExtWire;
+import java.util.Optional;
 import ${YYAndroidPackageName}.records.*;
 
 public final class LevelPlayAdInfoCodec {
@@ -17,46 +18,118 @@ public final class LevelPlayAdInfoCodec {
 
         int height = GMExtWire.readI32(b);
 
-        String format = GMExtWire.readString(b);
+        java.util.Optional<String> format = java.util.Optional.empty();
+        if (GMExtWire.readBool(b))
+        {
+            String __opt_format = GMExtWire.readString(b);
+            format = java.util.Optional.of(__opt_format);
+        }
 
-        String network = GMExtWire.readString(b);
+        java.util.Optional<String> network = java.util.Optional.empty();
+        if (GMExtWire.readBool(b))
+        {
+            String __opt_network = GMExtWire.readString(b);
+            network = java.util.Optional.of(__opt_network);
+        }
 
-        String unit_id = GMExtWire.readString(b);
+        java.util.Optional<String> unit_id = java.util.Optional.empty();
+        if (GMExtWire.readBool(b))
+        {
+            String __opt_unit_id = GMExtWire.readString(b);
+            unit_id = java.util.Optional.of(__opt_unit_id);
+        }
 
-        String unit_name = GMExtWire.readString(b);
+        java.util.Optional<String> unit_name = java.util.Optional.empty();
+        if (GMExtWire.readBool(b))
+        {
+            String __opt_unit_name = GMExtWire.readString(b);
+            unit_name = java.util.Optional.of(__opt_unit_name);
+        }
 
-        String placement_name = GMExtWire.readString(b);
+        java.util.Optional<String> placement_name = java.util.Optional.empty();
+        if (GMExtWire.readBool(b))
+        {
+            String __opt_placement_name = GMExtWire.readString(b);
+            placement_name = java.util.Optional.of(__opt_placement_name);
+        }
 
-        String country = GMExtWire.readString(b);
+        java.util.Optional<String> country = java.util.Optional.empty();
+        if (GMExtWire.readBool(b))
+        {
+            String __opt_country = GMExtWire.readString(b);
+            country = java.util.Optional.of(__opt_country);
+        }
 
-        String precision = GMExtWire.readString(b);
+        java.util.Optional<String> precision = java.util.Optional.empty();
+        if (GMExtWire.readBool(b))
+        {
+            String __opt_precision = GMExtWire.readString(b);
+            precision = java.util.Optional.of(__opt_precision);
+        }
 
-        double revenue = GMExtWire.readF64(b);
+        java.util.Optional<Double> revenue = java.util.Optional.empty();
+        if (GMExtWire.readBool(b))
+        {
+            double __opt_revenue = GMExtWire.readF64(b);
+            revenue = java.util.Optional.of(__opt_revenue);
+        }
 
         return new LevelPlayAdInfo(width, height, format, network, unit_id, unit_name, placement_name, country, precision, revenue);
     }
 
-    public static void write(ByteBuffer b, LevelPlayAdInfo obj)
+    public static void write(GMExtWire.IByteWriter b, LevelPlayAdInfo obj)
     {
         GMExtWire.writeI32(b, obj.width());
 
         GMExtWire.writeI32(b, obj.height());
 
-        GMExtWire.writeString(b, obj.format());
+        GMExtWire.writeBool(b, obj.format() != null && obj.format().isPresent());
+        if (obj.format() != null && obj.format().isPresent())
+        {
+            GMExtWire.writeString(b, obj.format().get());
+        }
 
-        GMExtWire.writeString(b, obj.network());
+        GMExtWire.writeBool(b, obj.network() != null && obj.network().isPresent());
+        if (obj.network() != null && obj.network().isPresent())
+        {
+            GMExtWire.writeString(b, obj.network().get());
+        }
 
-        GMExtWire.writeString(b, obj.unit_id());
+        GMExtWire.writeBool(b, obj.unit_id() != null && obj.unit_id().isPresent());
+        if (obj.unit_id() != null && obj.unit_id().isPresent())
+        {
+            GMExtWire.writeString(b, obj.unit_id().get());
+        }
 
-        GMExtWire.writeString(b, obj.unit_name());
+        GMExtWire.writeBool(b, obj.unit_name() != null && obj.unit_name().isPresent());
+        if (obj.unit_name() != null && obj.unit_name().isPresent())
+        {
+            GMExtWire.writeString(b, obj.unit_name().get());
+        }
 
-        GMExtWire.writeString(b, obj.placement_name());
+        GMExtWire.writeBool(b, obj.placement_name() != null && obj.placement_name().isPresent());
+        if (obj.placement_name() != null && obj.placement_name().isPresent())
+        {
+            GMExtWire.writeString(b, obj.placement_name().get());
+        }
 
-        GMExtWire.writeString(b, obj.country());
+        GMExtWire.writeBool(b, obj.country() != null && obj.country().isPresent());
+        if (obj.country() != null && obj.country().isPresent())
+        {
+            GMExtWire.writeString(b, obj.country().get());
+        }
 
-        GMExtWire.writeString(b, obj.precision());
+        GMExtWire.writeBool(b, obj.precision() != null && obj.precision().isPresent());
+        if (obj.precision() != null && obj.precision().isPresent())
+        {
+            GMExtWire.writeString(b, obj.precision().get());
+        }
 
-        GMExtWire.writeF64(b, obj.revenue());
+        GMExtWire.writeBool(b, obj.revenue() != null && obj.revenue().isPresent());
+        if (obj.revenue() != null && obj.revenue().isPresent())
+        {
+            GMExtWire.writeF64(b, obj.revenue().get());
+        }
 
     }
 }

@@ -1,9 +1,8 @@
 
 event_inherited();
 
-levelplay_init(function(_success,_error_message){
-		show_debug_message($"HERE!!! {{_success,_error_message}}")
-		if(_success)
+var _init_error = levelplay_init(function(_result){
+		if(_result.success)
 		{
 			instance_create_depth(room_width/2,300,0,Obj_LevelPlay_Banner)
 			instance_create_depth(room_width/2,400,0,Obj_LevelPlay_Interstitial)
@@ -15,120 +14,105 @@ levelplay_init(function(_success,_error_message){
 		}
 	})
 
+if (_init_error != LevelPlayError.Ok)
+{
+	show_message_async($"LevelPlay Initilization Failed: {_init_error}")
+}
 
-levelplay_banner_callback_subscribe(function(_data){
-		
-		show_debug_message($"Banner {_data}")
-		
-		switch(_data.type)
+
+levelplay_banner_callback_subscribe(function(_result,_type,_ad_info){
+
+		show_debug_message($"Banner {_result} {_type} {_ad_info}")
+
+		switch(_type)
 		{
-			case "loaded":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.Loaded:
 			break
 
-			case "loaded_failed":
-			break
-			
-			case "displayed":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.LoadFailed:
 			break
 
-			case "displayed_failed":
+			case LevelPlayCallbackEvent.Displayed:
 			break
 
-			case "clicked":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.DisplayFailed:
 			break
 
-			case "expanded":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.Clicked:
 			break
 
-			case "collapsed":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.Expanded:
 			break
 
-			case "left_application":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.Collapsed:
+			break
+
+			case LevelPlayCallbackEvent.LeftApplication:
 			break
 
 		}
 	})
 
-levelplay_interstitial_callback_subscribe(function(_data){
-	
-		show_debug_message($"Interstitial {_data}")
-		
-		switch(_data.type)
+levelplay_interstitial_callback_subscribe(function(_result,_type,_ad_info){
+
+		show_debug_message($"Interstitial {_result} {_type} {_ad_info}")
+
+		switch(_type)
 		{
-			case "loaded":
-				var ad_info = _data.ad_info
-			break
-			
-			case "loaded_failed":
+			case LevelPlayCallbackEvent.Loaded:
 			break
 
-			case "displayed":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.LoadFailed:
 			break
 
-			case "displayed_failed":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.Displayed:
 			break
 
-			case "closed":
-				var ad_info = _data.ad_info
-				show_debug_message(ad_info)
+			case LevelPlayCallbackEvent.DisplayFailed:
+			break
+
+			case LevelPlayCallbackEvent.Closed:
+				show_debug_message(_ad_info)
 				levelplay_interstitial_load(Obj_LevelPlay_Interstitial._id)
 			break
 
-			case "clicked":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.Clicked:
 			break
 
-			case "info_changed":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.InfoChanged:
 			break
 		}
 	})
-	
-levelplay_rewarded_callback_subscribe(function(_data){
-		
-		show_debug_message($"Rewarded {_data}")
-	
-		switch(_data.type)
+
+levelplay_rewarded_callback_subscribe(function(_result,_type,_ad_info,_reward){
+
+		show_debug_message($"Rewarded {_result} {_type} {_ad_info} {_reward}")
+
+		switch(_type)
 		{
-			case "loaded":
-				var ad_info = _data.ad_info
+			case LevelPlayCallbackEvent.Loaded:
 			break
 
-			case "loaded_failed":
-				
+			case LevelPlayCallbackEvent.LoadFailed:
 			break
-			
-			case "displayed":
-				var ad_info = _data.ad_info
+
+			case LevelPlayCallbackEvent.Displayed:
 			break
-			
-			case "displayed_failed":
-				var ad_info = _data.ad_info
+
+			case LevelPlayCallbackEvent.DisplayFailed:
 			break
-			
-			case "closed":
-				var ad_info = _data.ad_info
+
+			case LevelPlayCallbackEvent.Closed:
 				levelplay_rewarded_video_load(Obj_LevelPlay_RewardedAd._id)
 			break
-			
-			case "clicked":
-				var ad_info = _data.ad_info
+
+			case LevelPlayCallbackEvent.Clicked:
 			break
-			
-			case "info_changed":
-				var ad_info = _data.ad_info
+
+			case LevelPlayCallbackEvent.InfoChanged:
 			break
-			
-			case "rewarded":
-				var ad_info = _data.ad_info
+
+			case LevelPlayCallbackEvent.Rewarded:
 				show_message_async("Reward!")
 			break
 		}

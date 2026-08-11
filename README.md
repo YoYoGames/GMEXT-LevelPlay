@@ -3,13 +3,22 @@ Repository for GameMaker's LevelPlay Extension
 
 This repository was created with the intent of presenting users with the latest version available of the extension (even previous to marketplace updates) and also provide a way for the community to contribute with bug fixes and feature implementation.
 
-This extension will work Android and iOS.
+This extension will work on Android and iOS.
 
 ANDROID SOURCE:
-`source/LevelPlay_gml/extensions/levelplay/AndroidSource/Java/`
+`source/LevelPlay_gml/extensions/GMLevelPlay/AndroidSource/Java/`
 
 IOS SOURCE:
-`source/LevelPlay_gml/extensions/levelplay/iOSSource/`
+`source/LevelPlay_gml/extensions/GMLevelPlay/source/src/ios/`
+
+## Requirements
+
+This extension wraps Unity's LevelPlay (ironSource) mediation SDK. You will need an AppKey for each
+platform from your ironSource/LevelPlay account.
+
+> [!IMPORTANT]
+> Fill in the extension's **AndroidAppKey** and **iOSAppKey** options (Extension Options in the IDE)
+> with your own LevelPlay AppKeys before building.
 
 ---
 

@@ -7,20 +7,13 @@ module GMLevelPlay;
 // =============================================================================
 
 [global]
-class `[[LevelPlayInitEvent]]` prototype Object
+class `[[LevelPlayResult]]` prototype Object
 {
-    [field] property type : string { get; set; }
     [field] property success : bool { get; set; }
     [field, type_hint = `string?`]
-    property message : gmval { get; set; }
-}
-
-[global]
-class `[[LevelPlayAdError]]` prototype Object
-{
-    [field] property message : string { get; set; }
-    [field] property error_code : int32 { get; set; }
-    [field] property error_message : string { get; set; }
+    property error_message : gmval { get; set; }
+    [field, type_hint = `int32?`]
+    property sdk_error_code : gmval { get; set; }
 }
 
 [global]
@@ -28,14 +21,22 @@ class `[[LevelPlayAdInfo]]` prototype Object
 {
     [field] property width : int32 { get; set; }
     [field] property height : int32 { get; set; }
-    [field] property format : string { get; set; }
-    [field] property network : string { get; set; }
-    [field] property unit_id : string { get; set; }
-    [field] property unit_name : string { get; set; }
-    [field] property placement_name : string { get; set; }
-    [field] property country : string { get; set; }
-    [field] property precision : string { get; set; }
-    [field] property revenue : real { get; set; }
+    [field, type_hint = `string?`]
+    property format : gmval { get; set; }
+    [field, type_hint = `string?`]
+    property network : gmval { get; set; }
+    [field, type_hint = `string?`]
+    property unit_id : gmval { get; set; }
+    [field, type_hint = `string?`]
+    property unit_name : gmval { get; set; }
+    [field, type_hint = `string?`]
+    property placement_name : gmval { get; set; }
+    [field, type_hint = `string?`]
+    property country : gmval { get; set; }
+    [field, type_hint = `string?`]
+    property precision : gmval { get; set; }
+    [field, type_hint = `real?`]
+    property revenue : gmval { get; set; }
 }
 
 [global]
@@ -45,29 +46,13 @@ class `[[LevelPlayReward]]` prototype Object
     [field] property amount : int32 { get; set; }
 }
 
-/// Generic event object delivered by banner/interstitial/rewarded callbacks.
-/// Fields are present only when relevant to the event.
-[global]
-class `[[LevelPlayAdEvent]]` prototype Object
-{
-    [field] property type : string { get; set; }
-    [field, type_hint = `string?`]
-    property message : gmval { get; set; }
-    [field, type_hint = `LevelPlayAdInfo?`]
-    property ad_info : gmval { get; set; }
-    [field, type_hint = `LevelPlayAdError?`]
-    property error : gmval { get; set; }
-    [field, type_hint = `LevelPlayReward?`]
-    property reward : gmval { get; set; }
-}
-
 // -----------------------------------------------------------------------------
 // Init / settings
 // -----------------------------------------------------------------------------
 
-/// Callback receives [[LevelPlayInitEvent]].
-[global, bind = typed_gml]
-function levelplay_init(callback: func): unit;
+/// Callback receives [[LevelPlayResult]].
+[global, bind = typed_gml, type_hint = `LevelPlayError`]
+function levelplay_init(callback: func): gmval;
 
 [global, bind = typed_gml]
 function levelplay_is_initialized(): bool;
@@ -91,8 +76,8 @@ function levelplay_launch_test_suite(): unit;
 [global, bind = typed_gml]
 function levelplay_interstitial_init(ad_unit_id: string): unit;
 
-[global, bind = typed_gml]
-function levelplay_interstitial_load(): bool;
+[global, bind = typed_gml, type_hint = `LevelPlayError`]
+function levelplay_interstitial_load(): gmval;
 
 [global, bind = typed_gml]
 function levelplay_interstitial_is_ready(): bool;
@@ -100,10 +85,10 @@ function levelplay_interstitial_is_ready(): bool;
 [global, bind = typed_gml]
 function levelplay_interstitial_is_placement_capped(placement_id: string): bool;
 
-[global, bind = typed_gml]
-function levelplay_interstitial_show(placement_id: string): bool;
+[global, bind = typed_gml, type_hint = `LevelPlayError`]
+function levelplay_interstitial_show(placement_id: string): gmval;
 
-/// Callback receives [[LevelPlayAdEvent]].
+/// Callback receives (result: [[LevelPlayResult]], type: [[LevelPlayCallbackEvent]], ad_info: [[LevelPlayAdInfo]]?).
 [global, bind = typed_gml]
 function levelplay_interstitial_callback_subscribe(callback: func): unit;
 
@@ -114,8 +99,8 @@ function levelplay_interstitial_callback_subscribe(callback: func): unit;
 [global, bind = typed_gml]
 function levelplay_rewarded_video_init(ad_unit_id: string): unit;
 
-[global, bind = typed_gml]
-function levelplay_rewarded_video_load(): bool;
+[global, bind = typed_gml, type_hint = `LevelPlayError`]
+function levelplay_rewarded_video_load(): gmval;
 
 [global, bind = typed_gml]
 function levelplay_rewarded_video_is_ready(): bool;
@@ -123,10 +108,10 @@ function levelplay_rewarded_video_is_ready(): bool;
 [global, bind = typed_gml]
 function levelplay_rewarded_video_is_placement_capped(placement_id: string): bool;
 
-[global, bind = typed_gml]
-function levelplay_rewarded_video_show(placement_id: string): bool;
+[global, bind = typed_gml, type_hint = `LevelPlayError`]
+function levelplay_rewarded_video_show(placement_id: string): gmval;
 
-/// Callback receives [[LevelPlayAdEvent]].
+/// Callback receives (result: [[LevelPlayResult]], type: [[LevelPlayCallbackEvent]], ad_info: [[LevelPlayAdInfo]]?, reward: [[LevelPlayReward]]?). reward present only when type == Rewarded.
 [global, bind = typed_gml]
 function levelplay_rewarded_callback_subscribe(callback: func): unit;
 
@@ -134,8 +119,8 @@ function levelplay_rewarded_callback_subscribe(callback: func): unit;
 // Banner
 // -----------------------------------------------------------------------------
 
-[global, bind = typed_gml]
-function levelplay_banner_create(ad_unit_id: string, [type_hint=`LevelPlayBannerSize`] size, [type_hint=`LevelPlayBannerAlignH`] align_h, [type_hint=`LevelPlayBannerAlignV`] align_v): unit;
+[global, bind = typed_gml, type_hint = `LevelPlayError`]
+function levelplay_banner_create(ad_unit_id: string, [type_hint=`LevelPlayBannerSize`] size, [type_hint=`LevelPlayBannerAlignH`] align_h, [type_hint=`LevelPlayBannerAlignV`] align_v): gmval;
 
 [global, bind = typed_gml]
 function levelplay_banner_move([type_hint=`LevelPlayBannerAlignH`] align_h, [type_hint=`LevelPlayBannerAlignV`] align_v): unit;
@@ -143,7 +128,7 @@ function levelplay_banner_move([type_hint=`LevelPlayBannerAlignH`] align_h, [typ
 [global, bind = typed_gml]
 function levelplay_banner_destroy(): unit;
 
-/// Callback receives [[LevelPlayAdEvent]].
+/// Callback receives (result: [[LevelPlayResult]], type: [[LevelPlayCallbackEvent]], ad_info: [[LevelPlayAdInfo]]?).
 [global, bind = typed_gml]
 function levelplay_banner_callback_subscribe(callback: func): unit;
 
@@ -186,4 +171,17 @@ enum LevelPlayCallbackEvent:uint32
     Expanded,
     Collapsed,
     LeftApplication,
+}
+
+[global, bind = typed_gml]
+enum LevelPlayError:int32
+{
+    Ok,
+    NotInitialized,
+    AdNotInitialized,
+    AdNotReady,
+    PlacementCapped,
+    ActivityUnavailable,
+    RootViewUnavailable,
+    MissingAppKey,
 }

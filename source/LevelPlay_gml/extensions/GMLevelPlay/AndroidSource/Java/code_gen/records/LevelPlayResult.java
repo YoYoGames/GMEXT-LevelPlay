@@ -6,13 +6,14 @@ import ${YYAndroidPackageName}.GMExtWire;
 import ${YYAndroidPackageName}.codecs.*;
 
 import java.nio.ByteBuffer;
+import java.util.Optional;
 
-public record LevelPlayReward(String name, int amount) implements GMExtWire.ITypedStruct
+public record LevelPlayResult(boolean success, java.util.Optional<String> error_message, java.util.Optional<Integer> sdk_error_code) implements GMExtWire.ITypedStruct
 {
-    public static final int CODEC_ID = 2;
+    public static final int CODEC_ID = 0;
     @Override
     public void encode(GMExtWire.IByteWriter b)
     {
-        LevelPlayRewardCodec.write(b, this);
+        LevelPlayResultCodec.write(b, this);
     }
 }

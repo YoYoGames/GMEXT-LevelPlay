@@ -5,6 +5,7 @@ import ${YYAndroidPackageName}.GMExtUtils;
 import ${YYAndroidPackageName}.GMExtWire;
 import ${YYAndroidPackageName}.GMExtWire.GMFunction;
 import ${YYAndroidPackageName}.enums.*;
+import ${YYAndroidPackageName}.records.LevelPlayResult;
 
 import android.app.Activity;
 import android.view.View;
@@ -13,6 +14,9 @@ import android.view.ViewGroup.LayoutParams;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
+
+import java.util.Objects;
+import java.util.Optional;
 
 import com.ironsource.mediationsdk.IronSource;
 import com.unity3d.mediation.LevelPlay;
@@ -34,7 +38,6 @@ import com.unity3d.mediation.rewarded.LevelPlayRewardedAdListener;
 
 public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitListener {
 
-    private static final String ERR_NOT_INITIALIZED = "LevelPlay SDK is not initialized.";
     private static final String ERR_ACTIVITY_UNAVAILABLE = "Current Android activity is unavailable.";
 
     private boolean mLevelPlayInitialized = false;
@@ -92,19 +95,17 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     // Init / settings
     // -------------------------------------------------------------------------
 
-    public void levelplay_init(GMFunction callback) {
+    public LevelPlayError levelplay_init(GMFunction callback) {
         mInitCallback = callback;
 
         Activity activity = levelplay_get_activity();
         if (activity == null) {
-            if (mInitCallback != null) mInitCallback.call(initEventStream(false, ERR_ACTIVITY_UNAVAILABLE));
-            return;
+            return LevelPlayError.ActivityUnavailable;
         }
 
         String appKey = GMExtUtils.GetExtensionOption("GMLevelPlay", "AndroidAppKey");
         if (appKey == null || appKey.length() == 0) {
-            if (mInitCallback != null) mInitCallback.call(initEventStream(false, "Missing extension option: GMLevelPlay / AndroidAppKey."));
-            return;
+            return LevelPlayError.MissingAppKey;
         }
 
         LevelPlayInitRequest initRequest = new LevelPlayInitRequest.Builder(appKey)
@@ -112,18 +113,19 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
                 .build();
 
         LevelPlay.init(activity, initRequest, this);
+        return LevelPlayError.Ok;
     }
 
     @Override
     public void onInitFailed(@NonNull LevelPlayInitError error) {
         mLevelPlayInitialized = false;
-        if (mInitCallback != null) mInitCallback.call(initEventStream(false, String.valueOf(error)));
+        if (mInitCallback != null) mInitCallback.call(resultStream(false, String.valueOf(error)));
     }
 
     @Override
     public void onInitSuccess(LevelPlayConfiguration configuration) {
         mLevelPlayInitialized = true;
-        if (mInitCallback != null) mInitCallback.call(initEventStream(true, null));
+        if (mInitCallback != null) mInitCallback.call(resultStream(true, null));
     }
 
     public boolean levelplay_is_initialized() {
@@ -157,17 +159,15 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         mInterstitialAd.setListener(mInterstitialListener);
     }
 
-    public boolean levelplay_interstitial_load() {
+    public LevelPlayError levelplay_interstitial_load() {
         if (!mLevelPlayInitialized) {
-            sendInterstitialEvent("load_failed", ERR_NOT_INITIALIZED, null, null);
-            return false;
+            return LevelPlayError.NotInitialized;
         }
         if (mInterstitialAd == null) {
-            sendInterstitialEvent("load_failed", "Interstitial ad was not initialized.", null, null);
-            return false;
+            return LevelPlayError.AdNotInitialized;
         }
         mInterstitialAd.loadAd();
-        return true;
+        return LevelPlayError.Ok;
     }
 
     public boolean levelplay_interstitial_is_ready() {
@@ -179,27 +179,23 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         return LevelPlayInterstitialAd.isPlacementCapped(placement_id);
     }
 
-    public boolean levelplay_interstitial_show(String placement_id) {
+    public LevelPlayError levelplay_interstitial_show(String placement_id) {
         Activity activity = levelplay_get_activity();
         if (activity == null) {
-            sendInterstitialEvent("display_failed", ERR_ACTIVITY_UNAVAILABLE, null, null);
-            return false;
+            return LevelPlayError.ActivityUnavailable;
         }
         if (mInterstitialAd == null) {
-            sendInterstitialEvent("display_failed", "Interstitial ad was not initialized.", null, null);
-            return false;
+            return LevelPlayError.AdNotInitialized;
         }
         if (!mInterstitialAd.isAdReady()) {
-            sendInterstitialEvent("display_failed", "Interstitial ad is not ready.", null, null);
-            return false;
+            return LevelPlayError.AdNotReady;
         }
         if (LevelPlayInterstitialAd.isPlacementCapped(placement_id)) {
-            sendInterstitialEvent("display_failed", "Interstitial placement is capped.", null, null);
-            return false;
+            return LevelPlayError.PlacementCapped;
         }
 
         mInterstitialAd.showAd(activity, placement_id);
-        return true;
+        return LevelPlayError.Ok;
     }
 
     public void levelplay_interstitial_callback_subscribe(GMFunction callback) {
@@ -215,17 +211,15 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         mRewardedAd.setListener(mRewardedListener);
     }
 
-    public boolean levelplay_rewarded_video_load() {
+    public LevelPlayError levelplay_rewarded_video_load() {
         if (!mLevelPlayInitialized) {
-            sendRewardedEvent("load_failed", ERR_NOT_INITIALIZED, null, null, null);
-            return false;
+            return LevelPlayError.NotInitialized;
         }
         if (mRewardedAd == null) {
-            sendRewardedEvent("load_failed", "Rewarded ad was not initialized.", null, null, null);
-            return false;
+            return LevelPlayError.AdNotInitialized;
         }
         mRewardedAd.loadAd();
-        return true;
+        return LevelPlayError.Ok;
     }
 
     public boolean levelplay_rewarded_video_is_ready() {
@@ -237,27 +231,23 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         return LevelPlayRewardedAd.isPlacementCapped(placement_id);
     }
 
-    public boolean levelplay_rewarded_video_show(String placement_id) {
+    public LevelPlayError levelplay_rewarded_video_show(String placement_id) {
         Activity activity = levelplay_get_activity();
         if (activity == null) {
-            sendRewardedEvent("display_failed", ERR_ACTIVITY_UNAVAILABLE, null, null, null);
-            return false;
+            return LevelPlayError.ActivityUnavailable;
         }
         if (mRewardedAd == null) {
-            sendRewardedEvent("display_failed", "Rewarded ad was not initialized.", null, null, null);
-            return false;
+            return LevelPlayError.AdNotInitialized;
         }
         if (!mRewardedAd.isAdReady()) {
-            sendRewardedEvent("display_failed", "Rewarded ad is not ready.", null, null, null);
-            return false;
+            return LevelPlayError.AdNotReady;
         }
         if (LevelPlayRewardedAd.isPlacementCapped(placement_id)) {
-            sendRewardedEvent("display_failed", "Rewarded placement is capped.", null, null, null);
-            return false;
+            return LevelPlayError.PlacementCapped;
         }
 
         mRewardedAd.showAd(activity, placement_id);
-        return true;
+        return LevelPlayError.Ok;
     }
 
     public void levelplay_rewarded_callback_subscribe(GMFunction callback) {
@@ -268,11 +258,20 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     // Banner
     // -------------------------------------------------------------------------
 
-    public void levelplay_banner_create(String ad_unit_id, LevelPlayBannerSize size, LevelPlayBannerAlignH align_h, LevelPlayBannerAlignV align_v) {
+    public LevelPlayError levelplay_banner_create(String ad_unit_id, LevelPlayBannerSize size, LevelPlayBannerAlignH align_h, LevelPlayBannerAlignV align_v) {
+        if (!mLevelPlayInitialized) {
+            return LevelPlayError.NotInitialized;
+        }
+        if (levelplay_get_activity() == null) {
+            return LevelPlayError.ActivityUnavailable;
+        }
+
         RunnerActivity.ViewHandler.post(() -> {
             Activity activity = levelplay_get_activity();
             if (activity == null) {
-                sendBannerEvent("load_failed", ERR_ACTIVITY_UNAVAILABLE, null, null);
+                // Activity vanished between the synchronous guard above and this UI-thread hop;
+                // there is no return channel left at this point, fall back to the callback.
+                sendBannerFailure(ERR_ACTIVITY_UNAVAILABLE);
                 return;
             }
 
@@ -289,7 +288,11 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
             ViewGroup rootView = levelplay_get_root_view(activity);
             if (rootView == null) {
                 levelplay_banner_destroy_internal();
-                sendBannerEvent("load_failed", "Root view is unavailable.", null, null);
+                // Root-view unavailability can only be discovered here, on the main thread,
+                // after levelplay_banner_create's synchronous LevelPlayError return already
+                // reached GML -- the one deliberate exception to "guard failures skip the
+                // callback".
+                sendBannerFailure("Root view is unavailable.");
                 return;
             }
 
@@ -298,6 +301,8 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
             mLevelPlayBanner.setVisibility(View.VISIBLE);
             mLevelPlayBanner.loadAd();
         });
+
+        return LevelPlayError.Ok;
     }
 
     public void levelplay_banner_move(LevelPlayBannerAlignH align_h, LevelPlayBannerAlignV align_v) {
@@ -402,121 +407,121 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     private class BannerListener implements LevelPlayBannerAdViewListener {
         @Override
         public void onAdLoaded(@NonNull LevelPlayAdInfo adInfo) {
-            sendBannerEvent("loaded", null, adInfo, null);
+            sendBannerEvent(LevelPlayCallbackEvent.Loaded, adInfo, null);
         }
 
         @Override
         public void onAdLoadFailed(@NonNull LevelPlayAdError error) {
-            sendBannerEvent("load_failed", String.valueOf(error), null, error);
+            sendBannerEvent(LevelPlayCallbackEvent.LoadFailed, null, error);
         }
 
         @Override
         public void onAdDisplayed(@NonNull LevelPlayAdInfo adInfo) {
-            sendBannerEvent("displayed", null, adInfo, null);
+            sendBannerEvent(LevelPlayCallbackEvent.Displayed, adInfo, null);
         }
 
         @Override
         public void onAdDisplayFailed(@NonNull LevelPlayAdInfo adInfo, @NonNull LevelPlayAdError error) {
-            sendBannerEvent("display_failed", String.valueOf(error), adInfo, error);
+            sendBannerEvent(LevelPlayCallbackEvent.DisplayFailed, adInfo, error);
         }
 
         @Override
         public void onAdClicked(@NonNull LevelPlayAdInfo adInfo) {
-            sendBannerEvent("clicked", null, adInfo, null);
+            sendBannerEvent(LevelPlayCallbackEvent.Clicked, adInfo, null);
         }
 
         @Override
         public void onAdExpanded(@NonNull LevelPlayAdInfo adInfo) {
-            sendBannerEvent("expanded", null, adInfo, null);
+            sendBannerEvent(LevelPlayCallbackEvent.Expanded, adInfo, null);
         }
 
         @Override
         public void onAdCollapsed(@NonNull LevelPlayAdInfo adInfo) {
-            sendBannerEvent("collapsed", null, adInfo, null);
+            sendBannerEvent(LevelPlayCallbackEvent.Collapsed, adInfo, null);
         }
 
         @Override
         public void onAdLeftApplication(@NonNull LevelPlayAdInfo adInfo) {
-            sendBannerEvent("left_application", null, adInfo, null);
+            sendBannerEvent(LevelPlayCallbackEvent.LeftApplication, adInfo, null);
         }
     }
 
     private class InterstitialListener implements LevelPlayInterstitialAdListener {
         @Override
         public void onAdLoaded(@NonNull LevelPlayAdInfo adInfo) {
-            sendInterstitialEvent("loaded", null, adInfo, null);
+            sendInterstitialEvent(LevelPlayCallbackEvent.Loaded, adInfo, null);
         }
 
         @Override
         public void onAdLoadFailed(@NonNull LevelPlayAdError error) {
-            sendInterstitialEvent("load_failed", String.valueOf(error), null, error);
+            sendInterstitialEvent(LevelPlayCallbackEvent.LoadFailed, null, error);
         }
 
         @Override
         public void onAdDisplayed(@NonNull LevelPlayAdInfo adInfo) {
-            sendInterstitialEvent("displayed", null, adInfo, null);
+            sendInterstitialEvent(LevelPlayCallbackEvent.Displayed, adInfo, null);
         }
 
         @Override
         public void onAdDisplayFailed(@NonNull LevelPlayAdError error, @NonNull LevelPlayAdInfo adInfo) {
-            sendInterstitialEvent("display_failed", String.valueOf(error), adInfo, error);
+            sendInterstitialEvent(LevelPlayCallbackEvent.DisplayFailed, adInfo, error);
         }
 
         @Override
         public void onAdClosed(@NonNull LevelPlayAdInfo adInfo) {
-            sendInterstitialEvent("closed", null, adInfo, null);
+            sendInterstitialEvent(LevelPlayCallbackEvent.Closed, adInfo, null);
         }
 
         @Override
         public void onAdClicked(@NonNull LevelPlayAdInfo adInfo) {
-            sendInterstitialEvent("clicked", null, adInfo, null);
+            sendInterstitialEvent(LevelPlayCallbackEvent.Clicked, adInfo, null);
         }
 
         @Override
         public void onAdInfoChanged(@NonNull LevelPlayAdInfo adInfo) {
-            sendInterstitialEvent("info_changed", null, adInfo, null);
+            sendInterstitialEvent(LevelPlayCallbackEvent.InfoChanged, adInfo, null);
         }
     }
 
     private class RewardedListener implements LevelPlayRewardedAdListener {
         @Override
         public void onAdLoaded(@NonNull LevelPlayAdInfo adInfo) {
-            sendRewardedEvent("loaded", null, adInfo, null, null);
+            sendRewardedEvent(LevelPlayCallbackEvent.Loaded, adInfo, null, null);
         }
 
         @Override
         public void onAdLoadFailed(@NonNull LevelPlayAdError error) {
-            sendRewardedEvent("load_failed", String.valueOf(error), null, error, null);
+            sendRewardedEvent(LevelPlayCallbackEvent.LoadFailed, null, error, null);
         }
 
         @Override
         public void onAdDisplayed(@NonNull LevelPlayAdInfo adInfo) {
-            sendRewardedEvent("displayed", null, adInfo, null, null);
+            sendRewardedEvent(LevelPlayCallbackEvent.Displayed, adInfo, null, null);
         }
 
         @Override
         public void onAdDisplayFailed(@NonNull LevelPlayAdError error, @NonNull LevelPlayAdInfo adInfo) {
-            sendRewardedEvent("display_failed", String.valueOf(error), adInfo, error, null);
+            sendRewardedEvent(LevelPlayCallbackEvent.DisplayFailed, adInfo, error, null);
         }
 
         @Override
         public void onAdClosed(@NonNull LevelPlayAdInfo adInfo) {
-            sendRewardedEvent("closed", null, adInfo, null, null);
+            sendRewardedEvent(LevelPlayCallbackEvent.Closed, adInfo, null, null);
         }
 
         @Override
         public void onAdClicked(@NonNull LevelPlayAdInfo adInfo) {
-            sendRewardedEvent("clicked", null, adInfo, null, null);
+            sendRewardedEvent(LevelPlayCallbackEvent.Clicked, adInfo, null, null);
         }
 
         @Override
         public void onAdInfoChanged(@NonNull LevelPlayAdInfo adInfo) {
-            sendRewardedEvent("info_changed", null, adInfo, null, null);
+            sendRewardedEvent(LevelPlayCallbackEvent.InfoChanged, adInfo, null, null);
         }
 
         @Override
         public void onAdRewarded(@NonNull LevelPlayReward reward, @NonNull LevelPlayAdInfo adInfo) {
-            sendRewardedEvent("rewarded", null, adInfo, null, reward);
+            sendRewardedEvent(LevelPlayCallbackEvent.Rewarded, adInfo, null, reward);
         }
     }
 
@@ -524,81 +529,83 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     // Callback payload helpers — GMExtWire streams, no HashMap/Map payloads
     // -------------------------------------------------------------------------
 
-    private void sendBannerEvent(String type, String message, LevelPlayAdInfo adInfo, LevelPlayAdError error) {
+    private void sendBannerEvent(LevelPlayCallbackEvent type, LevelPlayAdInfo adInfo, LevelPlayAdError error) {
         if (mBannerCallback == null) return;
-        mBannerCallback.call(eventStream(type, message, adInfo, error, null));
+        mBannerCallback.call(resultStream(type, error), type, adInfoOptional(adInfo));
     }
 
-    private void sendInterstitialEvent(String type, String message, LevelPlayAdInfo adInfo, LevelPlayAdError error) {
+    private void sendInterstitialEvent(LevelPlayCallbackEvent type, LevelPlayAdInfo adInfo, LevelPlayAdError error) {
         if (mInterstitialCallback == null) return;
-        mInterstitialCallback.call(eventStream(type, message, adInfo, error, null));
+        mInterstitialCallback.call(resultStream(type, error), type, adInfoOptional(adInfo));
     }
 
-    private void sendRewardedEvent(String type, String message, LevelPlayAdInfo adInfo, LevelPlayAdError error, LevelPlayReward reward) {
+    private void sendRewardedEvent(LevelPlayCallbackEvent type, LevelPlayAdInfo adInfo, LevelPlayAdError error, LevelPlayReward reward) {
         if (mRewardedCallback == null) return;
-        mRewardedCallback.call(eventStream(type, message, adInfo, error, reward));
+        mRewardedCallback.call(resultStream(type, error), type, adInfoOptional(adInfo), rewardOptional(reward));
     }
 
-    private GMExtWire.StructStream initEventStream(boolean success, String message) {
-        GMExtWire.StructStream stream = new GMExtWire.StructStream();
-        stream.kv("type", "init");
-        stream.kv("success", success);
-        if (message != null) stream.kv("message", message);
-        return stream;
+    // The one deliberate exception to "guard failures skip the callback" -- see
+    // levelplay_banner_create's root-view-unavailable path.
+    private void sendBannerFailure(String errorMessage) {
+        if (mBannerCallback == null) return;
+        mBannerCallback.call(resultStream(false, errorMessage), LevelPlayCallbackEvent.LoadFailed,
+                Optional.<${YYAndroidPackageName}.records.LevelPlayAdInfo>empty());
     }
 
-    private GMExtWire.StructStream eventStream(String type, String message, LevelPlayAdInfo adInfo, LevelPlayAdError error, LevelPlayReward reward) {
-        GMExtWire.StructStream stream = new GMExtWire.StructStream();
-        stream.kv("type", type);
-
-        if (message != null) stream.kv("message", message);
-        if (adInfo != null) stream.kv("ad_info", adInfoStream(adInfo));
-        if (error != null) stream.kv("error", errorStream(error));
-        if (reward != null) stream.kv("reward", rewardStream(reward));
-
-        return stream;
+    private LevelPlayResult resultStream(boolean success, String errorMessage) {
+        return new LevelPlayResult(success, Optional.ofNullable(errorMessage), Optional.empty());
     }
 
-    private GMExtWire.StructStream errorStream(LevelPlayAdError error) {
-        GMExtWire.StructStream stream = new GMExtWire.StructStream();
-        stream.kv("message", String.valueOf(error));
-        stream.kv("error_code", error.getErrorCode());
-        stream.kv("error_message", error.getErrorMessage());
-        return stream;
-    }
+    private LevelPlayResult resultStream(LevelPlayCallbackEvent type, LevelPlayAdError error) {
+        boolean success = type != LevelPlayCallbackEvent.LoadFailed && type != LevelPlayCallbackEvent.DisplayFailed;
 
-    private GMExtWire.StructStream rewardStream(LevelPlayReward reward) {
-        GMExtWire.StructStream stream = new GMExtWire.StructStream();
-        stream.kv("name", reward.getName());
-        stream.kv("amount", reward.getAmount());
-        return stream;
-    }
-
-    private GMExtWire.StructStream adInfoStream(LevelPlayAdInfo adInfo) {
-        GMExtWire.StructStream stream = new GMExtWire.StructStream();
-
-        if (adInfo.getAdSize() != null) {
-            stream.kv("width", adInfo.getAdSize().getWidth());
-            stream.kv("height", adInfo.getAdSize().getHeight());
-        } else {
-            stream.kv("width", 0);
-            stream.kv("height", 0);
+        if (error == null) {
+            return new LevelPlayResult(success, Optional.empty(), Optional.empty());
         }
 
-        stream.kv("format", safeString(adInfo.getAdFormat()));
-        stream.kv("network", safeString(adInfo.getAdNetwork()));
-        stream.kv("unit_id", safeString(adInfo.getAdUnitId()));
-        stream.kv("unit_name", safeString(adInfo.getAdUnitName()));
-        stream.kv("placement_name", safeString(adInfo.getPlacementName()));
-        stream.kv("country", safeString(adInfo.getCountry()));
-        stream.kv("precision", safeString(adInfo.getPrecision()));
-        stream.kv("revenue", adInfo.getRevenue());
-
-        return stream;
+        return new LevelPlayResult(
+                success,
+                Optional.ofNullable(error.getErrorMessage()),
+                Optional.of(error.getErrorCode())
+        );
     }
 
-    private String safeString(String value) {
-        return value == null ? "" : value;
+    private Optional<${YYAndroidPackageName}.records.LevelPlayAdInfo> adInfoOptional(LevelPlayAdInfo adInfo) {
+        return adInfo != null ? Optional.of(adInfoStream(adInfo)) : Optional.empty();
+    }
+
+    private Optional<${YYAndroidPackageName}.records.LevelPlayReward> rewardOptional(LevelPlayReward reward) {
+        return reward != null ? Optional.of(rewardStream(reward)) : Optional.empty();
+    }
+
+    private ${YYAndroidPackageName}.records.LevelPlayReward rewardStream(LevelPlayReward reward) {
+        return new ${YYAndroidPackageName}.records.LevelPlayReward(
+                Objects.requireNonNullElse(reward.getName(), ""),
+                reward.getAmount()
+        );
+    }
+
+    private ${YYAndroidPackageName}.records.LevelPlayAdInfo adInfoStream(LevelPlayAdInfo adInfo) {
+        int width = 0;
+        int height = 0;
+
+        if (adInfo.getAdSize() != null) {
+            width = adInfo.getAdSize().getWidth();
+            height = adInfo.getAdSize().getHeight();
+        }
+
+        return new ${YYAndroidPackageName}.records.LevelPlayAdInfo(
+                width,
+                height,
+                Optional.ofNullable(adInfo.getAdFormat()),
+                Optional.ofNullable(adInfo.getAdNetwork()),
+                Optional.ofNullable(adInfo.getAdUnitId()),
+                Optional.ofNullable(adInfo.getAdUnitName()),
+                Optional.ofNullable(adInfo.getPlacementName()),
+                Optional.ofNullable(adInfo.getCountry()),
+                Optional.ofNullable(adInfo.getPrecision()),
+                Optional.ofNullable(adInfo.getRevenue())
+        );
     }
 
 }
