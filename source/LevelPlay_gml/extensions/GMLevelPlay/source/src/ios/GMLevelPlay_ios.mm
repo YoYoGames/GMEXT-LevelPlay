@@ -332,7 +332,6 @@ static NSString *LevelPlayAppKey(void)
         }
 
         if (self.bannerAdView != nil) {
-            [self.bannerAdView setDelegate:nil];
             [self.bannerAdView destroy];
             [self.bannerAdView removeFromSuperview];
         }
@@ -351,15 +350,17 @@ static NSString *LevelPlayAppKey(void)
             }
 
             if (bannerAdView != nil) {
-                [bannerAdView setDelegate:nil];
                 [bannerAdView destroy];
                 [bannerAdView removeFromSuperview];
             }
         });
     }
 
-    self.interstitialAd.delegate = nil;
-    self.rewardedAd.delegate = nil;
+    // Not manually nil-ing interstitialAd/rewardedAd's delegate here: LPMInterstitialAd/
+    // LPMRewardedAd document that the delegate is held weakly, and setDelegate: is
+    // non-nullable in this SDK version (passing nil is a hard API violation, not just a
+    // style choice) -- the weak reference self-zeroes once interstitialDelegate/
+    // rewardedDelegate are released below, same effect without the disallowed nil send.
 
     self.interstitialAd = nil;
     self.rewardedAd = nil;
@@ -714,7 +715,6 @@ static NSString *LevelPlayAppKey(void)
     }
 
     if (self.bannerAdView != nil) {
-        [self.bannerAdView setDelegate:nil];
         [self.bannerAdView destroy];
         [self.bannerAdView removeFromSuperview];
         self.bannerAdView = nil;
