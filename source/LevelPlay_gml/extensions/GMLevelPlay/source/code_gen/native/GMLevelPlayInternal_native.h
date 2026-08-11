@@ -23,14 +23,14 @@ namespace gm_enums
         Adaptive = 3
     };
 
-    enum class LevelPlayBannerAlignH : std::uint32_t
+    enum class LevelPlayBannerHAlign : std::uint32_t
     {
         Left = 0,
         Center = 1,
         Right = 2
     };
 
-    enum class LevelPlayBannerAlignV : std::uint32_t
+    enum class LevelPlayBannerVAlign : std::uint32_t
     {
         Top = 0,
         Center = 1,
@@ -215,7 +215,7 @@ bool levelplay_rewarded_video_is_ready();
 bool levelplay_rewarded_video_is_placement_capped(std::string_view placement_id);
 gm_enums::LevelPlayError levelplay_rewarded_video_show(std::string_view placement_id);
 void levelplay_rewarded_callback_subscribe(const gm::wire::GMFunction& callback);
-gm_enums::LevelPlayError levelplay_banner_create(std::string_view ad_unit_id, gm_enums::LevelPlayBannerSize size, gm_enums::LevelPlayBannerAlignH align_h, gm_enums::LevelPlayBannerAlignV align_v);
-void levelplay_banner_move(gm_enums::LevelPlayBannerAlignH align_h, gm_enums::LevelPlayBannerAlignV align_v);
+gm_enums::LevelPlayError levelplay_banner_create(std::string_view ad_unit_id, gm_enums::LevelPlayBannerSize size, gm_enums::LevelPlayBannerHAlign align_h, gm_enums::LevelPlayBannerVAlign align_v);
+void levelplay_banner_move(gm_enums::LevelPlayBannerHAlign align_h, gm_enums::LevelPlayBannerVAlign align_v);
 void levelplay_banner_destroy();
 void levelplay_banner_callback_subscribe(const gm::wire::GMFunction& callback);

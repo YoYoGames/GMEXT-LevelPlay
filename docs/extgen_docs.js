@@ -115,16 +115,16 @@
  * @function_partial levelplay_banner_create
  * @param {String} ad_unit_id
  * @param {Enum.LevelPlayBannerSize} size
- * @param {Enum.LevelPlayBannerAlignH} align_h
- * @param {Enum.LevelPlayBannerAlignV} align_v
+ * @param {Enum.LevelPlayBannerHAlign} align_h
+ * @param {Enum.LevelPlayBannerVAlign} align_v
  * @returns {Enum.LevelPlayError}
  * @function_end
  */
 
 /**
  * @function_partial levelplay_banner_move
- * @param {Enum.LevelPlayBannerAlignH} align_h
- * @param {Enum.LevelPlayBannerAlignV} align_v
+ * @param {Enum.LevelPlayBannerHAlign} align_h
+ * @param {Enum.LevelPlayBannerVAlign} align_v
  * @function_end
  */
 
@@ -179,7 +179,7 @@
  */
 
 /**
- * @enum_partial LevelPlayBannerAlignH
+ * @enum_partial LevelPlayBannerHAlign
  * @member Left
  * @member Center
  * @member Right
@@ -187,7 +187,7 @@
  */
 
 /**
- * @enum_partial LevelPlayBannerAlignV
+ * @enum_partial LevelPlayBannerVAlign
  * @member Top
  * @member Center
  * @member Bottom

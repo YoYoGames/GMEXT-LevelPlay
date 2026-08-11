@@ -113,8 +113,8 @@ static NSString *LevelPlayAppKey(void)
 - (LPMAdSize *)adSizeFromEnum:(gm_enums::LevelPlayBannerSize)size;
 
 - (void)destroyBannerOnMainThread;
-- (void)moveBannerOnMainThreadWithAlignH:(gm_enums::LevelPlayBannerAlignH)align_h
-                                  alignV:(gm_enums::LevelPlayBannerAlignV)align_v;
+- (void)moveBannerOnMainThreadWithAlignH:(gm_enums::LevelPlayBannerHAlign)align_h
+                                  alignV:(gm_enums::LevelPlayBannerVAlign)align_v;
 
 - (gm_structs::LevelPlayAdInfo)adInfoStream:(LPMAdInfo *)adInfo;
 - (gm_structs::LevelPlayReward)rewardStream:(LPMReward *)reward;
@@ -640,8 +640,8 @@ static NSString *LevelPlayAppKey(void)
 
 - (gm_enums::LevelPlayError)levelplay_banner_create:(std::string_view)ad_unit_id
                            size:(gm_enums::LevelPlayBannerSize)size
-                        align_h:(gm_enums::LevelPlayBannerAlignH)align_h
-                        align_v:(gm_enums::LevelPlayBannerAlignV)align_v
+                        align_h:(gm_enums::LevelPlayBannerHAlign)align_h
+                        align_v:(gm_enums::LevelPlayBannerVAlign)align_v
 {
     if (!self.levelPlayInitialized) {
         return gm_enums::LevelPlayError::NotInitialized;
@@ -692,8 +692,8 @@ static NSString *LevelPlayAppKey(void)
     return gm_enums::LevelPlayError::Ok;
 }
 
-- (void)levelplay_banner_move:(gm_enums::LevelPlayBannerAlignH)align_h
-                      align_v:(gm_enums::LevelPlayBannerAlignV)align_v
+- (void)levelplay_banner_move:(gm_enums::LevelPlayBannerHAlign)align_h
+                      align_v:(gm_enums::LevelPlayBannerVAlign)align_v
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self moveBannerOnMainThreadWithAlignH:align_h alignV:align_v];
@@ -729,8 +729,8 @@ static NSString *LevelPlayAppKey(void)
     self.bannerSize = nil;
 }
 
-- (void)moveBannerOnMainThreadWithAlignH:(gm_enums::LevelPlayBannerAlignH)align_h
-                                  alignV:(gm_enums::LevelPlayBannerAlignV)align_v
+- (void)moveBannerOnMainThreadWithAlignH:(gm_enums::LevelPlayBannerHAlign)align_h
+                                  alignV:(gm_enums::LevelPlayBannerVAlign)align_v
 {
     if (self.bannerAdView == nil || self.bannerSize == nil) {
         return;
@@ -752,15 +752,15 @@ static NSString *LevelPlayAppKey(void)
     NSLayoutConstraint *xConstraint = nil;
 
     switch (align_h) {
-        case gm_enums::LevelPlayBannerAlignH::Left:
+        case gm_enums::LevelPlayBannerHAlign::Left:
             xConstraint = [self.bannerAdView.leftAnchor constraintEqualToAnchor:safeArea.leftAnchor];
             break;
 
-        case gm_enums::LevelPlayBannerAlignH::Right:
+        case gm_enums::LevelPlayBannerHAlign::Right:
             xConstraint = [self.bannerAdView.rightAnchor constraintEqualToAnchor:safeArea.rightAnchor];
             break;
 
-        case gm_enums::LevelPlayBannerAlignH::Center:
+        case gm_enums::LevelPlayBannerHAlign::Center:
         default:
             xConstraint = [self.bannerAdView.centerXAnchor constraintEqualToAnchor:safeArea.centerXAnchor];
             break;
@@ -769,15 +769,15 @@ static NSString *LevelPlayAppKey(void)
     NSLayoutConstraint *yConstraint = nil;
 
     switch (align_v) {
-        case gm_enums::LevelPlayBannerAlignV::Top:
+        case gm_enums::LevelPlayBannerVAlign::Top:
             yConstraint = [self.bannerAdView.topAnchor constraintEqualToAnchor:safeArea.topAnchor];
             break;
 
-        case gm_enums::LevelPlayBannerAlignV::Center:
+        case gm_enums::LevelPlayBannerVAlign::Center:
             yConstraint = [self.bannerAdView.centerYAnchor constraintEqualToAnchor:safeArea.centerYAnchor];
             break;
 
-        case gm_enums::LevelPlayBannerAlignV::Bottom:
+        case gm_enums::LevelPlayBannerVAlign::Bottom:
         default:
             yConstraint = [self.bannerAdView.bottomAnchor constraintEqualToAnchor:safeArea.bottomAnchor];
             break;

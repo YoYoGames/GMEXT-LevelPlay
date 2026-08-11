@@ -16,14 +16,14 @@ enum LevelPlayBannerSize
     Adaptive = 3
 }
 
-enum LevelPlayBannerAlignH
+enum LevelPlayBannerHAlign
 {
     Left = 0,
     Center = 1,
     Right = 2
 }
 
-enum LevelPlayBannerAlignV
+enum LevelPlayBannerVAlign
 {
     Top = 0,
     Center = 1,
@@ -681,8 +681,8 @@ function levelplay_rewarded_callback_subscribe(_callback)
 /**
  * @param {String} _ad_unit_id
  * @param {Enum.LevelPlayBannerSize} _size
- * @param {Enum.LevelPlayBannerAlignH} _align_h
- * @param {Enum.LevelPlayBannerAlignV} _align_v
+ * @param {Enum.LevelPlayBannerHAlign} _align_h
+ * @param {Enum.LevelPlayBannerVAlign} _align_v
  * @returns {Enum.LevelPlayError}
  */
 function levelplay_banner_create(_ad_unit_id, _size, _align_h, _align_v)
@@ -702,12 +702,12 @@ function levelplay_banner_create(_ad_unit_id, _size, _align_h, _align_v)
     if (!is_numeric(_size)) show_error($"{_GMFUNCTION_} :: _size expected number", true);
     buffer_write(__args_buffer, buffer_u32, _size);
 
-    // param: _align_h, type: enum LevelPlayBannerAlignH
+    // param: _align_h, type: enum LevelPlayBannerHAlign
 
     if (!is_numeric(_align_h)) show_error($"{_GMFUNCTION_} :: _align_h expected number", true);
     buffer_write(__args_buffer, buffer_u32, _align_h);
 
-    // param: _align_v, type: enum LevelPlayBannerAlignV
+    // param: _align_v, type: enum LevelPlayBannerVAlign
 
     if (!is_numeric(_align_v)) show_error($"{_GMFUNCTION_} :: _align_v expected number", true);
     buffer_write(__args_buffer, buffer_u32, _align_v);
@@ -722,8 +722,8 @@ function levelplay_banner_create(_ad_unit_id, _size, _align_h, _align_v)
 }
 
 /**
- * @param {Enum.LevelPlayBannerAlignH} _align_h
- * @param {Enum.LevelPlayBannerAlignV} _align_v
+ * @param {Enum.LevelPlayBannerHAlign} _align_h
+ * @param {Enum.LevelPlayBannerVAlign} _align_v
  */
 function levelplay_banner_move(_align_h, _align_v)
 {
@@ -732,12 +732,12 @@ function levelplay_banner_move(_align_h, _align_v)
 
     var __args_buffer = __ext_core_get_args_buffer();
 
-    // param: _align_h, type: enum LevelPlayBannerAlignH
+    // param: _align_h, type: enum LevelPlayBannerHAlign
 
     if (!is_numeric(_align_h)) show_error($"{_GMFUNCTION_} :: _align_h expected number", true);
     buffer_write(__args_buffer, buffer_u32, _align_h);
 
-    // param: _align_v, type: enum LevelPlayBannerAlignV
+    // param: _align_v, type: enum LevelPlayBannerVAlign
 
     if (!is_numeric(_align_v)) show_error($"{_GMFUNCTION_} :: _align_v expected number", true);
     buffer_write(__args_buffer, buffer_u32, _align_v);

@@ -271,7 +271,7 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     // Banner
     // -------------------------------------------------------------------------
 
-    public LevelPlayError levelplay_banner_create(String ad_unit_id, LevelPlayBannerSize size, LevelPlayBannerAlignH align_h, LevelPlayBannerAlignV align_v) {
+    public LevelPlayError levelplay_banner_create(String ad_unit_id, LevelPlayBannerSize size, LevelPlayBannerHAlign align_h, LevelPlayBannerVAlign align_v) {
         if (!mLevelPlayInitialized) {
             return LevelPlayError.NotInitialized;
         }
@@ -318,7 +318,7 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         return LevelPlayError.Ok;
     }
 
-    public void levelplay_banner_move(LevelPlayBannerAlignH align_h, LevelPlayBannerAlignV align_v) {
+    public void levelplay_banner_move(LevelPlayBannerHAlign align_h, LevelPlayBannerVAlign align_v) {
         RunnerActivity.ViewHandler.post(() -> {
             if (mLevelPlayBanner == null) return;
 
@@ -362,7 +362,7 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         }
     }
 
-    private RelativeLayout.LayoutParams levelplay_banner_layout_params(LevelPlayBannerAlignH align_h, LevelPlayBannerAlignV align_v) {
+    private RelativeLayout.LayoutParams levelplay_banner_layout_params(LevelPlayBannerHAlign align_h, LevelPlayBannerVAlign align_v) {
         RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT,
                 LayoutParams.WRAP_CONTENT

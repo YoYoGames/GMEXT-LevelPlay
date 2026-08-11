@@ -182,11 +182,11 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         // field: size, type: enum LevelPlayBannerSize
         LevelPlayBannerSize size = LevelPlayBannerSize.from(GMExtWire.readI32(__arg_buffer));
 
-        // field: align_h, type: enum LevelPlayBannerAlignH
-        LevelPlayBannerAlignH align_h = LevelPlayBannerAlignH.from(GMExtWire.readI32(__arg_buffer));
+        // field: align_h, type: enum LevelPlayBannerHAlign
+        LevelPlayBannerHAlign align_h = LevelPlayBannerHAlign.from(GMExtWire.readI32(__arg_buffer));
 
-        // field: align_v, type: enum LevelPlayBannerAlignV
-        LevelPlayBannerAlignV align_v = LevelPlayBannerAlignV.from(GMExtWire.readI32(__arg_buffer));
+        // field: align_v, type: enum LevelPlayBannerVAlign
+        LevelPlayBannerVAlign align_v = LevelPlayBannerVAlign.from(GMExtWire.readI32(__arg_buffer));
 
         LevelPlayError __result = levelplay_banner_create(ad_unit_id, size, align_h, align_v);
 
@@ -202,11 +202,11 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
     {
         GMExtWire.order(__arg_buffer);
 
-        // field: align_h, type: enum LevelPlayBannerAlignH
-        LevelPlayBannerAlignH align_h = LevelPlayBannerAlignH.from(GMExtWire.readI32(__arg_buffer));
+        // field: align_h, type: enum LevelPlayBannerHAlign
+        LevelPlayBannerHAlign align_h = LevelPlayBannerHAlign.from(GMExtWire.readI32(__arg_buffer));
 
-        // field: align_v, type: enum LevelPlayBannerAlignV
-        LevelPlayBannerAlignV align_v = LevelPlayBannerAlignV.from(GMExtWire.readI32(__arg_buffer));
+        // field: align_v, type: enum LevelPlayBannerVAlign
+        LevelPlayBannerVAlign align_v = LevelPlayBannerVAlign.from(GMExtWire.readI32(__arg_buffer));
 
         levelplay_banner_move(align_h, align_v);
         return 0;

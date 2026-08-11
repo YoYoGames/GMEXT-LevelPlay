@@ -284,11 +284,11 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
     // field: size, type: enum LevelPlayBannerSize
     gm_enums::LevelPlayBannerSize size = gm::wire::codec::readValue<gm_enums::LevelPlayBannerSize>(__br);
 
-    // field: align_h, type: enum LevelPlayBannerAlignH
-    gm_enums::LevelPlayBannerAlignH align_h = gm::wire::codec::readValue<gm_enums::LevelPlayBannerAlignH>(__br);
+    // field: align_h, type: enum LevelPlayBannerHAlign
+    gm_enums::LevelPlayBannerHAlign align_h = gm::wire::codec::readValue<gm_enums::LevelPlayBannerHAlign>(__br);
 
-    // field: align_v, type: enum LevelPlayBannerAlignV
-    gm_enums::LevelPlayBannerAlignV align_v = gm::wire::codec::readValue<gm_enums::LevelPlayBannerAlignV>(__br);
+    // field: align_v, type: enum LevelPlayBannerVAlign
+    gm_enums::LevelPlayBannerVAlign align_v = gm::wire::codec::readValue<gm_enums::LevelPlayBannerVAlign>(__br);
 
     gm_enums::LevelPlayError __result = [__impl levelplay_banner_create:ad_unit_id size:size align_h:align_h align_v:align_v];
 
@@ -303,11 +303,11 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
 {
     gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
 
-    // field: align_h, type: enum LevelPlayBannerAlignH
-    gm_enums::LevelPlayBannerAlignH align_h = gm::wire::codec::readValue<gm_enums::LevelPlayBannerAlignH>(__br);
+    // field: align_h, type: enum LevelPlayBannerHAlign
+    gm_enums::LevelPlayBannerHAlign align_h = gm::wire::codec::readValue<gm_enums::LevelPlayBannerHAlign>(__br);
 
-    // field: align_v, type: enum LevelPlayBannerAlignV
-    gm_enums::LevelPlayBannerAlignV align_v = gm::wire::codec::readValue<gm_enums::LevelPlayBannerAlignV>(__br);
+    // field: align_v, type: enum LevelPlayBannerVAlign
+    gm_enums::LevelPlayBannerVAlign align_v = gm::wire::codec::readValue<gm_enums::LevelPlayBannerVAlign>(__br);
 
     [__impl levelplay_banner_move:align_h align_v:align_v];
 

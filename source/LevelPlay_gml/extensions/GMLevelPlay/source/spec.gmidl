@@ -120,10 +120,10 @@ function levelplay_rewarded_callback_subscribe(callback: func): unit;
 // -----------------------------------------------------------------------------
 
 [global, bind = typed_gml, type_hint = `LevelPlayError`]
-function levelplay_banner_create(ad_unit_id: string, [type_hint=`LevelPlayBannerSize`] size, [type_hint=`LevelPlayBannerAlignH`] align_h, [type_hint=`LevelPlayBannerAlignV`] align_v): gmval;
+function levelplay_banner_create(ad_unit_id: string, [type_hint=`LevelPlayBannerSize`] size, [type_hint=`LevelPlayBannerHAlign`] align_h, [type_hint=`LevelPlayBannerVAlign`] align_v): gmval;
 
 [global, bind = typed_gml]
-function levelplay_banner_move([type_hint=`LevelPlayBannerAlignH`] align_h, [type_hint=`LevelPlayBannerAlignV`] align_v): unit;
+function levelplay_banner_move([type_hint=`LevelPlayBannerHAlign`] align_h, [type_hint=`LevelPlayBannerVAlign`] align_v): unit;
 
 [global, bind = typed_gml]
 function levelplay_banner_destroy(): unit;
@@ -142,7 +142,7 @@ enum LevelPlayBannerSize:uint32
 }
 
 [global, bind = typed_gml]
-enum LevelPlayBannerAlignH:uint32
+enum LevelPlayBannerHAlign:uint32
 {
     Left,
     Center,
@@ -150,7 +150,7 @@ enum LevelPlayBannerAlignH:uint32
 }
 
 [global, bind = typed_gml]
-enum LevelPlayBannerAlignV:uint32
+enum LevelPlayBannerVAlign:uint32
 {
     Top,
     Center,

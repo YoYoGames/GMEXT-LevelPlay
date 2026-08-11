@@ -27,8 +27,8 @@ public interface GMLevelPlayInterface {
     public boolean levelplay_rewarded_video_is_placement_capped(String placement_id);
     public LevelPlayError levelplay_rewarded_video_show(String placement_id);
     public void levelplay_rewarded_callback_subscribe(GMFunction callback);
-    public LevelPlayError levelplay_banner_create(String ad_unit_id, LevelPlayBannerSize size, LevelPlayBannerAlignH align_h, LevelPlayBannerAlignV align_v);
-    public void levelplay_banner_move(LevelPlayBannerAlignH align_h, LevelPlayBannerAlignV align_v);
+    public LevelPlayError levelplay_banner_create(String ad_unit_id, LevelPlayBannerSize size, LevelPlayBannerHAlign align_h, LevelPlayBannerVAlign align_v);
+    public void levelplay_banner_move(LevelPlayBannerHAlign align_h, LevelPlayBannerVAlign align_v);
     public void levelplay_banner_destroy();
     public void levelplay_banner_callback_subscribe(GMFunction callback);
 }
