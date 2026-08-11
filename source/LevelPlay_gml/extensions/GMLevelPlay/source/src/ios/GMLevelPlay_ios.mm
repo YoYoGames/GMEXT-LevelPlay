@@ -26,7 +26,7 @@ static NSString *NSStringFromStringView(std::string_view value)
     NSString *result = [[NSString alloc] initWithBytes:value.data()
                                                 length:value.size()
                                               encoding:NSUTF8StringEncoding];
-    return result != nil ? [result autorelease] : @"";
+    return result != nil ? result : @"";
 }
 
 static std::string StringFromNSString(NSString *value)
@@ -316,9 +316,9 @@ static NSString *LevelPlayAppKey(void)
         self.levelPlayInitialized = NO;
         self.bannerConstraints = [NSArray array];
 
-        self.interstitialDelegate = [[[GMLevelPlayInterstitialDelegate alloc] initWithOwner:self] autorelease];
-        self.rewardedDelegate = [[[GMLevelPlayRewardedDelegate alloc] initWithOwner:self] autorelease];
-        self.bannerDelegate = [[[GMLevelPlayBannerDelegate alloc] initWithOwner:self] autorelease];
+        self.interstitialDelegate = [[GMLevelPlayInterstitialDelegate alloc] initWithOwner:self];
+        self.rewardedDelegate = [[GMLevelPlayRewardedDelegate alloc] initWithOwner:self];
+        self.bannerDelegate = [[GMLevelPlayBannerDelegate alloc] initWithOwner:self];
     }
 
     return self;
@@ -337,10 +337,13 @@ static NSString *LevelPlayAppKey(void)
             [self.bannerAdView removeFromSuperview];
         }
     } else {
-        // dealloc can run off the main thread; do not capture self in the hop below
-        // (self's retain count is already zero here), just the plain UIKit objects needed.
-        LPMBannerAdView *bannerAdView = [self.bannerAdView retain];
-        NSArray<NSLayoutConstraint *> *bannerConstraints = [self.bannerConstraints retain];
+        // dealloc can run off the main thread; do not capture self in the hop below --
+        // self's retain count is already zero here, and ARC would try to re-retain it
+        // implicitly on any block capture that references self. Capture the plain UIKit
+        // objects into local __strong variables instead; ARC keeps them alive for the
+        // block's duration on its own, no manual retain/release needed.
+        LPMBannerAdView *bannerAdView = self.bannerAdView;
+        NSArray<NSLayoutConstraint *> *bannerConstraints = self.bannerConstraints;
 
         dispatch_sync(dispatch_get_main_queue(), ^{
             if (bannerConstraints != nil && bannerConstraints.count > 0) {
@@ -353,9 +356,6 @@ static NSString *LevelPlayAppKey(void)
                 [bannerAdView removeFromSuperview];
             }
         });
-
-        [bannerAdView release];
-        [bannerConstraints release];
     }
 
     self.interstitialAd.delegate = nil;
@@ -374,8 +374,6 @@ static NSString *LevelPlayAppKey(void)
     self.interstitialDelegate = nil;
     self.rewardedDelegate = nil;
     self.bannerDelegate = nil;
-
-    [super dealloc];
 }
 
 - (UIViewController *)rootViewController
@@ -426,24 +424,24 @@ static NSString *LevelPlayAppKey(void)
 
     LPMInitRequestBuilder *requestBuilder = [[LPMInitRequestBuilder alloc] initWithAppKey:appKey];
     LPMInitRequest *initRequest = [requestBuilder build];
-    [requestBuilder release];
 
-    // Project is compiling with manual reference counting, so do not use __weak / __strong here.
+    // Project compiles under ARC: this block strongly captures blockSelf automatically
+    // (the normal, desired behavior here -- it keeps the singleton owner alive for the
+    // outstanding async completion, not a retain-cycle risk since the SDK's own completion
+    // block isn't stored long-term back on self).
     GMLevelPlay *blockSelf = self;
 
     [LevelPlay initWithRequest:initRequest
                     completion:^(LPMConfiguration *_Nullable config, NSError *_Nullable error) {
         (void)config;
 
-        NSError *safeError = [error retain];
-
         dispatch_async(dispatch_get_main_queue(), ^{
             gm_structs::LevelPlayResult result{};
 
-            if (safeError != nil) {
+            if (error != nil) {
                 blockSelf.levelPlayInitialized = NO;
                 result.success = false;
-                result.error_message = StringFromNSError(safeError);
+                result.error_message = StringFromNSError(error);
             } else {
                 blockSelf.levelPlayInitialized = YES;
                 result.success = true;
@@ -452,8 +450,6 @@ static NSString *LevelPlayAppKey(void)
             if (blockSelf->mInitCallback) {
                 blockSelf->mInitCallback.call(result);
             }
-
-            [safeError release];
         });
     }];
 
@@ -496,7 +492,7 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)levelplay_interstitial_init:(std::string_view)ad_unit_id
 {
-    self.interstitialAd = [[[LPMInterstitialAd alloc] initWithAdUnitId:NSStringFromStringView(ad_unit_id)] autorelease];
+    self.interstitialAd = [[LPMInterstitialAd alloc] initWithAdUnitId:NSStringFromStringView(ad_unit_id)];
     self.interstitialAd.delegate = self.interstitialDelegate;
 }
 
@@ -568,7 +564,7 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)levelplay_rewarded_video_init:(std::string_view)ad_unit_id
 {
-    self.rewardedAd = [[[LPMRewardedAd alloc] initWithAdUnitId:NSStringFromStringView(ad_unit_id)] autorelease];
+    self.rewardedAd = [[LPMRewardedAd alloc] initWithAdUnitId:NSStringFromStringView(ad_unit_id)];
     self.rewardedAd.delegate = self.rewardedDelegate;
 }
 
@@ -676,7 +672,7 @@ static NSString *LevelPlayAppKey(void)
 
         self.bannerSize = [self adSizeFromEnum:size];
 
-        self.bannerAdView = [[[LPMBannerAdView alloc] initWithAdUnitId:adUnitId] autorelease];
+        self.bannerAdView = [[LPMBannerAdView alloc] initWithAdUnitId:adUnitId];
         [self.bannerAdView setAdSize:self.bannerSize];
         [self.bannerAdView setDelegate:self.bannerDelegate];
 
@@ -905,16 +901,10 @@ static NSString *LevelPlayAppKey(void)
                    error:(NSError *)error
 {
     if (![NSThread isMainThread]) {
-        LPMAdInfo *adInfoCopy = [adInfo retain];
-        NSError *errorCopy = [error retain];
-
         dispatch_async(dispatch_get_main_queue(), ^{
             [self sendBannerEvent:type
-                            adInfo:adInfoCopy
-                             error:errorCopy];
-
-            [adInfoCopy release];
-            [errorCopy release];
+                            adInfo:adInfo
+                             error:error];
         });
         return;
     }
@@ -935,16 +925,10 @@ static NSString *LevelPlayAppKey(void)
                          error:(NSError *)error
 {
     if (![NSThread isMainThread]) {
-        LPMAdInfo *adInfoCopy = [adInfo retain];
-        NSError *errorCopy = [error retain];
-
         dispatch_async(dispatch_get_main_queue(), ^{
             [self sendInterstitialEvent:type
-                                  adInfo:adInfoCopy
-                                   error:errorCopy];
-
-            [adInfoCopy release];
-            [errorCopy release];
+                                  adInfo:adInfo
+                                   error:error];
         });
         return;
     }
@@ -966,19 +950,11 @@ static NSString *LevelPlayAppKey(void)
                     reward:(LPMReward *)reward
 {
     if (![NSThread isMainThread]) {
-        LPMAdInfo *adInfoCopy = [adInfo retain];
-        NSError *errorCopy = [error retain];
-        LPMReward *rewardCopy = [reward retain];
-
         dispatch_async(dispatch_get_main_queue(), ^{
             [self sendRewardedEvent:type
-                              adInfo:adInfoCopy
-                               error:errorCopy
-                              reward:rewardCopy];
-
-            [adInfoCopy release];
-            [errorCopy release];
-            [rewardCopy release];
+                              adInfo:adInfo
+                               error:error
+                              reward:reward];
         });
         return;
     }
