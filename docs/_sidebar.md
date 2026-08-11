@@ -3,6 +3,7 @@
 ### Guides
 
 * ${page.getting_started}
+* ${page.extension_options}
 
 ### Ads
 

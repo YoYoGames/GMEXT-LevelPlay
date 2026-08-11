@@ -1,6 +1,6 @@
 {
   "$GMProject":"v1",
-  "%Name":"Unity LevelPlay",
+  "%Name":"LevelPlay",
   "AudioGroups":[
     {"$GMAudioGroup":"v1","%Name":"audiogroup_default","exportDir":"","name":"audiogroup_default","resourceType":"GMAudioGroup","resourceVersion":"2.0","targets":-1,},
   ],
@@ -25,9 +25,9 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.14.4.222",
+    "IDEVersion":"2026.100.0.1118",
   },
-  "name":"Unity LevelPlay",
+  "name":"LevelPlay",
   "resources":[
     {"id":{"name":"ExtensionCore","path":"extensions/ExtensionCore/ExtensionCore.yy",},},
     {"id":{"name":"GMLevelPlay","path":"extensions/GMLevelPlay/GMLevelPlay.yy",},},
@@ -57,7 +57,6 @@
     {"id":{"name":"Room_LevelPlay","path":"rooms/Room_LevelPlay/Room_LevelPlay.yy",},},
     {"id":{"name":"ExtensionCore_api","path":"scripts/ExtensionCore_api/ExtensionCore_api.yy",},},
     {"id":{"name":"GMLevelPlay_API","path":"scripts/GMLevelPlay_API/GMLevelPlay_API.yy",},},
-    {"id":{"name":"LevelPlay_MACROS","path":"scripts/LevelPlay_MACROS/LevelPlay_MACROS.yy",},},
     {"id":{"name":"spr_gm_background","path":"sprites/spr_gm_background/spr_gm_background.yy",},},
     {"id":{"name":"spr_gm_button","path":"sprites/spr_gm_button/spr_gm_button.yy",},},
     {"id":{"name":"spr_gm_textbox","path":"sprites/spr_gm_textbox/spr_gm_textbox.yy",},},
