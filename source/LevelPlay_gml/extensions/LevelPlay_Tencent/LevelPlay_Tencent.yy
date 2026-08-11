@@ -25,7 +25,7 @@
   "installdir":"",
   "iosCocoaPodDependencies":"",
   "iosCocoaPods":"",
-  "ioscodeinjection":"<YYIosCocoaPods>\r\npod 'IronSourceTencentAdapter','4.3.9.0'\r\n</YYIosCocoaPods>\r\n\r\n\r\n<YYIosPlist>\r\n</YYIosPlist>",
+  "ioscodeinjection":"<YYIosCocoaPods>\r\npod 'IronSourceTencentAdapter','5.4.0'\r\n</YYIosCocoaPods>\r\n\r\n\r\n<YYIosPlist>\r\n</YYIosPlist>",
   "iosdelegatename":"",
   "iosplistinject":null,
   "iosProps":true,

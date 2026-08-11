@@ -18,7 +18,6 @@ import androidx.annotation.NonNull;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.ironsource.mediationsdk.IronSource;
 import com.unity3d.mediation.LevelPlay;
 import com.unity3d.mediation.LevelPlayAdError;
 import com.unity3d.mediation.LevelPlayAdInfo;
@@ -69,16 +68,10 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     // -------------------------------------------------------------------------
     // Lifecycle
     // -------------------------------------------------------------------------
-
-    public void onPause() {
-        Activity activity = levelplay_get_activity();
-        if (activity != null) IronSource.onPause(activity);
-    }
-
-    public void onResume() {
-        Activity activity = levelplay_get_activity();
-        if (activity != null) IronSource.onResume(activity);
-    }
+    // onPause()/onResume() removed: LevelPlay 9.0.0+ observes Activity lifecycle
+    // automatically via com.ironsource.lifecycle.LevelPlayActivityLifecycleProvider/
+    // IronsourceLifecycleProvider (declared in the SDK's own manifest) -- no manual
+    // forwarding call exists anymore. ExtensionBase's own no-op default now applies.
 
     public void onDestroy() {
         levelplay_banner_destroy();
@@ -132,21 +125,21 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     }
 
     public void levelplay_set_consent(boolean enable) {
-        IronSource.setConsent(enable);
+        LevelPlay.setConsent(enable);
     }
 
     // https://developers.is.com/ironsource-mobile/android/regulation-advanced-settings/#step-4
     public void levelplay_set_metadata(String key, String value) {
-        IronSource.setMetaData(key, value);
+        LevelPlay.setMetaData(key, value);
     }
 
     public void levelplay_set_dynamic_user_id(String user_id) {
-        IronSource.setDynamicUserId(user_id);
+        LevelPlay.setDynamicUserId(user_id);
     }
 
     public void levelplay_launch_test_suite() {
         Activity activity = levelplay_get_activity();
-        if (activity != null) IronSource.launchTestSuite(activity);
+        if (activity != null) LevelPlay.launchTestSuite(activity);
     }
 
     // -------------------------------------------------------------------------
@@ -290,8 +283,10 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
 
             levelplay_banner_destroy_internal();
 
-            mLevelPlayBanner = new LevelPlayBannerAdView(activity, ad_unit_id);
-            mLevelPlayBanner.setAdSize(levelplay_banner_size(size));
+            LevelPlayBannerAdView.Config bannerConfig = new LevelPlayBannerAdView.Config.Builder()
+                    .setAdSize(levelplay_banner_size(size))
+                    .build();
+            mLevelPlayBanner = new LevelPlayBannerAdView(activity, ad_unit_id, bannerConfig);
             mLevelPlayBanner.setBannerListener(mBannerListener);
 
             LayoutParams params = levelplay_banner_layout_params(align_h, align_v);
