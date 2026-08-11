@@ -11,4 +11,4 @@ else if(os_type == os_ios)
 
 
 levelplay_interstitial_init(_id)
-levelplay_interstitial_load()//(_id)
+levelplay_interstitial_load()

@@ -40,22 +40,22 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
 
     private static final String ERR_ACTIVITY_UNAVAILABLE = "Current Android activity is unavailable.";
 
-    private boolean mLevelPlayInitialized = false;
+    private volatile boolean mLevelPlayInitialized = false;
 
-    private GMFunction mInitCallback = null;
-    private GMFunction mBannerCallback = null;
-    private GMFunction mInterstitialCallback = null;
-    private GMFunction mRewardedCallback = null;
+    private volatile GMFunction mInitCallback = null;
+    private volatile GMFunction mBannerCallback = null;
+    private volatile GMFunction mInterstitialCallback = null;
+    private volatile GMFunction mRewardedCallback = null;
 
     private final RewardedListener mRewardedListener = new RewardedListener();
     private final InterstitialListener mInterstitialListener = new InterstitialListener();
     private final BannerListener mBannerListener = new BannerListener();
 
-    private LevelPlayInterstitialAd mInterstitialAd = null;
-    private LevelPlayRewardedAd mRewardedAd = null;
+    private volatile LevelPlayInterstitialAd mInterstitialAd = null;
+    private volatile LevelPlayRewardedAd mRewardedAd = null;
 
-    private RelativeLayout mBannerLayout = null;
-    private LevelPlayBannerAdView mLevelPlayBanner = null;
+    private volatile RelativeLayout mBannerLayout = null;
+    private volatile LevelPlayBannerAdView mLevelPlayBanner = null;
 
     private Activity levelplay_get_activity() {
         return RunnerActivity.CurrentActivity;
@@ -109,7 +109,6 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         }
 
         LevelPlayInitRequest initRequest = new LevelPlayInitRequest.Builder(appKey)
-                .withUserId("UserID")
                 .build();
 
         LevelPlay.init(activity, initRequest, this);
@@ -166,7 +165,9 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         if (mInterstitialAd == null) {
             return LevelPlayError.AdNotInitialized;
         }
-        mInterstitialAd.loadAd();
+        RunnerActivity.ViewHandler.post(() -> {
+            if (mInterstitialAd != null) mInterstitialAd.loadAd();
+        });
         return LevelPlayError.Ok;
     }
 
@@ -194,7 +195,12 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
             return LevelPlayError.PlacementCapped;
         }
 
-        mInterstitialAd.showAd(activity, placement_id);
+        RunnerActivity.ViewHandler.post(() -> {
+            Activity postActivity = levelplay_get_activity();
+            if (postActivity != null && mInterstitialAd != null) {
+                mInterstitialAd.showAd(postActivity, placement_id);
+            }
+        });
         return LevelPlayError.Ok;
     }
 
@@ -218,7 +224,9 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         if (mRewardedAd == null) {
             return LevelPlayError.AdNotInitialized;
         }
-        mRewardedAd.loadAd();
+        RunnerActivity.ViewHandler.post(() -> {
+            if (mRewardedAd != null) mRewardedAd.loadAd();
+        });
         return LevelPlayError.Ok;
     }
 
@@ -246,7 +254,12 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
             return LevelPlayError.PlacementCapped;
         }
 
-        mRewardedAd.showAd(activity, placement_id);
+        RunnerActivity.ViewHandler.post(() -> {
+            Activity postActivity = levelplay_get_activity();
+            if (postActivity != null && mRewardedAd != null) {
+                mRewardedAd.showAd(postActivity, placement_id);
+            }
+        });
         return LevelPlayError.Ok;
     }
 

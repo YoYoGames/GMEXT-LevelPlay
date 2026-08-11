@@ -73,7 +73,7 @@ levelplay_interstitial_callback_subscribe(function(_result,_type,_ad_info){
 
 			case LevelPlayCallbackEvent.Closed:
 				show_debug_message(_ad_info)
-				levelplay_interstitial_load(Obj_LevelPlay_Interstitial._id)
+				levelplay_interstitial_load()
 			break
 
 			case LevelPlayCallbackEvent.Clicked:
@@ -103,7 +103,7 @@ levelplay_rewarded_callback_subscribe(function(_result,_type,_ad_info,_reward){
 			break
 
 			case LevelPlayCallbackEvent.Closed:
-				levelplay_rewarded_video_load(Obj_LevelPlay_RewardedAd._id)
+				levelplay_rewarded_video_load()
 			break
 
 			case LevelPlayCallbackEvent.Clicked:
