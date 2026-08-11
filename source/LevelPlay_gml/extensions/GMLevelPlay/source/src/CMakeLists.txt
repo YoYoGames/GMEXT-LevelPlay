@@ -12,7 +12,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # =============================================================================
 # GameMaker iOS integration (optional)
 # =============================================================================
-set(EXT_GM_XCODEPROJ_OVERRIDE "~/GameMakerStudio2/GM_IOS/Unity_LevelPlay/Unity_LevelPlay/Unity_LevelPlay.xcodeproj" CACHE FILEPATH "" FORCE)
+set(EXT_GM_XCODEPROJ_OVERRIDE "~/GameMakerStudio2/GM_IOS/LevelPlay/LevelPlay/LevelPlay.xcodeproj" CACHE FILEPATH "" FORCE)
 set(EXT_GM_APP_TARGET_OVERRIDE "" CACHE STRING "" FORCE)
 
 # =============================================================================
