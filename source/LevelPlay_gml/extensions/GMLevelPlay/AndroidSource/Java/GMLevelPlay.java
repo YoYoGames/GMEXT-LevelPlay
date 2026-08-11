@@ -26,6 +26,7 @@ import com.unity3d.mediation.LevelPlayConfiguration;
 import com.unity3d.mediation.LevelPlayInitError;
 import com.unity3d.mediation.LevelPlayInitListener;
 import com.unity3d.mediation.LevelPlayInitRequest;
+import com.unity3d.mediation.LevelPlayPrivacySettings;
 import com.unity3d.mediation.banner.LevelPlayBannerAdView;
 import com.unity3d.mediation.banner.LevelPlayBannerAdViewListener;
 import com.unity3d.mediation.interstitial.LevelPlayInterstitialAd;
@@ -125,7 +126,7 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     }
 
     public void levelplay_set_consent(boolean enable) {
-        LevelPlay.setConsent(enable);
+        LevelPlayPrivacySettings.setGDPRConsent(enable);
     }
 
     // https://developers.is.com/ironsource-mobile/android/regulation-advanced-settings/#step-4

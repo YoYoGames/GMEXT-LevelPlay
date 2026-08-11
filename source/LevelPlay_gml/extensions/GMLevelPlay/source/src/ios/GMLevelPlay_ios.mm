@@ -463,22 +463,18 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)levelplay_set_consent:(bool)enable
 {
-    if ([LevelPlay respondsToSelector:@selector(setConsent:)]) {
-        [LevelPlay setConsent:enable];
-    } else {
-        [IronSource setConsent:enable];
-    }
+    [LPMPrivacySettings setGDPRConsent:enable];
 }
 
 - (void)levelplay_set_metadata:(std::string_view)key value:(std::string_view)value
 {
-    [IronSource setMetaDataWithKey:NSStringFromStringView(key)
+    [LevelPlay setMetaDataWithKey:NSStringFromStringView(key)
                              value:NSStringFromStringView(value)];
 }
 
 - (void)levelplay_set_dynamic_user_id:(std::string_view)user_id
 {
-    [IronSource setDynamicUserId:NSStringFromStringView(user_id)];
+    [LevelPlay setDynamicUserId:NSStringFromStringView(user_id)];
 }
 
 - (void)levelplay_launch_test_suite
@@ -486,7 +482,7 @@ static NSString *LevelPlayAppKey(void)
     UIViewController *controller = [self rootViewController];
 
     if (controller != nil) {
-        [IronSource launchTestSuite:controller];
+        [LevelPlay launchTestSuite:controller];
     }
 }
 
@@ -672,8 +668,10 @@ static NSString *LevelPlayAppKey(void)
 
         self.bannerSize = [self adSizeFromEnum:size];
 
-        self.bannerAdView = [[LPMBannerAdView alloc] initWithAdUnitId:adUnitId];
-        [self.bannerAdView setAdSize:self.bannerSize];
+        LPMBannerAdViewConfig *bannerConfig =
+            [[[[LPMBannerAdViewConfigBuilder alloc] init] setWithAdSize:self.bannerSize] build];
+
+        self.bannerAdView = [[LPMBannerAdView alloc] initWithAdUnitId:adUnitId config:bannerConfig];
         [self.bannerAdView setDelegate:self.bannerDelegate];
 
         self.bannerAdView.translatesAutoresizingMaskIntoConstraints = NO;
