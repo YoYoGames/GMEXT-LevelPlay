@@ -35,47 +35,44 @@ levelplay_init(function(_result)
 Every other ad function fails with ${constant.LevelPlayError}.NotInitialized until this callback has
 fired with `success == true`.
 
-## 2. Subscribe to callbacks
+## 2. Create, load, and show ads
 
-Subscribe once per ad type, before loading - the subscription lasts for as long as your game runs (or
-until you call the `_callback_subscribe` function again with a different function):
+Interstitial and rewarded video are handle-based: `_create` builds a reusable ad instance and attaches
+`callback` as its listener for the handle's whole lifetime, then `_load` (re)loads it using that same
+callback - you only specify the callback once, not on every reload:
 
 ```gml
-levelplay_interstitial_callback_subscribe(function(_result, _type, _ad_info)
+on_interstitial_event = function(_result, _type, _ad_info)
 {
     switch (_type)
     {
         case LevelPlayCallbackEvent.Loaded:
-            levelplay_interstitial_show("");
+            levelplay_interstitial_show(handle);
             break;
         case LevelPlayCallbackEvent.LoadFailed:
             show_debug_message($"Interstitial failed to load: {_result.error_message}");
             break;
+        case LevelPlayCallbackEvent.Closed:
+            levelplay_interstitial_load(handle); // reload for next time, same callback
+            break;
     }
-});
+};
+
+handle = levelplay_interstitial_create("your_ad_unit_id", on_interstitial_event);
+levelplay_interstitial_load(handle);
 ```
 
-See ${module.interstitial}, ${module.rewarded_video}, and ${module.banner} for each ad type's full
-callback shape - rewarded video's callback carries an extra `reward` argument, and banner's fires
-repeatedly for the life of the banner instead of once per load/show pair.
+Hold onto as many handles as you want - each is independent. Only call
+${function.levelplay_interstitial_set_callback}/${function.levelplay_rewarded_video_set_callback} if
+you actually want to swap a handle's callback for a different one; most usage never needs it. See
+${module.interstitial} and ${module.rewarded_video} for the full callback shape (rewarded video's
+callback carries an extra `reward` argument).
 
-## 3. Load and show ads
+Banner ads are different: there is only ever one instance, created directly with no separate load
+step, and its own `_callback_subscribe` function fires repeatedly for the life of the banner instead
+of once per load/show pair - see ${module.banner}.
 
-Interstitial and rewarded video follow the same init/load/show pattern:
-
-```gml
-levelplay_interstitial_init("your_ad_unit_id");
-levelplay_interstitial_load();
-
-// ...later, once the Loaded callback has fired...
-
-if (levelplay_interstitial_is_ready())
-    levelplay_interstitial_show("");
-```
-
-Banner ads are created directly, with no separate load step - see ${function.levelplay_banner_create}.
-
-## 4. Handling callbacks
+## 3. Handling callbacks
 
 Always check `result.success` first:
 
@@ -94,11 +91,12 @@ function(_result, _type, _ad_info)
 Synchronous failures (e.g. calling `_show` before an ad is ready) are reported immediately through
 each function's ${constant.LevelPlayError} return value instead - see ${module.general}.
 
-## 5. Cleanup
+## 4. Cleanup
 
-Destroy an active banner with ${function.levelplay_banner_destroy} when you're done with it.
-Interstitial and rewarded video have no separate dispose call - calling `_init` again with a new ad
-unit ID replaces the previous instance.
+Destroy an active banner with ${function.levelplay_banner_destroy} when you're done with it. Call
+${function.levelplay_interstitial_destroy}/${function.levelplay_rewarded_video_destroy} when you're
+truly done with an interstitial/rewarded handle - both are no-ops on an already-invalid handle. A
+handle you intend to keep reusing doesn't need destroying between shows, just reloading.
 
 ## Testing notes
 

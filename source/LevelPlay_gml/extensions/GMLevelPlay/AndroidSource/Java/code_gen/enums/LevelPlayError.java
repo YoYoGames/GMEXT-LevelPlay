@@ -6,12 +6,12 @@ public enum LevelPlayError
 {
     Ok((int)0),
     NotInitialized((int)1),
-    AdNotInitialized((int)2),
-    AdNotReady((int)3),
-    PlacementCapped((int)4),
-    ActivityUnavailable((int)5),
-    RootViewUnavailable((int)6),
-    MissingAppKey((int)7);
+    AdNotReady((int)2),
+    PlacementCapped((int)3),
+    ActivityUnavailable((int)4),
+    RootViewUnavailable((int)5),
+    MissingAppKey((int)6),
+    InvalidHandle((int)7);
 
     private final int value;
     private LevelPlayError(int v)
@@ -31,17 +31,17 @@ public enum LevelPlayError
             case 1:
                 return LevelPlayError.NotInitialized;
             case 2:
-                return LevelPlayError.AdNotInitialized;
-            case 3:
                 return LevelPlayError.AdNotReady;
-            case 4:
+            case 3:
                 return LevelPlayError.PlacementCapped;
-            case 5:
+            case 4:
                 return LevelPlayError.ActivityUnavailable;
-            case 6:
+            case 5:
                 return LevelPlayError.RootViewUnavailable;
-            case 7:
+            case 6:
                 return LevelPlayError.MissingAppKey;
+            case 7:
+                return LevelPlayError.InvalidHandle;
             default:
                 throw new IllegalArgumentException("Unknown LevelPlayError value: " + v);
         }

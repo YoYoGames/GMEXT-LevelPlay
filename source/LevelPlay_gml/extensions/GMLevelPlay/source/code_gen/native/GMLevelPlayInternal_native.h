@@ -56,12 +56,12 @@ namespace gm_enums
     {
         Ok = 0,
         NotInitialized = 1,
-        AdNotInitialized = 2,
-        AdNotReady = 3,
-        PlacementCapped = 4,
-        ActivityUnavailable = 5,
-        RootViewUnavailable = 6,
-        MissingAppKey = 7
+        AdNotReady = 2,
+        PlacementCapped = 3,
+        ActivityUnavailable = 4,
+        RootViewUnavailable = 5,
+        MissingAppKey = 6,
+        InvalidHandle = 7
     };
 
 }
@@ -203,18 +203,22 @@ void levelplay_set_consent(bool enable);
 void levelplay_set_metadata(std::string_view key, std::string_view value);
 void levelplay_set_dynamic_user_id(std::string_view user_id);
 void levelplay_launch_test_suite();
-void levelplay_interstitial_init(std::string_view ad_unit_id);
-gm_enums::LevelPlayError levelplay_interstitial_load();
-bool levelplay_interstitial_is_ready();
+std::uint64_t levelplay_interstitial_create(std::string_view ad_unit_id, const gm::wire::GMFunction& callback);
+gm_enums::LevelPlayError levelplay_interstitial_load(std::uint64_t handle);
+gm_enums::LevelPlayError levelplay_interstitial_set_callback(std::uint64_t handle, const gm::wire::GMFunction& callback);
+bool levelplay_interstitial_is_ready(std::uint64_t handle);
 bool levelplay_interstitial_is_placement_capped(std::string_view placement_id);
-gm_enums::LevelPlayError levelplay_interstitial_show(std::string_view placement_id);
-void levelplay_interstitial_callback_subscribe(const gm::wire::GMFunction& callback);
-void levelplay_rewarded_video_init(std::string_view ad_unit_id);
-gm_enums::LevelPlayError levelplay_rewarded_video_load();
-bool levelplay_rewarded_video_is_ready();
+gm_enums::LevelPlayError levelplay_interstitial_show(std::uint64_t handle, std::optional<std::string_view> placement_id);
+void levelplay_interstitial_destroy(std::uint64_t handle);
+std::vector<std::uint64_t> levelplay_interstitial_get_live_handles();
+std::uint64_t levelplay_rewarded_video_create(std::string_view ad_unit_id, const gm::wire::GMFunction& callback);
+gm_enums::LevelPlayError levelplay_rewarded_video_load(std::uint64_t handle);
+gm_enums::LevelPlayError levelplay_rewarded_video_set_callback(std::uint64_t handle, const gm::wire::GMFunction& callback);
+bool levelplay_rewarded_video_is_ready(std::uint64_t handle);
 bool levelplay_rewarded_video_is_placement_capped(std::string_view placement_id);
-gm_enums::LevelPlayError levelplay_rewarded_video_show(std::string_view placement_id);
-void levelplay_rewarded_callback_subscribe(const gm::wire::GMFunction& callback);
+gm_enums::LevelPlayError levelplay_rewarded_video_show(std::uint64_t handle, std::optional<std::string_view> placement_id);
+void levelplay_rewarded_video_destroy(std::uint64_t handle);
+std::vector<std::uint64_t> levelplay_rewarded_video_get_live_handles();
 gm_enums::LevelPlayError levelplay_banner_create(std::string_view ad_unit_id, gm_enums::LevelPlayBannerSize size, gm_enums::LevelPlayBannerHAlign align_h, gm_enums::LevelPlayBannerVAlign align_v);
 void levelplay_banner_move(gm_enums::LevelPlayBannerHAlign align_h, gm_enums::LevelPlayBannerVAlign align_v);
 void levelplay_banner_destroy();

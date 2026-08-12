@@ -46,13 +46,11 @@
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#1-initialize">1. Initialize</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#2-subscribe-to-callbacks">2. Subscribe to callbacks</a>
+    <li class="toctree-l2"><a class="reference internal" href="#2-create-load-and-show-ads">2. Create, load, and show ads</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#3-load-and-show-ads">3. Load and show ads</a>
+    <li class="toctree-l2"><a class="reference internal" href="#3-handling-callbacks">3. Handling callbacks</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#4-handling-callbacks">4. Handling callbacks</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#5-cleanup">5. Cleanup</a>
+    <li class="toctree-l2"><a class="reference internal" href="#4-cleanup">4. Cleanup</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#testing-notes">Testing notes</a>
     </li>
@@ -126,37 +124,38 @@ through showing your first ad. See <a href="extension_options.html">Extension Op
 </code></pre></div>
 <p>Every other ad function fails with <a href="general.html#levelplayerror">LevelPlayError</a>.NotInitialized until this callback has
 fired with <code>success == true</code>.</p>
-<h2 id="2-subscribe-to-callbacks">2. Subscribe to callbacks</h2>
-<p>Subscribe once per ad type, before loading - the subscription lasts for as long as your game runs (or
-until you call the <code>_callback_subscribe</code> function again with a different function):</p>
-<div class="highlight"><pre><span></span><code>levelplay_interstitial_callback_subscribe(function(_result, _type, _ad_info)
+<h2 id="2-create-load-and-show-ads">2. Create, load, and show ads</h2>
+<p>Interstitial and rewarded video are handle-based: <code>_create</code> builds a reusable ad instance and attaches
+<code>callback</code> as its listener for the handle's whole lifetime, then <code>_load</code> (re)loads it using that same
+callback - you only specify the callback once, not on every reload:</p>
+<div class="highlight"><pre><span></span><code>on_interstitial_event = function(_result, _type, _ad_info)
 {
     switch (_type)
     {
         case LevelPlayCallbackEvent.Loaded:
-            levelplay_interstitial_show(&quot;&quot;);
+            levelplay_interstitial_show(handle);
             break;
         case LevelPlayCallbackEvent.LoadFailed:
             show_debug_message($&quot;Interstitial failed to load: {_result.error_message}&quot;);
             break;
+        case LevelPlayCallbackEvent.Closed:
+            levelplay_interstitial_load(handle); // reload for next time, same callback
+            break;
     }
-});
-</code></pre></div>
-<p>See <a href="interstitial.html">Interstitial</a>, <a href="rewarded_video.html">Rewarded Video</a>, and <a href="banner.html">Banner</a> for each ad type's full
-callback shape - rewarded video's callback carries an extra <code>reward</code> argument, and banner's fires
-repeatedly for the life of the banner instead of once per load/show pair.</p>
-<h2 id="3-load-and-show-ads">3. Load and show ads</h2>
-<p>Interstitial and rewarded video follow the same init/load/show pattern:</p>
-<div class="highlight"><pre><span></span><code>levelplay_interstitial_init(&quot;your_ad_unit_id&quot;);
-levelplay_interstitial_load();
+};
 
-// ...later, once the Loaded callback has fired...
-
-if (levelplay_interstitial_is_ready())
-    levelplay_interstitial_show(&quot;&quot;);
+handle = levelplay_interstitial_create(&quot;your_ad_unit_id&quot;, on_interstitial_event);
+levelplay_interstitial_load(handle);
 </code></pre></div>
-<p>Banner ads are created directly, with no separate load step - see <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a>.</p>
-<h2 id="4-handling-callbacks">4. Handling callbacks</h2>
+<p>Hold onto as many handles as you want - each is independent. Only call
+<a href="interstitial.html#levelplay_interstitial_set_callback">levelplay_interstitial_set_callback</a>/<a href="rewarded_video.html#levelplay_rewarded_video_set_callback">levelplay_rewarded_video_set_callback</a> if
+you actually want to swap a handle's callback for a different one; most usage never needs it. See
+<a href="interstitial.html">Interstitial</a> and <a href="rewarded_video.html">Rewarded Video</a> for the full callback shape (rewarded video's
+callback carries an extra <code>reward</code> argument).</p>
+<p>Banner ads are different: there is only ever one instance, created directly with no separate load
+step, and its own <code>_callback_subscribe</code> function fires repeatedly for the life of the banner instead
+of once per load/show pair - see <a href="banner.html">Banner</a>.</p>
+<h2 id="3-handling-callbacks">3. Handling callbacks</h2>
 <p>Always check <code>result.success</code> first:</p>
 <div class="highlight"><pre><span></span><code>function(_result, _type, _ad_info)
 {
@@ -170,10 +169,11 @@ if (levelplay_interstitial_is_ready())
 </code></pre></div>
 <p>Synchronous failures (e.g. calling <code>_show</code> before an ad is ready) are reported immediately through
 each function's <a href="general.html#levelplayerror">LevelPlayError</a> return value instead - see <a href="general.html">General</a>.</p>
-<h2 id="5-cleanup">5. Cleanup</h2>
-<p>Destroy an active banner with <a href="banner.html#levelplay_banner_destroy">levelplay_banner_destroy</a> when you're done with it.
-Interstitial and rewarded video have no separate dispose call - calling <code>_init</code> again with a new ad
-unit ID replaces the previous instance.</p>
+<h2 id="4-cleanup">4. Cleanup</h2>
+<p>Destroy an active banner with <a href="banner.html#levelplay_banner_destroy">levelplay_banner_destroy</a> when you're done with it. Call
+<a href="interstitial.html#levelplay_interstitial_destroy">levelplay_interstitial_destroy</a>/<a href="rewarded_video.html#levelplay_rewarded_video_destroy">levelplay_rewarded_video_destroy</a> when you're
+truly done with an interstitial/rewarded handle - both are no-ops on an already-invalid handle. A
+handle you intend to keep reusing doesn't need destroying between shows, just reloading.</p>
 <h2 id="testing-notes">Testing notes</h2>
 <p>Call <a href="general.html#levelplay_launch_test_suite">levelplay_launch_test_suite</a> during development to open LevelPlay's integration test
 suite and verify your platform setup. &gt; [!NOTE]</p>

@@ -58,12 +58,12 @@ namespace gm_enums
     {
         Ok = 0,
         NotInitialized = 1,
-        AdNotInitialized = 2,
-        AdNotReady = 3,
-        PlacementCapped = 4,
-        ActivityUnavailable = 5,
-        RootViewUnavailable = 6,
-        MissingAppKey = 7
+        AdNotReady = 2,
+        PlacementCapped = 3,
+        ActivityUnavailable = 4,
+        RootViewUnavailable = 5,
+        MissingAppKey = 6,
+        InvalidHandle = 7
     };
 
 }
@@ -206,18 +206,22 @@ namespace gm::wire::details
 - (void)levelplay_set_metadata:(std::string_view)key value:(std::string_view)value;
 - (void)levelplay_set_dynamic_user_id:(std::string_view)user_id;
 - (void)levelplay_launch_test_suite;
-- (void)levelplay_interstitial_init:(std::string_view)ad_unit_id;
-- (gm_enums::LevelPlayError)levelplay_interstitial_load;
-- (bool)levelplay_interstitial_is_ready;
+- (std::uint64_t)levelplay_interstitial_create:(std::string_view)ad_unit_id callback:(gm::wire::GMFunction)callback;
+- (gm_enums::LevelPlayError)levelplay_interstitial_load:(std::uint64_t)handle;
+- (gm_enums::LevelPlayError)levelplay_interstitial_set_callback:(std::uint64_t)handle callback:(gm::wire::GMFunction)callback;
+- (bool)levelplay_interstitial_is_ready:(std::uint64_t)handle;
 - (bool)levelplay_interstitial_is_placement_capped:(std::string_view)placement_id;
-- (gm_enums::LevelPlayError)levelplay_interstitial_show:(std::string_view)placement_id;
-- (void)levelplay_interstitial_callback_subscribe:(gm::wire::GMFunction)callback;
-- (void)levelplay_rewarded_video_init:(std::string_view)ad_unit_id;
-- (gm_enums::LevelPlayError)levelplay_rewarded_video_load;
-- (bool)levelplay_rewarded_video_is_ready;
+- (gm_enums::LevelPlayError)levelplay_interstitial_show:(std::uint64_t)handle placement_id:(std::optional<std::string_view>)placement_id;
+- (void)levelplay_interstitial_destroy:(std::uint64_t)handle;
+- (std::vector<std::uint64_t>)levelplay_interstitial_get_live_handles;
+- (std::uint64_t)levelplay_rewarded_video_create:(std::string_view)ad_unit_id callback:(gm::wire::GMFunction)callback;
+- (gm_enums::LevelPlayError)levelplay_rewarded_video_load:(std::uint64_t)handle;
+- (gm_enums::LevelPlayError)levelplay_rewarded_video_set_callback:(std::uint64_t)handle callback:(gm::wire::GMFunction)callback;
+- (bool)levelplay_rewarded_video_is_ready:(std::uint64_t)handle;
 - (bool)levelplay_rewarded_video_is_placement_capped:(std::string_view)placement_id;
-- (gm_enums::LevelPlayError)levelplay_rewarded_video_show:(std::string_view)placement_id;
-- (void)levelplay_rewarded_callback_subscribe:(gm::wire::GMFunction)callback;
+- (gm_enums::LevelPlayError)levelplay_rewarded_video_show:(std::uint64_t)handle placement_id:(std::optional<std::string_view>)placement_id;
+- (void)levelplay_rewarded_video_destroy:(std::uint64_t)handle;
+- (std::vector<std::uint64_t>)levelplay_rewarded_video_get_live_handles;
 - (gm_enums::LevelPlayError)levelplay_banner_create:(std::string_view)ad_unit_id size:(gm_enums::LevelPlayBannerSize)size align_h:(gm_enums::LevelPlayBannerHAlign)align_h align_v:(gm_enums::LevelPlayBannerVAlign)align_v;
 - (void)levelplay_banner_move:(gm_enums::LevelPlayBannerHAlign)align_h align_v:(gm_enums::LevelPlayBannerVAlign)align_v;
 - (void)levelplay_banner_destroy;
@@ -232,18 +236,22 @@ namespace gm::wire::details
 - (double)__EXT_NATIVE__levelplay_set_metadata:(char*)key arg1:(char*)value;
 - (double)__EXT_NATIVE__levelplay_set_dynamic_user_id:(char*)user_id;
 - (double)__EXT_NATIVE__levelplay_launch_test_suite;
-- (double)__EXT_NATIVE__levelplay_interstitial_init:(char*)ad_unit_id;
-- (double)__EXT_NATIVE__levelplay_interstitial_load:(char*)__ret_buffer arg1:(double)__ret_buffer_length;
-- (double)__EXT_NATIVE__levelplay_interstitial_is_ready;
+- (double)__EXT_NATIVE__levelplay_interstitial_create:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_interstitial_load:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_interstitial_set_callback:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_interstitial_is_ready:(char*)__arg_buffer arg1:(double)__arg_buffer_length;
 - (double)__EXT_NATIVE__levelplay_interstitial_is_placement_capped:(char*)placement_id;
-- (double)__EXT_NATIVE__levelplay_interstitial_show:(char*)placement_id arg1:(char*)__ret_buffer arg2:(double)__ret_buffer_length;
-- (double)__EXT_NATIVE__levelplay_interstitial_callback_subscribe:(char*)__arg_buffer arg1:(double)__arg_buffer_length;
-- (double)__EXT_NATIVE__levelplay_rewarded_video_init:(char*)ad_unit_id;
-- (double)__EXT_NATIVE__levelplay_rewarded_video_load:(char*)__ret_buffer arg1:(double)__ret_buffer_length;
-- (double)__EXT_NATIVE__levelplay_rewarded_video_is_ready;
+- (double)__EXT_NATIVE__levelplay_interstitial_show:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_interstitial_destroy:(char*)__arg_buffer arg1:(double)__arg_buffer_length;
+- (double)__EXT_NATIVE__levelplay_interstitial_get_live_handles:(char*)__ret_buffer arg1:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_rewarded_video_create:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_rewarded_video_load:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_rewarded_video_set_callback:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_rewarded_video_is_ready:(char*)__arg_buffer arg1:(double)__arg_buffer_length;
 - (double)__EXT_NATIVE__levelplay_rewarded_video_is_placement_capped:(char*)placement_id;
-- (double)__EXT_NATIVE__levelplay_rewarded_video_show:(char*)placement_id arg1:(char*)__ret_buffer arg2:(double)__ret_buffer_length;
-- (double)__EXT_NATIVE__levelplay_rewarded_callback_subscribe:(char*)__arg_buffer arg1:(double)__arg_buffer_length;
+- (double)__EXT_NATIVE__levelplay_rewarded_video_show:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
+- (double)__EXT_NATIVE__levelplay_rewarded_video_destroy:(char*)__arg_buffer arg1:(double)__arg_buffer_length;
+- (double)__EXT_NATIVE__levelplay_rewarded_video_get_live_handles:(char*)__ret_buffer arg1:(double)__ret_buffer_length;
 - (double)__EXT_NATIVE__levelplay_banner_create:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length;
 - (double)__EXT_NATIVE__levelplay_banner_move:(char*)__arg_buffer arg1:(double)__arg_buffer_length;
 - (double)__EXT_NATIVE__levelplay_banner_destroy;

@@ -49,12 +49,12 @@ enum LevelPlayError
 {
     Ok = 0,
     NotInitialized = 1,
-    AdNotInitialized = 2,
-    AdNotReady = 3,
-    PlacementCapped = 4,
-    ActivityUnavailable = 5,
-    RootViewUnavailable = 6,
-    MissingAppKey = 7
+    AdNotReady = 2,
+    PlacementCapped = 3,
+    ActivityUnavailable = 4,
+    RootViewUnavailable = 5,
+    MissingAppKey = 6,
+    InvalidHandle = 7
 }
 
 // #####################################################################
@@ -546,44 +546,150 @@ function levelplay_init(_callback)
 // Skipping function levelplay_launch_test_suite (no wrapper is required)
 
 
-// Skipping function levelplay_interstitial_init (no wrapper is required)
-
-
 /**
- * @returns {Enum.LevelPlayError}
+ * @param {String} _ad_unit_id
+ * @param {Function} _callback
+ * @returns {Real}
  */
-function levelplay_interstitial_load()
+function levelplay_interstitial_create(_ad_unit_id, _callback)
 {
     var __available__ = __GMLevelPlay_is_available();
     if (!__available__) return;
 
+    var __dispatcher__ = __GMLevelPlay_get_dispatcher();
+
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _ad_unit_id, type: String
+    if (!is_string(_ad_unit_id)) show_error($"{_GMFUNCTION_} :: _ad_unit_id expected string", true);
+    buffer_write(__args_buffer, buffer_u32, string_byte_length(_ad_unit_id));
+    buffer_write(__args_buffer, buffer_string, _ad_unit_id);
+
+    // param: _callback, type: Function
+    if (!is_callable(_callback)) show_error($"{_GMFUNCTION_} :: _callback expected callable type", true);
+    var _callback_handle = __ext_core_function_register(_callback, __dispatcher__);
+    buffer_write(__args_buffer, buffer_u64, _callback_handle);
+
     var __ret_buffer = __ext_core_get_ret_buffer();
 
-    var __return_value__ = __levelplay_interstitial_load(buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+    var __return_value__ = __levelplay_interstitial_create(buffer_get_address(__args_buffer), buffer_tell(__args_buffer), buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+
+    var __result__ = undefined;
+    __result__ = buffer_read(__ret_buffer, buffer_u64);
+    return __result__;
+}
+
+/**
+ * @param {Real} _handle
+ * @returns {Enum.LevelPlayError}
+ */
+function levelplay_interstitial_load(_handle)
+{
+    var __available__ = __GMLevelPlay_is_available();
+    if (!__available__) return;
+
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
+    var __ret_buffer = __ext_core_get_ret_buffer();
+
+    var __return_value__ = __levelplay_interstitial_load(buffer_get_address(__args_buffer), buffer_tell(__args_buffer), buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
 
     var __result__ = undefined;
     __result__ = buffer_read(__ret_buffer, buffer_s32);
     return __result__;
 }
 
-// Skipping function levelplay_interstitial_is_ready (no wrapper is required)
+/**
+ * @param {Real} _handle
+ * @param {Function} _callback
+ * @returns {Enum.LevelPlayError}
+ */
+function levelplay_interstitial_set_callback(_handle, _callback)
+{
+    var __available__ = __GMLevelPlay_is_available();
+    if (!__available__) return;
 
+    var __dispatcher__ = __GMLevelPlay_get_dispatcher();
+
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
+    // param: _callback, type: Function
+    if (!is_callable(_callback)) show_error($"{_GMFUNCTION_} :: _callback expected callable type", true);
+    var _callback_handle = __ext_core_function_register(_callback, __dispatcher__);
+    buffer_write(__args_buffer, buffer_u64, _callback_handle);
+
+    var __ret_buffer = __ext_core_get_ret_buffer();
+
+    var __return_value__ = __levelplay_interstitial_set_callback(buffer_get_address(__args_buffer), buffer_tell(__args_buffer), buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+
+    var __result__ = undefined;
+    __result__ = buffer_read(__ret_buffer, buffer_s32);
+    return __result__;
+}
+
+/**
+ * @param {Real} _handle
+ * @returns {Bool}
+ */
+function levelplay_interstitial_is_ready(_handle)
+{
+    var __available__ = __GMLevelPlay_is_available();
+    if (!__available__) return;
+
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
+    var __return_value__ = __levelplay_interstitial_is_ready(buffer_get_address(__args_buffer), buffer_tell(__args_buffer));
+
+    return __return_value__;
+}
 
 // Skipping function levelplay_interstitial_is_placement_capped (no wrapper is required)
 
 
 /**
+ * @param {Real} _handle
  * @param {String} _placement_id
  * @returns {Enum.LevelPlayError}
  */
-function levelplay_interstitial_show(_placement_id)
+function levelplay_interstitial_show(_handle, _placement_id)
 {
     var __available__ = __GMLevelPlay_is_available();
     if (!__available__) return;
 
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
+    // param: _placement_id, type: optional<String>
+    if (is_undefined(_placement_id))
+    {
+        buffer_write(__args_buffer, buffer_bool, false);
+    }
+    else
+    {
+        buffer_write(__args_buffer, buffer_bool, true);
+        if (!is_string(_placement_id)) show_error($"{_GMFUNCTION_} :: _placement_id expected string", true);
+        buffer_write(__args_buffer, buffer_u32, string_byte_length(_placement_id));
+        buffer_write(__args_buffer, buffer_string, _placement_id);
+    }
+
     var __ret_buffer = __ext_core_get_ret_buffer();
 
-    var __return_value__ = __levelplay_interstitial_show(_placement_id, buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+    var __return_value__ = __levelplay_interstitial_show(buffer_get_address(__args_buffer), buffer_tell(__args_buffer), buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
 
     var __result__ = undefined;
     __result__ = buffer_read(__ret_buffer, buffer_s32);
@@ -591,9 +697,52 @@ function levelplay_interstitial_show(_placement_id)
 }
 
 /**
- * @param {Function} _callback
+ * @param {Real} _handle
  */
-function levelplay_interstitial_callback_subscribe(_callback)
+function levelplay_interstitial_destroy(_handle)
+{
+    var __available__ = __GMLevelPlay_is_available();
+    if (!__available__) return;
+
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
+    var __return_value__ = __levelplay_interstitial_destroy(buffer_get_address(__args_buffer), buffer_tell(__args_buffer));
+
+    return __return_value__;
+}
+
+/**
+ * @returns {Array[Real]}
+ */
+function levelplay_interstitial_get_live_handles()
+{
+    var __available__ = __GMLevelPlay_is_available();
+    if (!__available__) return;
+
+    var __ret_buffer = __ext_core_get_ret_buffer();
+
+    var __return_value__ = __levelplay_interstitial_get_live_handles(buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+
+    var __result__ = undefined;
+    var __length__ = buffer_read(__ret_buffer, buffer_u32);
+    __result__ = array_create(__length__);
+    for (var _i = 0; _i < __length__; ++_i)
+    {
+        __result__[_i] = buffer_read(__ret_buffer, buffer_u64);
+    }
+    return __result__;
+}
+
+/**
+ * @param {String} _ad_unit_id
+ * @param {Function} _callback
+ * @returns {Real}
+ */
+function levelplay_rewarded_video_create(_ad_unit_id, _callback)
 {
     var __available__ = __GMLevelPlay_is_available();
     if (!__available__) return;
@@ -602,54 +751,136 @@ function levelplay_interstitial_callback_subscribe(_callback)
 
     var __args_buffer = __ext_core_get_args_buffer();
 
+    // param: _ad_unit_id, type: String
+    if (!is_string(_ad_unit_id)) show_error($"{_GMFUNCTION_} :: _ad_unit_id expected string", true);
+    buffer_write(__args_buffer, buffer_u32, string_byte_length(_ad_unit_id));
+    buffer_write(__args_buffer, buffer_string, _ad_unit_id);
+
     // param: _callback, type: Function
     if (!is_callable(_callback)) show_error($"{_GMFUNCTION_} :: _callback expected callable type", true);
     var _callback_handle = __ext_core_function_register(_callback, __dispatcher__);
     buffer_write(__args_buffer, buffer_u64, _callback_handle);
 
-    var __return_value__ = __levelplay_interstitial_callback_subscribe(buffer_get_address(__args_buffer), buffer_tell(__args_buffer));
+    var __ret_buffer = __ext_core_get_ret_buffer();
 
-    return __return_value__;
+    var __return_value__ = __levelplay_rewarded_video_create(buffer_get_address(__args_buffer), buffer_tell(__args_buffer), buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+
+    var __result__ = undefined;
+    __result__ = buffer_read(__ret_buffer, buffer_u64);
+    return __result__;
 }
 
-// Skipping function levelplay_rewarded_video_init (no wrapper is required)
-
-
 /**
+ * @param {Real} _handle
  * @returns {Enum.LevelPlayError}
  */
-function levelplay_rewarded_video_load()
+function levelplay_rewarded_video_load(_handle)
 {
     var __available__ = __GMLevelPlay_is_available();
     if (!__available__) return;
 
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
     var __ret_buffer = __ext_core_get_ret_buffer();
 
-    var __return_value__ = __levelplay_rewarded_video_load(buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+    var __return_value__ = __levelplay_rewarded_video_load(buffer_get_address(__args_buffer), buffer_tell(__args_buffer), buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
 
     var __result__ = undefined;
     __result__ = buffer_read(__ret_buffer, buffer_s32);
     return __result__;
 }
 
-// Skipping function levelplay_rewarded_video_is_ready (no wrapper is required)
+/**
+ * @param {Real} _handle
+ * @param {Function} _callback
+ * @returns {Enum.LevelPlayError}
+ */
+function levelplay_rewarded_video_set_callback(_handle, _callback)
+{
+    var __available__ = __GMLevelPlay_is_available();
+    if (!__available__) return;
 
+    var __dispatcher__ = __GMLevelPlay_get_dispatcher();
+
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
+    // param: _callback, type: Function
+    if (!is_callable(_callback)) show_error($"{_GMFUNCTION_} :: _callback expected callable type", true);
+    var _callback_handle = __ext_core_function_register(_callback, __dispatcher__);
+    buffer_write(__args_buffer, buffer_u64, _callback_handle);
+
+    var __ret_buffer = __ext_core_get_ret_buffer();
+
+    var __return_value__ = __levelplay_rewarded_video_set_callback(buffer_get_address(__args_buffer), buffer_tell(__args_buffer), buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+
+    var __result__ = undefined;
+    __result__ = buffer_read(__ret_buffer, buffer_s32);
+    return __result__;
+}
+
+/**
+ * @param {Real} _handle
+ * @returns {Bool}
+ */
+function levelplay_rewarded_video_is_ready(_handle)
+{
+    var __available__ = __GMLevelPlay_is_available();
+    if (!__available__) return;
+
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
+    var __return_value__ = __levelplay_rewarded_video_is_ready(buffer_get_address(__args_buffer), buffer_tell(__args_buffer));
+
+    return __return_value__;
+}
 
 // Skipping function levelplay_rewarded_video_is_placement_capped (no wrapper is required)
 
 
 /**
+ * @param {Real} _handle
  * @param {String} _placement_id
  * @returns {Enum.LevelPlayError}
  */
-function levelplay_rewarded_video_show(_placement_id)
+function levelplay_rewarded_video_show(_handle, _placement_id)
 {
     var __available__ = __GMLevelPlay_is_available();
     if (!__available__) return;
 
+    var __args_buffer = __ext_core_get_args_buffer();
+
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
+
+    // param: _placement_id, type: optional<String>
+    if (is_undefined(_placement_id))
+    {
+        buffer_write(__args_buffer, buffer_bool, false);
+    }
+    else
+    {
+        buffer_write(__args_buffer, buffer_bool, true);
+        if (!is_string(_placement_id)) show_error($"{_GMFUNCTION_} :: _placement_id expected string", true);
+        buffer_write(__args_buffer, buffer_u32, string_byte_length(_placement_id));
+        buffer_write(__args_buffer, buffer_string, _placement_id);
+    }
+
     var __ret_buffer = __ext_core_get_ret_buffer();
 
-    var __return_value__ = __levelplay_rewarded_video_show(_placement_id, buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+    var __return_value__ = __levelplay_rewarded_video_show(buffer_get_address(__args_buffer), buffer_tell(__args_buffer), buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
 
     var __result__ = undefined;
     __result__ = buffer_read(__ret_buffer, buffer_s32);
@@ -657,25 +888,44 @@ function levelplay_rewarded_video_show(_placement_id)
 }
 
 /**
- * @param {Function} _callback
+ * @param {Real} _handle
  */
-function levelplay_rewarded_callback_subscribe(_callback)
+function levelplay_rewarded_video_destroy(_handle)
 {
     var __available__ = __GMLevelPlay_is_available();
     if (!__available__) return;
 
-    var __dispatcher__ = __GMLevelPlay_get_dispatcher();
-
     var __args_buffer = __ext_core_get_args_buffer();
 
-    // param: _callback, type: Function
-    if (!is_callable(_callback)) show_error($"{_GMFUNCTION_} :: _callback expected callable type", true);
-    var _callback_handle = __ext_core_function_register(_callback, __dispatcher__);
-    buffer_write(__args_buffer, buffer_u64, _callback_handle);
+    // param: _handle, type: UInt64
+    if (!is_numeric(_handle)) show_error($"{_GMFUNCTION_} :: _handle expected number", true);
+    buffer_write(__args_buffer, buffer_u64, _handle);
 
-    var __return_value__ = __levelplay_rewarded_callback_subscribe(buffer_get_address(__args_buffer), buffer_tell(__args_buffer));
+    var __return_value__ = __levelplay_rewarded_video_destroy(buffer_get_address(__args_buffer), buffer_tell(__args_buffer));
 
     return __return_value__;
+}
+
+/**
+ * @returns {Array[Real]}
+ */
+function levelplay_rewarded_video_get_live_handles()
+{
+    var __available__ = __GMLevelPlay_is_available();
+    if (!__available__) return;
+
+    var __ret_buffer = __ext_core_get_ret_buffer();
+
+    var __return_value__ = __levelplay_rewarded_video_get_live_handles(buffer_get_address(__ret_buffer), buffer_get_size(__ret_buffer));
+
+    var __result__ = undefined;
+    var __length__ = buffer_read(__ret_buffer, buffer_u32);
+    __result__ = array_create(__length__);
+    for (var _i = 0; _i < __length__; ++_i)
+    {
+        __result__[_i] = buffer_read(__ret_buffer, buffer_u64);
+    }
+    return __result__;
 }
 
 /**

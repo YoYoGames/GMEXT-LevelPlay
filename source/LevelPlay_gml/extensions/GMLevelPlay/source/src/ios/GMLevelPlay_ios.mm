@@ -7,9 +7,11 @@
 #import <UIKit/UIKit.h>
 #import <IronSource/IronSource.h>
 
+#include <atomic>
 #include <cstdint>
 #include <string>
 #include <string_view>
+#include <vector>
 
 extern UIViewController *g_controller;
 extern UIView *g_glView;
@@ -55,16 +57,44 @@ static NSString *LevelPlayAppKey(void)
     return result != nil ? result : @"";
 }
 
+// Shared across interstitial + rewarded so a handle from one ad type can never coincide with a live
+// handle from the other -- a handle used against the wrong family's map fails loud as InvalidHandle
+// instead of silently touching the wrong ad.
+static std::atomic<std::uint64_t> g_next_ad_handle{1};
+
 @class GMLevelPlay;
 
+// Interstitial/rewarded delegates are now per-handle (one instance per created ad, not one shared
+// instance for the whole extension) -- each carries its own callback directly, since LPMInterstitialAd/
+// LPMRewardedAd already attach a distinct delegate per instance (unlike the single shared owner-level
+// callback model this replaces).
 @interface GMLevelPlayInterstitialDelegate : NSObject <LPMInterstitialAdDelegate>
+{
+    // Store GMFunction as a direct ivar, not an Objective-C property -- see the rationale on
+    // GMLevelPlay's own mInitCallback/mBannerCallback ivars below.
+    gm::wire::GMFunction mCallback;
+}
 @property(nonatomic, assign) GMLevelPlay *owner;
 - (instancetype)initWithOwner:(GMLevelPlay *)owner;
+- (void)setCallback:(gm::wire::GMFunction)callback;
+- (void)dispatchEvent:(gm_enums::LevelPlayCallbackEvent)type
+                adInfo:(LPMAdInfo *)adInfo
+                 error:(NSError *)error
+        fallbackUnitId:(NSString *)fallbackUnitId;
 @end
 
 @interface GMLevelPlayRewardedDelegate : NSObject <LPMRewardedAdDelegate>
+{
+    gm::wire::GMFunction mCallback;
+}
 @property(nonatomic, assign) GMLevelPlay *owner;
 - (instancetype)initWithOwner:(GMLevelPlay *)owner;
+- (void)setCallback:(gm::wire::GMFunction)callback;
+- (void)dispatchEvent:(gm_enums::LevelPlayCallbackEvent)type
+                adInfo:(LPMAdInfo *)adInfo
+                 error:(NSError *)error
+                reward:(LPMReward *)reward
+        fallbackUnitId:(NSString *)fallbackUnitId;
 @end
 
 @interface GMLevelPlayBannerDelegate : NSObject <LPMBannerAdViewDelegate>
@@ -77,6 +107,24 @@ static NSString *LevelPlayAppKey(void)
 // Do NOT redeclare it as:
 // @interface GMLevelPlay : GMLevelPlayInternal <GMLevelPlayInterface>
 // That causes: duplicate interface definition for class 'GMLevelPlay'.
+
+// A handle's only strong owners: LPMInterstitialAd/LPMRewardedAd hold their delegate *weakly*, so
+// without this the delegate would be deallocated by ARC the instant create() returns and every
+// future callback would silently stop firing.
+@interface GMLevelPlayInterstitialHandleEntry : NSObject
+@property(nonatomic, retain) LPMInterstitialAd *ad;
+@property(nonatomic, retain) GMLevelPlayInterstitialDelegate *delegate;
+@end
+@implementation GMLevelPlayInterstitialHandleEntry
+@end
+
+@interface GMLevelPlayRewardedHandleEntry : NSObject
+@property(nonatomic, retain) LPMRewardedAd *ad;
+@property(nonatomic, retain) GMLevelPlayRewardedDelegate *delegate;
+@end
+@implementation GMLevelPlayRewardedHandleEntry
+@end
+
 @interface GMLevelPlay ()
 {
     // Store GMFunction as direct ivars, not Objective-C properties.
@@ -84,21 +132,20 @@ static NSString *LevelPlayAppKey(void)
     // and those temporaries can destruct/free GameMaker-managed memory at unsafe times.
     gm::wire::GMFunction mInitCallback;
     gm::wire::GMFunction mBannerCallback;
-    gm::wire::GMFunction mInterstitialCallback;
-    gm::wire::GMFunction mRewardedCallback;
 }
 
 @property(nonatomic, assign) BOOL levelPlayInitialized;
 
-@property(nonatomic, retain) LPMInterstitialAd *interstitialAd;
-@property(nonatomic, retain) LPMRewardedAd *rewardedAd;
 @property(nonatomic, retain) LPMBannerAdView *bannerAdView;
 @property(nonatomic, retain) LPMAdSize *bannerSize;
 @property(nonatomic, retain) NSArray<NSLayoutConstraint *> *bannerConstraints;
 
-@property(nonatomic, retain) GMLevelPlayInterstitialDelegate *interstitialDelegate;
-@property(nonatomic, retain) GMLevelPlayRewardedDelegate *rewardedDelegate;
 @property(nonatomic, retain) GMLevelPlayBannerDelegate *bannerDelegate;
+
+@property(nonatomic, retain) NSMutableDictionary<NSNumber *, GMLevelPlayInterstitialHandleEntry *> *interstitialHandles;
+@property(nonatomic, retain) NSMutableDictionary<NSNumber *, GMLevelPlayRewardedHandleEntry *> *rewardedHandles;
+// Guards interstitialHandles/rewardedHandles.
+@property(nonatomic, retain) NSObject *adHandlesLock;
 
 - (UIViewController *)rootViewController;
 - (UIView *)rootView;
@@ -127,26 +174,6 @@ static NSString *LevelPlayAppKey(void)
                    error:(NSError *)error
           fallbackUnitId:(NSString *)fallbackUnitId;
 
-- (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
-                        adInfo:(LPMAdInfo *)adInfo
-                         error:(NSError *)error;
-
-- (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
-                        adInfo:(LPMAdInfo *)adInfo
-                         error:(NSError *)error
-                fallbackUnitId:(NSString *)fallbackUnitId;
-
-- (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
-                    adInfo:(LPMAdInfo *)adInfo
-                     error:(NSError *)error
-                    reward:(LPMReward *)reward;
-
-- (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
-                    adInfo:(LPMAdInfo *)adInfo
-                     error:(NSError *)error
-                    reward:(LPMReward *)reward
-            fallbackUnitId:(NSString *)fallbackUnitId;
-
 // The one deliberate exception to "guard failures skip the callback" -- see
 // levelplay_banner_create's root-view-unavailable path.
 - (void)sendBannerFailure:(NSString *)message;
@@ -164,42 +191,86 @@ static NSString *LevelPlayAppKey(void)
     return self;
 }
 
+- (void)setCallback:(gm::wire::GMFunction)callback
+{
+    @synchronized (self) {
+        mCallback = callback;
+    }
+}
+
+- (void)dispatchEvent:(gm_enums::LevelPlayCallbackEvent)type
+                adInfo:(LPMAdInfo *)adInfo
+                 error:(NSError *)error
+        fallbackUnitId:(NSString *)fallbackUnitId
+{
+    if (![NSThread isMainThread]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self dispatchEvent:type adInfo:adInfo error:error fallbackUnitId:fallbackUnitId];
+        });
+        return;
+    }
+
+    // mCallback/owner can be written (setCallback:, dealloc's teardown) from a different thread
+    // than this method runs on (the SDK's own delivery thread, per the isMainThread hop above) --
+    // snapshot both under the lock, then do the actual work outside it so a re-entrant call from
+    // the callback itself can't deadlock against this lock.
+    gm::wire::GMFunction callback;
+    GMLevelPlay *owner = nil;
+    @synchronized (self) {
+        callback = mCallback;
+        owner = self.owner;
+    }
+
+    if (!callback) {
+        return;
+    }
+
+    if (owner == nil) {
+        return;
+    }
+
+    gm_structs::LevelPlayResult result = [owner resultStream:type error:error];
+    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt = [owner adInfoOptional:adInfo fallbackUnitId:fallbackUnitId];
+
+    callback.call(result, type, adInfoOpt);
+}
+
 - (void)didLoadAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Loaded adInfo:adInfo error:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Loaded adInfo:adInfo error:nil fallbackUnitId:nil];
 }
 
 - (void)didFailToLoadAdWithAdUnitId:(NSString *)adUnitId error:(NSError *)error
 {
-    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed
-                                adInfo:nil
-                                 error:error
-                        fallbackUnitId:adUnitId];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed
+                  adInfo:nil
+                   error:error
+          fallbackUnitId:adUnitId];
 }
 
 - (void)didDisplayAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Displayed adInfo:adInfo error:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Displayed adInfo:adInfo error:nil fallbackUnitId:nil];
 }
 
 - (void)didFailToDisplayAdWithAdInfo:(LPMAdInfo *)adInfo error:(NSError *)error
 {
-    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error fallbackUnitId:nil];
 }
 
 - (void)didCloseAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Closed adInfo:adInfo error:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Closed adInfo:adInfo error:nil fallbackUnitId:nil];
 }
 
 - (void)didClickAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Clicked adInfo:adInfo error:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Clicked adInfo:adInfo error:nil fallbackUnitId:nil];
 }
 
 - (void)didChangeAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::InfoChanged adInfo:adInfo error:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::InfoChanged adInfo:adInfo error:nil fallbackUnitId:nil];
 }
 
 @end
@@ -215,48 +286,95 @@ static NSString *LevelPlayAppKey(void)
     return self;
 }
 
+- (void)setCallback:(gm::wire::GMFunction)callback
+{
+    @synchronized (self) {
+        mCallback = callback;
+    }
+}
+
+- (void)dispatchEvent:(gm_enums::LevelPlayCallbackEvent)type
+                adInfo:(LPMAdInfo *)adInfo
+                 error:(NSError *)error
+                reward:(LPMReward *)reward
+        fallbackUnitId:(NSString *)fallbackUnitId
+{
+    if (![NSThread isMainThread]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self dispatchEvent:type adInfo:adInfo error:error reward:reward fallbackUnitId:fallbackUnitId];
+        });
+        return;
+    }
+
+    // mCallback/owner can be written (setCallback:, dealloc's teardown) from a different thread
+    // than this method runs on (the SDK's own delivery thread, per the isMainThread hop above) --
+    // snapshot both under the lock, then do the actual work outside it so a re-entrant call from
+    // the callback itself can't deadlock against this lock.
+    gm::wire::GMFunction callback;
+    GMLevelPlay *owner = nil;
+    @synchronized (self) {
+        callback = mCallback;
+        owner = self.owner;
+    }
+
+    if (!callback) {
+        return;
+    }
+
+    if (owner == nil) {
+        return;
+    }
+
+    gm_structs::LevelPlayResult result = [owner resultStream:type error:error];
+    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt = [owner adInfoOptional:adInfo fallbackUnitId:fallbackUnitId];
+    std::optional<gm_structs::LevelPlayReward> rewardOpt =
+        reward != nil ? std::optional<gm_structs::LevelPlayReward>([owner rewardStream:reward]) : std::nullopt;
+
+    callback.call(result, type, adInfoOpt, rewardOpt);
+}
+
 - (void)didLoadAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Loaded adInfo:adInfo error:nil reward:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Loaded adInfo:adInfo error:nil reward:nil fallbackUnitId:nil];
 }
 
 - (void)didFailToLoadAdWithAdUnitId:(NSString *)adUnitId error:(NSError *)error
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed
-                            adInfo:nil
-                             error:error
-                            reward:nil
-                    fallbackUnitId:adUnitId];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed
+                  adInfo:nil
+                   error:error
+                  reward:nil
+          fallbackUnitId:adUnitId];
 }
 
 - (void)didDisplayAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Displayed adInfo:adInfo error:nil reward:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Displayed adInfo:adInfo error:nil reward:nil fallbackUnitId:nil];
 }
 
 - (void)didFailToDisplayAdWithAdInfo:(LPMAdInfo *)adInfo error:(NSError *)error
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error reward:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error reward:nil fallbackUnitId:nil];
 }
 
 - (void)didCloseAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Closed adInfo:adInfo error:nil reward:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Closed adInfo:adInfo error:nil reward:nil fallbackUnitId:nil];
 }
 
 - (void)didClickAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Clicked adInfo:adInfo error:nil reward:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Clicked adInfo:adInfo error:nil reward:nil fallbackUnitId:nil];
 }
 
 - (void)didChangeAdInfo:(LPMAdInfo *)adInfo
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::InfoChanged adInfo:adInfo error:nil reward:nil];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::InfoChanged adInfo:adInfo error:nil reward:nil fallbackUnitId:nil];
 }
 
 - (void)didRewardAdWithAdInfo:(LPMAdInfo *)adInfo reward:(LPMReward *)reward
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Rewarded adInfo:adInfo error:nil reward:reward];
+    [self dispatchEvent:gm_enums::LevelPlayCallbackEvent::Rewarded adInfo:adInfo error:nil reward:reward fallbackUnitId:nil];
 }
 
 @end
@@ -327,9 +445,11 @@ static NSString *LevelPlayAppKey(void)
         self.levelPlayInitialized = NO;
         self.bannerConstraints = [NSArray array];
 
-        self.interstitialDelegate = [[GMLevelPlayInterstitialDelegate alloc] initWithOwner:self];
-        self.rewardedDelegate = [[GMLevelPlayRewardedDelegate alloc] initWithOwner:self];
         self.bannerDelegate = [[GMLevelPlayBannerDelegate alloc] initWithOwner:self];
+
+        self.interstitialHandles = [NSMutableDictionary dictionary];
+        self.rewardedHandles = [NSMutableDictionary dictionary];
+        self.adHandlesLock = [[NSObject alloc] init];
     }
 
     return self;
@@ -367,24 +487,35 @@ static NSString *LevelPlayAppKey(void)
         });
     }
 
-    // Not manually nil-ing interstitialAd/rewardedAd's delegate here: LPMInterstitialAd/
-    // LPMRewardedAd document that the delegate is held weakly, and setDelegate: is
-    // non-nullable in this SDK version (passing nil is a hard API violation, not just a
-    // style choice) -- the weak reference self-zeroes once interstitialDelegate/
-    // rewardedDelegate are released below, same effect without the disallowed nil send.
+    // Not manually nil-ing each handle entry's delegate's owner is unsafe to skip here: LPMInterstitialAd/
+    // LPMRewardedAd document that their delegate is held weakly, and setDelegate: is non-nullable in this
+    // SDK version (passing nil is a hard API violation, not just a style choice) -- clearing owner (a
+    // plain assign property, not a retain) on each delegate before dropping the maps prevents any
+    // in-flight dispatchEvent: from touching a deallocating self. Each delegate's own @synchronized(self)
+    // (see setCallback:/dispatchEvent:) guards this same owner field against a concurrent read there.
+    @synchronized (self.adHandlesLock) {
+        for (GMLevelPlayInterstitialHandleEntry *entry in self.interstitialHandles.allValues) {
+            @synchronized (entry.delegate) {
+                entry.delegate.owner = nil;
+            }
+        }
+        [self.interstitialHandles removeAllObjects];
+        self.interstitialHandles = nil;
 
-    self.interstitialAd = nil;
-    self.rewardedAd = nil;
+        for (GMLevelPlayRewardedHandleEntry *entry in self.rewardedHandles.allValues) {
+            @synchronized (entry.delegate) {
+                entry.delegate.owner = nil;
+            }
+        }
+        [self.rewardedHandles removeAllObjects];
+        self.rewardedHandles = nil;
+    }
+
     self.bannerAdView = nil;
     self.bannerSize = nil;
     self.bannerConstraints = nil;
 
-    self.interstitialDelegate.owner = nil;
-    self.rewardedDelegate.owner = nil;
     self.bannerDelegate.owner = nil;
-
-    self.interstitialDelegate = nil;
-    self.rewardedDelegate = nil;
     self.bannerDelegate = nil;
 }
 
@@ -498,29 +629,67 @@ static NSString *LevelPlayAppKey(void)
     }
 }
 
-- (void)levelplay_interstitial_init:(std::string_view)ad_unit_id
+- (std::uint64_t)levelplay_interstitial_create:(std::string_view)ad_unit_id callback:(gm::wire::GMFunction)callback
 {
-    self.interstitialAd = [[LPMInterstitialAd alloc] initWithAdUnitId:NSStringFromStringView(ad_unit_id)];
-    self.interstitialAd.delegate = self.interstitialDelegate;
+    std::uint64_t handle = g_next_ad_handle.fetch_add(1);
+
+    GMLevelPlayInterstitialDelegate *delegate = [[GMLevelPlayInterstitialDelegate alloc] initWithOwner:self];
+    [delegate setCallback:callback];
+    LPMInterstitialAd *ad = [[LPMInterstitialAd alloc] initWithAdUnitId:NSStringFromStringView(ad_unit_id)];
+    ad.delegate = delegate;
+
+    GMLevelPlayInterstitialHandleEntry *entry = [[GMLevelPlayInterstitialHandleEntry alloc] init];
+    entry.ad = ad;
+    entry.delegate = delegate;
+
+    @synchronized (self.adHandlesLock) {
+        self.interstitialHandles[@(handle)] = entry;
+    }
+
+    return handle;
 }
 
-- (gm_enums::LevelPlayError)levelplay_interstitial_load
+- (gm_enums::LevelPlayError)levelplay_interstitial_load:(std::uint64_t)handle
 {
     if (!self.levelPlayInitialized) {
         return gm_enums::LevelPlayError::NotInitialized;
     }
 
-    if (self.interstitialAd == nil) {
-        return gm_enums::LevelPlayError::AdNotInitialized;
+    GMLevelPlayInterstitialHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.interstitialHandles[@(handle)];
     }
 
-    [self.interstitialAd loadAd];
+    if (entry == nil) {
+        return gm_enums::LevelPlayError::InvalidHandle;
+    }
+
+    [entry.ad loadAd];
     return gm_enums::LevelPlayError::Ok;
 }
 
-- (bool)levelplay_interstitial_is_ready
+- (gm_enums::LevelPlayError)levelplay_interstitial_set_callback:(std::uint64_t)handle callback:(gm::wire::GMFunction)callback
 {
-    return self.interstitialAd != nil && [self.interstitialAd isAdReady];
+    GMLevelPlayInterstitialHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.interstitialHandles[@(handle)];
+    }
+
+    if (entry == nil) {
+        return gm_enums::LevelPlayError::InvalidHandle;
+    }
+
+    [entry.delegate setCallback:callback];
+    return gm_enums::LevelPlayError::Ok;
+}
+
+- (bool)levelplay_interstitial_is_ready:(std::uint64_t)handle
+{
+    GMLevelPlayInterstitialHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.interstitialHandles[@(handle)];
+    }
+    return entry != nil && [entry.ad isAdReady];
 }
 
 - (bool)levelplay_interstitial_is_placement_capped:(std::string_view)placement_id
@@ -532,7 +701,7 @@ static NSString *LevelPlayAppKey(void)
     return [LPMInterstitialAd isPlacementCapped:NSStringFromStringView(placement_id)];
 }
 
-- (gm_enums::LevelPlayError)levelplay_interstitial_show:(std::string_view)placement_id
+- (gm_enums::LevelPlayError)levelplay_interstitial_show:(std::uint64_t)handle placement_id:(std::optional<std::string_view>)placement_id
 {
     UIViewController *controller = [self rootViewController];
 
@@ -540,54 +709,120 @@ static NSString *LevelPlayAppKey(void)
         return gm_enums::LevelPlayError::ActivityUnavailable;
     }
 
-    if (self.interstitialAd == nil) {
-        return gm_enums::LevelPlayError::AdNotInitialized;
+    GMLevelPlayInterstitialHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.interstitialHandles[@(handle)];
     }
 
-    if (![self.interstitialAd isAdReady]) {
+    if (entry == nil) {
+        return gm_enums::LevelPlayError::InvalidHandle;
+    }
+
+    if (![entry.ad isAdReady]) {
         return gm_enums::LevelPlayError::AdNotReady;
     }
 
-    NSString *placement = NSStringFromStringView(placement_id);
+    NSString *placement = placement_id.has_value() ? NSStringFromStringView(*placement_id) : nil;
 
     if (placement.length > 0 && [LPMInterstitialAd isPlacementCapped:placement]) {
         return gm_enums::LevelPlayError::PlacementCapped;
     }
 
-    [self.interstitialAd showAdWithViewController:controller
-                                    placementName:placement.length > 0 ? placement : nil];
+    [entry.ad showAdWithViewController:controller
+                          placementName:placement.length > 0 ? placement : nil];
 
     return gm_enums::LevelPlayError::Ok;
 }
 
-- (void)levelplay_interstitial_callback_subscribe:(gm::wire::GMFunction)callback
+- (void)levelplay_interstitial_destroy:(std::uint64_t)handle
 {
-    mInterstitialCallback = callback;
+    GMLevelPlayInterstitialHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.interstitialHandles[@(handle)];
+        [self.interstitialHandles removeObjectForKey:@(handle)];
+    }
+    // No SDK dispose/destroy method exists on LPMInterstitialAd (confirmed) -- dropping the map
+    // entry (which owns the only strong refs to the ad and its delegate) is most of the cleanup.
+    // Also clear the delegate's callback: a load already in flight when this was called can still
+    // deliver one late completion after this handle is gone, and clearing the callback makes that
+    // a silent no-op (see dispatchEvent:'s callback check) instead of an unexpected callback into
+    // GML for a handle the caller has already destroyed.
+    [entry.delegate setCallback:gm::wire::GMFunction()];
 }
 
-- (void)levelplay_rewarded_video_init:(std::string_view)ad_unit_id
+- (std::vector<std::uint64_t>)levelplay_interstitial_get_live_handles
 {
-    self.rewardedAd = [[LPMRewardedAd alloc] initWithAdUnitId:NSStringFromStringView(ad_unit_id)];
-    self.rewardedAd.delegate = self.rewardedDelegate;
+    std::vector<std::uint64_t> handles;
+    @synchronized (self.adHandlesLock) {
+        handles.reserve(self.interstitialHandles.count);
+        for (NSNumber *key in self.interstitialHandles) {
+            handles.push_back(key.unsignedLongLongValue);
+        }
+    }
+    return handles;
 }
 
-- (gm_enums::LevelPlayError)levelplay_rewarded_video_load
+- (std::uint64_t)levelplay_rewarded_video_create:(std::string_view)ad_unit_id callback:(gm::wire::GMFunction)callback
+{
+    std::uint64_t handle = g_next_ad_handle.fetch_add(1);
+
+    GMLevelPlayRewardedDelegate *delegate = [[GMLevelPlayRewardedDelegate alloc] initWithOwner:self];
+    [delegate setCallback:callback];
+    LPMRewardedAd *ad = [[LPMRewardedAd alloc] initWithAdUnitId:NSStringFromStringView(ad_unit_id)];
+    ad.delegate = delegate;
+
+    GMLevelPlayRewardedHandleEntry *entry = [[GMLevelPlayRewardedHandleEntry alloc] init];
+    entry.ad = ad;
+    entry.delegate = delegate;
+
+    @synchronized (self.adHandlesLock) {
+        self.rewardedHandles[@(handle)] = entry;
+    }
+
+    return handle;
+}
+
+- (gm_enums::LevelPlayError)levelplay_rewarded_video_load:(std::uint64_t)handle
 {
     if (!self.levelPlayInitialized) {
         return gm_enums::LevelPlayError::NotInitialized;
     }
 
-    if (self.rewardedAd == nil) {
-        return gm_enums::LevelPlayError::AdNotInitialized;
+    GMLevelPlayRewardedHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.rewardedHandles[@(handle)];
     }
 
-    [self.rewardedAd loadAd];
+    if (entry == nil) {
+        return gm_enums::LevelPlayError::InvalidHandle;
+    }
+
+    [entry.ad loadAd];
     return gm_enums::LevelPlayError::Ok;
 }
 
-- (bool)levelplay_rewarded_video_is_ready
+- (gm_enums::LevelPlayError)levelplay_rewarded_video_set_callback:(std::uint64_t)handle callback:(gm::wire::GMFunction)callback
 {
-    return self.rewardedAd != nil && [self.rewardedAd isAdReady];
+    GMLevelPlayRewardedHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.rewardedHandles[@(handle)];
+    }
+
+    if (entry == nil) {
+        return gm_enums::LevelPlayError::InvalidHandle;
+    }
+
+    [entry.delegate setCallback:callback];
+    return gm_enums::LevelPlayError::Ok;
+}
+
+- (bool)levelplay_rewarded_video_is_ready:(std::uint64_t)handle
+{
+    GMLevelPlayRewardedHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.rewardedHandles[@(handle)];
+    }
+    return entry != nil && [entry.ad isAdReady];
 }
 
 - (bool)levelplay_rewarded_video_is_placement_capped:(std::string_view)placement_id
@@ -599,7 +834,7 @@ static NSString *LevelPlayAppKey(void)
     return [LPMRewardedAd isPlacementCapped:NSStringFromStringView(placement_id)];
 }
 
-- (gm_enums::LevelPlayError)levelplay_rewarded_video_show:(std::string_view)placement_id
+- (gm_enums::LevelPlayError)levelplay_rewarded_video_show:(std::uint64_t)handle placement_id:(std::optional<std::string_view>)placement_id
 {
     UIViewController *controller = [self rootViewController];
 
@@ -607,29 +842,57 @@ static NSString *LevelPlayAppKey(void)
         return gm_enums::LevelPlayError::ActivityUnavailable;
     }
 
-    if (self.rewardedAd == nil) {
-        return gm_enums::LevelPlayError::AdNotInitialized;
+    GMLevelPlayRewardedHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.rewardedHandles[@(handle)];
     }
 
-    if (![self.rewardedAd isAdReady]) {
+    if (entry == nil) {
+        return gm_enums::LevelPlayError::InvalidHandle;
+    }
+
+    if (![entry.ad isAdReady]) {
         return gm_enums::LevelPlayError::AdNotReady;
     }
 
-    NSString *placement = NSStringFromStringView(placement_id);
+    NSString *placement = placement_id.has_value() ? NSStringFromStringView(*placement_id) : nil;
 
     if (placement.length > 0 && [LPMRewardedAd isPlacementCapped:placement]) {
         return gm_enums::LevelPlayError::PlacementCapped;
     }
 
-    [self.rewardedAd showAdWithViewController:controller
-                                placementName:placement.length > 0 ? placement : nil];
+    [entry.ad showAdWithViewController:controller
+                          placementName:placement.length > 0 ? placement : nil];
 
     return gm_enums::LevelPlayError::Ok;
 }
 
-- (void)levelplay_rewarded_callback_subscribe:(gm::wire::GMFunction)callback
+- (void)levelplay_rewarded_video_destroy:(std::uint64_t)handle
 {
-    mRewardedCallback = callback;
+    GMLevelPlayRewardedHandleEntry *entry = nil;
+    @synchronized (self.adHandlesLock) {
+        entry = self.rewardedHandles[@(handle)];
+        [self.rewardedHandles removeObjectForKey:@(handle)];
+    }
+    // No SDK dispose/destroy method exists on LPMRewardedAd (confirmed) -- dropping the map entry
+    // (which owns the only strong refs to the ad and its delegate) is most of the cleanup. Also
+    // clear the delegate's callback: a load already in flight when this was called can still
+    // deliver one late completion after this handle is gone, and clearing the callback makes that
+    // a silent no-op (see dispatchEvent:'s callback check) instead of an unexpected callback into
+    // GML for a handle the caller has already destroyed.
+    [entry.delegate setCallback:gm::wire::GMFunction()];
+}
+
+- (std::vector<std::uint64_t>)levelplay_rewarded_video_get_live_handles
+{
+    std::vector<std::uint64_t> handles;
+    @synchronized (self.adHandlesLock) {
+        handles.reserve(self.rewardedHandles.count);
+        for (NSNumber *key in self.rewardedHandles) {
+            handles.push_back(key.unsignedLongLongValue);
+        }
+    }
+    return handles;
 }
 
 - (gm_enums::LevelPlayError)levelplay_banner_create:(std::string_view)ad_unit_id
@@ -941,75 +1204,6 @@ static NSString *LevelPlayAppKey(void)
     std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt = [self adInfoOptional:adInfo fallbackUnitId:fallbackUnitId];
 
     mBannerCallback.call(result, type, adInfoOpt);
-}
-
-- (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
-                        adInfo:(LPMAdInfo *)adInfo
-                         error:(NSError *)error
-{
-    [self sendInterstitialEvent:type adInfo:adInfo error:error fallbackUnitId:nil];
-}
-
-- (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
-                        adInfo:(LPMAdInfo *)adInfo
-                         error:(NSError *)error
-                fallbackUnitId:(NSString *)fallbackUnitId
-{
-    if (![NSThread isMainThread]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self sendInterstitialEvent:type
-                                  adInfo:adInfo
-                                   error:error
-                          fallbackUnitId:fallbackUnitId];
-        });
-        return;
-    }
-
-    if (!mInterstitialCallback) {
-        return;
-    }
-
-    gm_structs::LevelPlayResult result = [self resultStream:type error:error];
-    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt = [self adInfoOptional:adInfo fallbackUnitId:fallbackUnitId];
-
-    mInterstitialCallback.call(result, type, adInfoOpt);
-}
-
-- (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
-                    adInfo:(LPMAdInfo *)adInfo
-                     error:(NSError *)error
-                    reward:(LPMReward *)reward
-{
-    [self sendRewardedEvent:type adInfo:adInfo error:error reward:reward fallbackUnitId:nil];
-}
-
-- (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
-                    adInfo:(LPMAdInfo *)adInfo
-                     error:(NSError *)error
-                    reward:(LPMReward *)reward
-            fallbackUnitId:(NSString *)fallbackUnitId
-{
-    if (![NSThread isMainThread]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self sendRewardedEvent:type
-                              adInfo:adInfo
-                               error:error
-                              reward:reward
-                      fallbackUnitId:fallbackUnitId];
-        });
-        return;
-    }
-
-    if (!mRewardedCallback) {
-        return;
-    }
-
-    gm_structs::LevelPlayResult result = [self resultStream:type error:error];
-    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt = [self adInfoOptional:adInfo fallbackUnitId:fallbackUnitId];
-    std::optional<gm_structs::LevelPlayReward> rewardOpt =
-        reward != nil ? std::optional<gm_structs::LevelPlayReward>([self rewardStream:reward]) : std::nullopt;
-
-    mRewardedCallback.call(result, type, adInfoOpt, rewardOpt);
 }
 
 - (void)sendBannerFailure:(NSString *)message

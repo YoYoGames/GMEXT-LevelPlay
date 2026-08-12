@@ -73,47 +73,84 @@ function levelplay_launch_test_suite(): unit;
 // Interstitial
 // -----------------------------------------------------------------------------
 
-[global, bind = typed_gml]
-function levelplay_interstitial_init(ad_unit_id: string): unit;
+/// Constructs the interstitial ad instance and attaches callback as its listener for the handle's
+/// whole lifetime (Loaded/LoadFailed, then every subsequent Displayed/DisplayFailed/Closed/Clicked/
+/// InfoChanged event). Callback receives (result: [[LevelPlayResult]], type: [[LevelPlayCallbackEvent]],
+/// ad_info: [[LevelPlayAdInfo]]?). Synchronous and effectively infallible - the returned handle is
+/// reusable across many load/show cycles; call levelplay_interstitial_destroy when truly done with it.
+[global, bind = typed_gml, type_hint = `uint64`]
+function levelplay_interstitial_create(ad_unit_id: string, callback: func): gmval;
 
+/// Requests a (re)load using the handle's existing callback (see levelplay_interstitial_create /
+/// levelplay_interstitial_set_callback).
 [global, bind = typed_gml, type_hint = `LevelPlayError`]
-function levelplay_interstitial_load(): gmval;
+function levelplay_interstitial_load([type_hint=`uint64`] handle: gmval): gmval;
+
+/// Replaces the handle's active callback, in place of the one given to levelplay_interstitial_create.
+[global, bind = typed_gml, type_hint = `LevelPlayError`]
+function levelplay_interstitial_set_callback([type_hint=`uint64`] handle: gmval, callback: func): gmval;
 
 [global, bind = typed_gml]
-function levelplay_interstitial_is_ready(): bool;
+function levelplay_interstitial_is_ready([type_hint=`uint64`] handle: gmval): bool;
 
 [global, bind = typed_gml]
 function levelplay_interstitial_is_placement_capped(placement_id: string): bool;
 
 [global, bind = typed_gml, type_hint = `LevelPlayError`]
-function levelplay_interstitial_show(placement_id: string): gmval;
+function levelplay_interstitial_show([type_hint=`uint64`] handle: gmval, [type_hint=`string?`] placement_id: gmval): gmval;
 
-/// Callback receives (result: [[LevelPlayResult]], type: [[LevelPlayCallbackEvent]], ad_info: [[LevelPlayAdInfo]]?).
+/// Removes the handle and releases the native ad instance. No-op for an already-invalid handle. The
+/// SDK exposes no dispose/destroy method on this class - this is wrapper-side cleanup only.
 [global, bind = typed_gml]
-function levelplay_interstitial_callback_subscribe(callback: func): unit;
+function levelplay_interstitial_destroy([type_hint=`uint64`] handle: gmval): unit;
+
+/// Returns every currently-live interstitial handle (created but not yet destroyed). Intended for
+/// leak detection during development - e.g. logging array_length(...) periodically to catch handles
+/// that are never destroyed.
+[global, bind = typed_gml, type_hint = `uint64[]`]
+function levelplay_interstitial_get_live_handles(): gmval;
 
 // -----------------------------------------------------------------------------
 // Rewarded video
 // -----------------------------------------------------------------------------
 
-[global, bind = typed_gml]
-function levelplay_rewarded_video_init(ad_unit_id: string): unit;
+/// Constructs the rewarded video ad instance and attaches callback as its listener for the handle's
+/// whole lifetime (Loaded/LoadFailed, then every subsequent Displayed/DisplayFailed/Closed/Clicked/
+/// InfoChanged/Rewarded event). Callback receives (result: [[LevelPlayResult]], type:
+/// [[LevelPlayCallbackEvent]], ad_info: [[LevelPlayAdInfo]]?, reward: [[LevelPlayReward]]? - present
+/// only when type == Rewarded). Synchronous and effectively infallible - the returned handle is
+/// reusable across many load/show cycles; call levelplay_rewarded_video_destroy when truly done with it.
+[global, bind = typed_gml, type_hint = `uint64`]
+function levelplay_rewarded_video_create(ad_unit_id: string, callback: func): gmval;
 
+/// Requests a (re)load using the handle's existing callback (see levelplay_rewarded_video_create /
+/// levelplay_rewarded_video_set_callback).
 [global, bind = typed_gml, type_hint = `LevelPlayError`]
-function levelplay_rewarded_video_load(): gmval;
+function levelplay_rewarded_video_load([type_hint=`uint64`] handle: gmval): gmval;
+
+/// Replaces the handle's active callback, in place of the one given to levelplay_rewarded_video_create.
+[global, bind = typed_gml, type_hint = `LevelPlayError`]
+function levelplay_rewarded_video_set_callback([type_hint=`uint64`] handle: gmval, callback: func): gmval;
 
 [global, bind = typed_gml]
-function levelplay_rewarded_video_is_ready(): bool;
+function levelplay_rewarded_video_is_ready([type_hint=`uint64`] handle: gmval): bool;
 
 [global, bind = typed_gml]
 function levelplay_rewarded_video_is_placement_capped(placement_id: string): bool;
 
 [global, bind = typed_gml, type_hint = `LevelPlayError`]
-function levelplay_rewarded_video_show(placement_id: string): gmval;
+function levelplay_rewarded_video_show([type_hint=`uint64`] handle: gmval, [type_hint=`string?`] placement_id: gmval): gmval;
 
-/// Callback receives (result: [[LevelPlayResult]], type: [[LevelPlayCallbackEvent]], ad_info: [[LevelPlayAdInfo]]?, reward: [[LevelPlayReward]]?). reward present only when type == Rewarded.
+/// Removes the handle and releases the native ad instance. No-op for an already-invalid handle. The
+/// SDK exposes no dispose/destroy method on this class - this is wrapper-side cleanup only.
 [global, bind = typed_gml]
-function levelplay_rewarded_callback_subscribe(callback: func): unit;
+function levelplay_rewarded_video_destroy([type_hint=`uint64`] handle: gmval): unit;
+
+/// Returns every currently-live rewarded video handle (created but not yet destroyed). Intended for
+/// leak detection during development - e.g. logging array_length(...) periodically to catch handles
+/// that are never destroyed.
+[global, bind = typed_gml, type_hint = `uint64[]`]
+function levelplay_rewarded_video_get_live_handles(): gmval;
 
 // -----------------------------------------------------------------------------
 // Banner
@@ -178,10 +215,10 @@ enum LevelPlayError:int32
 {
     Ok,
     NotInitialized,
-    AdNotInitialized,
     AdNotReady,
     PlacementCapped,
     ActivityUnavailable,
     RootViewUnavailable,
     MissingAppKey,
+    InvalidHandle,
 }

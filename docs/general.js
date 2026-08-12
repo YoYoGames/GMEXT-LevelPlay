@@ -115,8 +115,6 @@
  * ${struct.LevelPlayResult}.
  * @member Ok The call was accepted.
  * @member NotInitialized ${function.levelplay_init} has not completed successfully yet.
- * @member AdNotInitialized The ad type's `_init` function has not been called yet, so no ad instance
- * exists.
  * @member AdNotReady The ad has not finished loading yet (or has already been shown).
  * @member PlacementCapped The given placement has reached its daily cap.
  * @member ActivityUnavailable The current Android activity / iOS view controller is not available.
@@ -125,13 +123,15 @@
  * it is reported through the banner callback instead - see ${function.levelplay_banner_callback_subscribe}.
  * @member MissingAppKey The extension's `AndroidAppKey`/`iOSAppKey` option is not set for the current
  * platform.
+ * @member InvalidHandle Interstitial/rewarded video only - `handle` is not a live handle from the
+ * matching `_create` function (or has already been destroyed).
  * @const_end
  */
 
 /**
  * @const LevelPlayCallbackEvent
  * @desc The lifecycle events an ad callback can fire with. Which subset of these a given ad type uses
- * is documented on that type's `_callback_subscribe` function.
+ * is documented on that type's `_load` function (banner: `_callback_subscribe`).
  * @member Loaded The ad finished loading and is ready to show.
  * @member LoadFailed The ad failed to load. ${struct.LevelPlayResult}.success is `false` for this
  * event.

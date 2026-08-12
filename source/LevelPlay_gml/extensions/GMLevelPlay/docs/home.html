@@ -96,10 +96,13 @@ ironSource) ad mediation SDK for <strong>Android and iOS</strong>. Call <a href=
 any other function. Every function that talks to the SDK asynchronously reports its outcome through
 a callback carrying a <a href="general.html#levelplayresult">LevelPlayResult</a> - check <code>result.success</code> before trusting the rest of
 the payload.</p>
-<p>Each ad type (interstitial, rewarded video, banner) is a single mutable instance, not a handle you
-hold onto: call the type's <code>_init</code> function once with an ad unit ID, then <code>_load</code>/<code>_show</code> as needed.
-Each type also has its own <code>_callback_subscribe</code> function - call it once to receive every lifecycle
-event for that ad type, for as long as your game runs.</p>
+<p>Interstitial and rewarded video ads are handle-based: <code>_create</code> constructs a reusable ad instance,
+returns a handle, and attaches the callback that will receive every lifecycle event for that
+handle's whole lifetime; <code>_load</code>/<code>_show</code>/<code>_destroy</code> then all operate on the handle, with <code>_load</code>
+reusing the same callback on every reload (swap it explicitly with <code>_set_callback</code> if you ever need
+to). Hold onto as many handles as you want at once - see
+<a href="interstitial.html">Interstitial</a>/<a href="rewarded_video.html">Rewarded Video</a>. Banner stays a single mutable instance (there is
+only ever one banner view) with its own <code>_callback_subscribe</code> function - see <a href="banner.html">Banner</a>.</p>
 <h2 id="guides">Guides</h2>
 <p>Guides for the LevelPlay extension.</p>
 <ul>

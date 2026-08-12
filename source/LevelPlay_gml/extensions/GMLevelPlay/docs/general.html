@@ -340,12 +340,12 @@ unavailable. &gt; [!IMPORTANT]</p>
 
 <h1 id="levelplaycallbackevent">LevelPlayCallbackEvent</h1>
 <p>The lifecycle events an ad callback can fire with. Which subset of these a given ad type uses
-is documented on that type's <code>_callback_subscribe</code> function.</p>
+is documented on that type's <code>_load</code> function (banner: <code>_callback_subscribe</code>).</p>
 <p>These constants are referenced by the following functions:</p>
 <ul>
 <li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
-<li><a href="interstitial.html#levelplay_interstitial_callback_subscribe">levelplay_interstitial_callback_subscribe</a></li>
-<li><a href="rewarded_video.html#levelplay_rewarded_callback_subscribe">levelplay_rewarded_callback_subscribe</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_create">levelplay_interstitial_create</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_video_create">levelplay_rewarded_video_create</a></li>
 </ul>
 <p><br></p>
 <table>
@@ -416,8 +416,10 @@ by the SDK itself after a call was accepted instead arrives asynchronously via
 <li><a href="banner.html#levelplay_banner_create">levelplay_banner_create</a></li>
 <li><a href="general.html#levelplay_init">levelplay_init</a></li>
 <li><a href="interstitial.html#levelplay_interstitial_load">levelplay_interstitial_load</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_set_callback">levelplay_interstitial_set_callback</a></li>
 <li><a href="interstitial.html#levelplay_interstitial_show">levelplay_interstitial_show</a></li>
 <li><a href="rewarded_video.html#levelplay_rewarded_video_load">levelplay_rewarded_video_load</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_video_set_callback">levelplay_rewarded_video_set_callback</a></li>
 <li><a href="rewarded_video.html#levelplay_rewarded_video_show">levelplay_rewarded_video_show</a></li>
 </ul>
 <p><br></p>
@@ -436,10 +438,6 @@ by the SDK itself after a call was accepted instead arrives asynchronously via
 <tr>
 <td><code>NotInitialized</code></td>
 <td><a href="general.html#levelplay_init">levelplay_init</a> has not completed successfully yet.</td>
-</tr>
-<tr>
-<td><code>AdNotInitialized</code></td>
-<td>The ad type's <code>_init</code> function has not been called yet, so no ad instance<br>exists.</td>
 </tr>
 <tr>
 <td><code>AdNotReady</code></td>
@@ -461,6 +459,10 @@ by the SDK itself after a call was accepted instead arrives asynchronously via
 <td><code>MissingAppKey</code></td>
 <td>The extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> option is not set for the current<br>platform.</td>
 </tr>
+<tr>
+<td><code>InvalidHandle</code></td>
+<td>Interstitial/rewarded video only - <code>handle</code> is not a live handle from the<br>matching <code>_create</code> function (or has already been destroyed).</td>
+</tr>
 </tbody>
 </table>
 <p><br></p>
@@ -476,8 +478,8 @@ event; it is absent for every other event and for <a href="general.html#levelpla
 <ul>
 <li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
 <li><a href="general.html#levelplay_init">levelplay_init</a></li>
-<li><a href="interstitial.html#levelplay_interstitial_callback_subscribe">levelplay_interstitial_callback_subscribe</a></li>
-<li><a href="rewarded_video.html#levelplay_rewarded_callback_subscribe">levelplay_rewarded_callback_subscribe</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_create">levelplay_interstitial_create</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_video_create">levelplay_rewarded_video_create</a></li>
 </ul>
 <p><br></p>
 <table>
@@ -519,8 +521,8 @@ object exists yet) - <code>unit_id</code> is populated from that fallback and ev
 <p>This struct is referenced by the following functions:</p>
 <ul>
 <li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
-<li><a href="interstitial.html#levelplay_interstitial_callback_subscribe">levelplay_interstitial_callback_subscribe</a></li>
-<li><a href="rewarded_video.html#levelplay_rewarded_callback_subscribe">levelplay_rewarded_callback_subscribe</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_create">levelplay_interstitial_create</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_video_create">levelplay_rewarded_video_create</a></li>
 </ul>
 <p><br></p>
 <table>
@@ -593,7 +595,7 @@ object exists yet) - <code>unit_id</code> is populated from that fallback and ev
 <a href="general.html#levelplaycallbackevent">LevelPlayCallbackEvent</a>.Rewarded event. See <a href="getting_started.html">Getting Started</a>.</p>
 <p>This struct is referenced by the following functions:</p>
 <ul>
-<li><a href="rewarded_video.html#levelplay_rewarded_callback_subscribe">levelplay_rewarded_callback_subscribe</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_video_create">levelplay_rewarded_video_create</a></li>
 </ul>
 <p><br></p>
 <table>

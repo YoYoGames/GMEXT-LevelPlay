@@ -66,15 +66,34 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return 0;
     }
 
-    public double __EXT_NATIVE__levelplay_interstitial_init(String ad_unit_id)
+    public double __EXT_NATIVE__levelplay_interstitial_create(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        levelplay_interstitial_init(ad_unit_id);
-        return 0;
+        GMExtWire.order(__arg_buffer);
+
+        // field: ad_unit_id, type: String
+        String ad_unit_id = GMExtWire.readString(__arg_buffer);
+
+        // field: callback, type: Function
+        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+
+        long __result = levelplay_interstitial_create(ad_unit_id, callback);
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: UInt64
+        GMExtWire.writeI64(__ret_buffer_writer, __result);
+
+        return (double)__result;
     }
 
-    public double __EXT_NATIVE__levelplay_interstitial_load(ByteBuffer __ret_buffer, double __ret_buffer_length)
+    public double __EXT_NATIVE__levelplay_interstitial_load(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        LevelPlayError __result = levelplay_interstitial_load();
+        GMExtWire.order(__arg_buffer);
+
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        LevelPlayError __result = levelplay_interstitial_load(handle);
 
         GMExtWire.order(__ret_buffer);
         GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
@@ -84,9 +103,34 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return 0;
     }
 
-    public double __EXT_NATIVE__levelplay_interstitial_is_ready()
+    public double __EXT_NATIVE__levelplay_interstitial_set_callback(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        boolean __result = levelplay_interstitial_is_ready();
+        GMExtWire.order(__arg_buffer);
+
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        // field: callback, type: Function
+        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+
+        LevelPlayError __result = levelplay_interstitial_set_callback(handle, callback);
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: enum LevelPlayError
+        GMExtWire.writeI32(__ret_buffer_writer, __result.value());
+
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_interstitial_is_ready(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        boolean __result = levelplay_interstitial_is_ready(handle);
         return __result ? 1.0 : 0.0;
     }
 
@@ -96,9 +140,22 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return __result ? 1.0 : 0.0;
     }
 
-    public double __EXT_NATIVE__levelplay_interstitial_show(String placement_id, ByteBuffer __ret_buffer, double __ret_buffer_length)
+    public double __EXT_NATIVE__levelplay_interstitial_show(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        LevelPlayError __result = levelplay_interstitial_show(placement_id);
+        GMExtWire.order(__arg_buffer);
+
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        // field: placement_id, type: optional<String>
+        java.util.Optional<String> placement_id = java.util.Optional.empty();
+        if (GMExtWire.readBool(__arg_buffer))
+        {
+            String __opt_placement_id = GMExtWire.readString(__arg_buffer);
+            placement_id = java.util.Optional.of(__opt_placement_id);
+        }
+
+        LevelPlayError __result = levelplay_interstitial_show(handle, placement_id);
 
         GMExtWire.order(__ret_buffer);
         GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
@@ -108,26 +165,57 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return 0;
     }
 
-    public double __EXT_NATIVE__levelplay_interstitial_callback_subscribe(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    public double __EXT_NATIVE__levelplay_interstitial_destroy(ByteBuffer __arg_buffer, double __arg_buffer_length)
     {
         GMExtWire.order(__arg_buffer);
+
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        levelplay_interstitial_destroy(handle);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_interstitial_get_live_handles(ByteBuffer __ret_buffer, double __ret_buffer_length)
+    {
+        java.util.List<Long> __result = levelplay_interstitial_get_live_handles();
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: UInt64[]
+        GMExtWire.writeList(__ret_buffer_writer, __result, (bb, x) -> GMExtWire.writeI64(bb, x));
+
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_video_create(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: ad_unit_id, type: String
+        String ad_unit_id = GMExtWire.readString(__arg_buffer);
 
         // field: callback, type: Function
         GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
 
-        levelplay_interstitial_callback_subscribe(callback);
-        return 0;
+        long __result = levelplay_rewarded_video_create(ad_unit_id, callback);
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: UInt64
+        GMExtWire.writeI64(__ret_buffer_writer, __result);
+
+        return (double)__result;
     }
 
-    public double __EXT_NATIVE__levelplay_rewarded_video_init(String ad_unit_id)
+    public double __EXT_NATIVE__levelplay_rewarded_video_load(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        levelplay_rewarded_video_init(ad_unit_id);
-        return 0;
-    }
+        GMExtWire.order(__arg_buffer);
 
-    public double __EXT_NATIVE__levelplay_rewarded_video_load(ByteBuffer __ret_buffer, double __ret_buffer_length)
-    {
-        LevelPlayError __result = levelplay_rewarded_video_load();
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        LevelPlayError __result = levelplay_rewarded_video_load(handle);
 
         GMExtWire.order(__ret_buffer);
         GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
@@ -137,9 +225,34 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return 0;
     }
 
-    public double __EXT_NATIVE__levelplay_rewarded_video_is_ready()
+    public double __EXT_NATIVE__levelplay_rewarded_video_set_callback(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        boolean __result = levelplay_rewarded_video_is_ready();
+        GMExtWire.order(__arg_buffer);
+
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        // field: callback, type: Function
+        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+
+        LevelPlayError __result = levelplay_rewarded_video_set_callback(handle, callback);
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: enum LevelPlayError
+        GMExtWire.writeI32(__ret_buffer_writer, __result.value());
+
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_video_is_ready(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    {
+        GMExtWire.order(__arg_buffer);
+
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        boolean __result = levelplay_rewarded_video_is_ready(handle);
         return __result ? 1.0 : 0.0;
     }
 
@@ -149,9 +262,22 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return __result ? 1.0 : 0.0;
     }
 
-    public double __EXT_NATIVE__levelplay_rewarded_video_show(String placement_id, ByteBuffer __ret_buffer, double __ret_buffer_length)
+    public double __EXT_NATIVE__levelplay_rewarded_video_show(ByteBuffer __arg_buffer, double __arg_buffer_length, ByteBuffer __ret_buffer, double __ret_buffer_length)
     {
-        LevelPlayError __result = levelplay_rewarded_video_show(placement_id);
+        GMExtWire.order(__arg_buffer);
+
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
+
+        // field: placement_id, type: optional<String>
+        java.util.Optional<String> placement_id = java.util.Optional.empty();
+        if (GMExtWire.readBool(__arg_buffer))
+        {
+            String __opt_placement_id = GMExtWire.readString(__arg_buffer);
+            placement_id = java.util.Optional.of(__opt_placement_id);
+        }
+
+        LevelPlayError __result = levelplay_rewarded_video_show(handle, placement_id);
 
         GMExtWire.order(__ret_buffer);
         GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
@@ -161,14 +287,26 @@ public abstract class GMLevelPlayInternal extends RunnerSocial implements GMLeve
         return 0;
     }
 
-    public double __EXT_NATIVE__levelplay_rewarded_callback_subscribe(ByteBuffer __arg_buffer, double __arg_buffer_length)
+    public double __EXT_NATIVE__levelplay_rewarded_video_destroy(ByteBuffer __arg_buffer, double __arg_buffer_length)
     {
         GMExtWire.order(__arg_buffer);
 
-        // field: callback, type: Function
-        GMFunction callback = GMExtWire.readGMFunction(__arg_buffer, __dispatch_queue);
+        // field: handle, type: UInt64
+        long handle = GMExtWire.readI64(__arg_buffer);
 
-        levelplay_rewarded_callback_subscribe(callback);
+        levelplay_rewarded_video_destroy(handle);
+        return 0;
+    }
+
+    public double __EXT_NATIVE__levelplay_rewarded_video_get_live_handles(ByteBuffer __ret_buffer, double __ret_buffer_length)
+    {
+        java.util.List<Long> __result = levelplay_rewarded_video_get_live_handles();
+
+        GMExtWire.order(__ret_buffer);
+        GMExtWire.IByteWriter __ret_buffer_writer = new GMExtWire.GMBufferWriter(__ret_buffer);
+        // return: __result, type: UInt64[]
+        GMExtWire.writeList(__ret_buffer_writer, __result, (bb, x) -> GMExtWire.writeI64(bb, x));
+
         return 0;
     }
 

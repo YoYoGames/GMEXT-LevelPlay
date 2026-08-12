@@ -298,7 +298,7 @@ function __ext_core_function_dispatch_calls(_handler, _decoders) {
     static _dummy_context = {};
 	var _buf = __ext_core_get_async_buffer();
 	var _size = _handler(buffer_get_address(_buf), buffer_get_size(_buf));
-		
+	
 	// Nothing to handle
 	if (_size == 0) return 0;
 
@@ -319,6 +319,7 @@ function __ext_core_function_dispatch_calls(_handler, _decoders) {
 	
 	// Read the size of callbacks to be triggered this frame
 	var _count = buffer_read(_buf, buffer_u16);
+
 	var _ref_map = __ext_core_function_map(); // Cache the ref map
 	repeat (_count) {
 			
@@ -334,7 +335,7 @@ function __ext_core_function_dispatch_calls(_handler, _decoders) {
 				with (_dummy_context) method_call(_ref[0 /* callable */], _args); // Call the method with argument array
 				break;
 			case 2: // release
-                var _ref_count = --_ref[1 /* ref count */];
+				var _ref_count = --_ref[1 /* ref count */];
                 if (_ref_count <= 0) {
     				ds_map_delete(_ref_map, _handle); // Remove the entry from the map
                 }

@@ -164,16 +164,33 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
     return 0;
 }
 
-- (double)__EXT_NATIVE__levelplay_interstitial_init:(char*)ad_unit_id
+- (double)__EXT_NATIVE__levelplay_interstitial_create:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length
 {
-    [__impl levelplay_interstitial_init:ad_unit_id];
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
 
+    // field: ad_unit_id, type: String
+    std::string_view ad_unit_id = gm::wire::codec::readValue<std::string_view>(__br);
+
+    // field: callback, type: Function
+    gm::wire::GMFunction callback = gm::wire::codec::readFunction(__br, &__dispatch_queue);
+
+    std::uint64_t __result = [__impl levelplay_interstitial_create:ad_unit_id callback:callback];
+
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: UInt64
+    gm::wire::codec::writeValue(__bw, __result);
     return 0;
 }
 
-- (double)__EXT_NATIVE__levelplay_interstitial_load:(char*)__ret_buffer arg1:(double)__ret_buffer_length
+- (double)__EXT_NATIVE__levelplay_interstitial_load:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length
 {
-    gm_enums::LevelPlayError __result = [__impl levelplay_interstitial_load];
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
+
+    gm_enums::LevelPlayError __result = [__impl levelplay_interstitial_load:handle];
 
     gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
 
@@ -182,9 +199,33 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
     return 0;
 }
 
-- (double)__EXT_NATIVE__levelplay_interstitial_is_ready
+- (double)__EXT_NATIVE__levelplay_interstitial_set_callback:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length
 {
-    bool __result = [__impl levelplay_interstitial_is_ready];
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
+
+    // field: callback, type: Function
+    gm::wire::GMFunction callback = gm::wire::codec::readFunction(__br, &__dispatch_queue);
+
+    gm_enums::LevelPlayError __result = [__impl levelplay_interstitial_set_callback:handle callback:callback];
+
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: enum LevelPlayError
+    gm::wire::codec::writeValue(__bw, __result);
+    return 0;
+}
+
+- (double)__EXT_NATIVE__levelplay_interstitial_is_ready:(char*)__arg_buffer arg1:(double)__arg_buffer_length
+{
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
+
+    bool __result = [__impl levelplay_interstitial_is_ready:handle];
 
     return static_cast<double>(__result);
 }
@@ -196,9 +237,17 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
     return static_cast<double>(__result);
 }
 
-- (double)__EXT_NATIVE__levelplay_interstitial_show:(char*)placement_id arg1:(char*)__ret_buffer arg2:(double)__ret_buffer_length
+- (double)__EXT_NATIVE__levelplay_interstitial_show:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length
 {
-    gm_enums::LevelPlayError __result = [__impl levelplay_interstitial_show:placement_id];
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
+
+    // field: placement_id, type: optional<String>
+    std::optional<std::string_view> placement_id = gm::wire::codec::readOptional<std::string_view>(__br);
+
+    gm_enums::LevelPlayError __result = [__impl levelplay_interstitial_show:handle placement_id:placement_id];
 
     gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
 
@@ -207,28 +256,56 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
     return 0;
 }
 
-- (double)__EXT_NATIVE__levelplay_interstitial_callback_subscribe:(char*)__arg_buffer arg1:(double)__arg_buffer_length
+- (double)__EXT_NATIVE__levelplay_interstitial_destroy:(char*)__arg_buffer arg1:(double)__arg_buffer_length
 {
     gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
+
+    [__impl levelplay_interstitial_destroy:handle];
+
+    return 0;
+}
+
+- (double)__EXT_NATIVE__levelplay_interstitial_get_live_handles:(char*)__ret_buffer arg1:(double)__ret_buffer_length
+{
+    std::vector<std::uint64_t> __result = [__impl levelplay_interstitial_get_live_handles];
+
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: UInt64[]
+    gm::wire::codec::writeValue(__bw, __result);
+    return 0;
+}
+
+- (double)__EXT_NATIVE__levelplay_rewarded_video_create:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length
+{
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: ad_unit_id, type: String
+    std::string_view ad_unit_id = gm::wire::codec::readValue<std::string_view>(__br);
 
     // field: callback, type: Function
     gm::wire::GMFunction callback = gm::wire::codec::readFunction(__br, &__dispatch_queue);
 
-    [__impl levelplay_interstitial_callback_subscribe:callback];
+    std::uint64_t __result = [__impl levelplay_rewarded_video_create:ad_unit_id callback:callback];
 
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: UInt64
+    gm::wire::codec::writeValue(__bw, __result);
     return 0;
 }
 
-- (double)__EXT_NATIVE__levelplay_rewarded_video_init:(char*)ad_unit_id
+- (double)__EXT_NATIVE__levelplay_rewarded_video_load:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length
 {
-    [__impl levelplay_rewarded_video_init:ad_unit_id];
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
 
-    return 0;
-}
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
 
-- (double)__EXT_NATIVE__levelplay_rewarded_video_load:(char*)__ret_buffer arg1:(double)__ret_buffer_length
-{
-    gm_enums::LevelPlayError __result = [__impl levelplay_rewarded_video_load];
+    gm_enums::LevelPlayError __result = [__impl levelplay_rewarded_video_load:handle];
 
     gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
 
@@ -237,9 +314,33 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
     return 0;
 }
 
-- (double)__EXT_NATIVE__levelplay_rewarded_video_is_ready
+- (double)__EXT_NATIVE__levelplay_rewarded_video_set_callback:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length
 {
-    bool __result = [__impl levelplay_rewarded_video_is_ready];
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
+
+    // field: callback, type: Function
+    gm::wire::GMFunction callback = gm::wire::codec::readFunction(__br, &__dispatch_queue);
+
+    gm_enums::LevelPlayError __result = [__impl levelplay_rewarded_video_set_callback:handle callback:callback];
+
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: enum LevelPlayError
+    gm::wire::codec::writeValue(__bw, __result);
+    return 0;
+}
+
+- (double)__EXT_NATIVE__levelplay_rewarded_video_is_ready:(char*)__arg_buffer arg1:(double)__arg_buffer_length
+{
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
+
+    bool __result = [__impl levelplay_rewarded_video_is_ready:handle];
 
     return static_cast<double>(__result);
 }
@@ -251,9 +352,17 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
     return static_cast<double>(__result);
 }
 
-- (double)__EXT_NATIVE__levelplay_rewarded_video_show:(char*)placement_id arg1:(char*)__ret_buffer arg2:(double)__ret_buffer_length
+- (double)__EXT_NATIVE__levelplay_rewarded_video_show:(char*)__arg_buffer arg1:(double)__arg_buffer_length arg2:(char*)__ret_buffer arg3:(double)__ret_buffer_length
 {
-    gm_enums::LevelPlayError __result = [__impl levelplay_rewarded_video_show:placement_id];
+    gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
+
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
+
+    // field: placement_id, type: optional<String>
+    std::optional<std::string_view> placement_id = gm::wire::codec::readOptional<std::string_view>(__br);
+
+    gm_enums::LevelPlayError __result = [__impl levelplay_rewarded_video_show:handle placement_id:placement_id];
 
     gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
 
@@ -262,15 +371,26 @@ static void GMInjectSelectorsIntoSubclass(Class subclass, Class base)
     return 0;
 }
 
-- (double)__EXT_NATIVE__levelplay_rewarded_callback_subscribe:(char*)__arg_buffer arg1:(double)__arg_buffer_length
+- (double)__EXT_NATIVE__levelplay_rewarded_video_destroy:(char*)__arg_buffer arg1:(double)__arg_buffer_length
 {
     gm::byteio::BufferReader __br{__arg_buffer, static_cast<size_t>(__arg_buffer_length)};
 
-    // field: callback, type: Function
-    gm::wire::GMFunction callback = gm::wire::codec::readFunction(__br, &__dispatch_queue);
+    // field: handle, type: UInt64
+    std::uint64_t handle = gm::wire::codec::readValue<std::uint64_t>(__br);
 
-    [__impl levelplay_rewarded_callback_subscribe:callback];
+    [__impl levelplay_rewarded_video_destroy:handle];
 
+    return 0;
+}
+
+- (double)__EXT_NATIVE__levelplay_rewarded_video_get_live_handles:(char*)__ret_buffer arg1:(double)__ret_buffer_length
+{
+    std::vector<std::uint64_t> __result = [__impl levelplay_rewarded_video_get_live_handles];
+
+    gm::byteio::BufferWriter __bw{__ret_buffer, static_cast<size_t>(__ret_buffer_length)};
+
+    // return: __result, type: UInt64[]
+    gm::wire::codec::writeValue(__bw, __result);
     return 0;
 }
 

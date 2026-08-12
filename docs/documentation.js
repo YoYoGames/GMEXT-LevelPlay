@@ -23,10 +23,13 @@
  * a callback carrying a ${struct.LevelPlayResult} - check `result.success` before trusting the rest of
  * the payload.
  *
- * Each ad type (interstitial, rewarded video, banner) is a single mutable instance, not a handle you
- * hold onto: call the type's `_init` function once with an ad unit ID, then `_load`/`_show` as needed.
- * Each type also has its own `_callback_subscribe` function - call it once to receive every lifecycle
- * event for that ad type, for as long as your game runs.
+ * Interstitial and rewarded video ads are handle-based: `_create` constructs a reusable ad instance,
+ * returns a handle, and attaches the callback that will receive every lifecycle event for that
+ * handle's whole lifetime; `_load`/`_show`/`_destroy` then all operate on the handle, with `_load`
+ * reusing the same callback on every reload (swap it explicitly with `_set_callback` if you ever need
+ * to). Hold onto as many handles as you want at once - see
+ * ${module.interstitial}/${module.rewarded_video}. Banner stays a single mutable instance (there is
+ * only ever one banner view) with its own `_callback_subscribe` function - see ${module.banner}.
  *
  * @section_end
  *
