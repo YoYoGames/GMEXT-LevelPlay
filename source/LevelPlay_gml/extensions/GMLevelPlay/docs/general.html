@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>General - GMEXT-LevelPlay</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+        <link href="assets/css/gmext_style.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "General";
+        var mkdocs_page_input_path = "general.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/gml.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> GMEXT-LevelPlay
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="extension_options.html">Extension Options</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Modules</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">General</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#structs">Structs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#constants">Constants</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="interstitial.html">Interstitial</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="rewarded_video.html">Rewarded Video</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="banner.html">Banner</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">GMEXT-LevelPlay</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Modules</li>
+      <li class="breadcrumb-item active">General</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/YoYoGames/GMEXT-LevelPlay/edit/master/docs/general.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a id="top"></a></p>
+<h1 id="general"><strong>General</strong></h1>
+<p>Initialization, privacy/regulation settings, and the shared result/data types every ad
+module's callbacks use.</p>
+<h2 id="functions">Functions</h2>
+<p>Initialization and cross-ad-type functions.</p>
+<ul>
+<li><a href="general.html#levelplay_init">levelplay_init</a></li>
+<li><a href="general.html#levelplay_is_initialized">levelplay_is_initialized</a></li>
+<li><a href="general.html#levelplay_set_consent">levelplay_set_consent</a></li>
+<li><a href="general.html#levelplay_set_metadata">levelplay_set_metadata</a></li>
+<li><a href="general.html#levelplay_set_dynamic_user_id">levelplay_set_dynamic_user_id</a></li>
+<li><a href="general.html#levelplay_launch_test_suite">levelplay_launch_test_suite</a></li>
+</ul>
+<h2 id="structs">Structs</h2>
+<p>Shared data types used across every ad module.</p>
+<ul>
+<li><a href="general.html#levelplayresult">LevelPlayResult</a></li>
+<li><a href="general.html#levelplayadinfo">LevelPlayAdInfo</a></li>
+<li><a href="general.html#levelplayreward">LevelPlayReward</a></li>
+</ul>
+<h2 id="constants">Constants</h2>
+<p>This module includes a set of predefined constants that can be utilized for various purposes. Browse through the available constants to find values relevant to your needs and enhance the efficiency of your code.</p>
+<ul>
+<li><a href="general.html#levelplayerror">LevelPlayError</a></li>
+<li><a href="general.html#levelplaycallbackevent">LevelPlayCallbackEvent</a></li>
+</ul>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_init">levelplay_init</h1>
+<p>Initializes the LevelPlay SDK. Call this once, before any other LevelPlay function. Requires
+the extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> option to be set for the current platform (see
+<a href="extension_options.html">Extension Options</a>).</p>
+<p>This function operates asynchronously, which means that it does not immediately return the requested result. Instead, upon completion of the task, it will trigger the <a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Method_Variables.htm">Callback</a>.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_init(callback)
+</code></pre></div>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>callback</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Script_Functions.htm">Function</a></td>
+<td>The function to call once initialization completes or fails.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p><a href="general.html#levelplayerror">LevelPlayError</a></p>
+</blockquote>
+<p><a href="general.html#levelplayerror">LevelPlayError</a>.Ok if the initialization request was
+accepted, an error code if it was rejected outright (e.g. a missing app key) - in the rejected case
+<code>callback</code> is never invoked.</p>
+<p><br></p>
+<p><strong>Triggers:</strong></p>
+<blockquote>
+<p><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Method_Variables.htm">Callback</a></p>
+</blockquote>
+<p>Fires once, when the SDK finishes starting up (or fails to). Not fired if
+<a href="general.html#levelplay_init">levelplay_init</a> itself returned an error synchronously.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>result</td>
+<td><a href="general.html#levelplayresult">LevelPlayResult</a></td>
+<td>The initialization outcome.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code>levelplay_init(function(_result)
+{
+    if (_result.success)
+        show_debug_message(&quot;LevelPlay initialized&quot;);
+    else
+        show_debug_message($&quot;LevelPlay failed to initialize: {_result.error_message}&quot;);
+});
+</code></pre></div>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_is_initialized">levelplay_is_initialized</h1>
+<p>Returns whether <a href="general.html#levelplay_init">levelplay_init</a> has completed successfully.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_is_initialized()
+</code></pre></div>
+</blockquote>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Boolean</a></p>
+</blockquote>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_set_consent">levelplay_set_consent</h1>
+<p>Sets whether the user provided consent, communicated to every mediated network that supports
+it. See <a href="https://developers.is.com/ironsource-mobile/android/regulation-advanced-settings/#step-4">Regulation Advanced Settings</a>.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_set_consent(enable)
+</code></pre></div>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>enable</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Boolean</a></td>
+<td>Whether the user provided consent.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_set_metadata">levelplay_set_metadata</h1>
+<p>Sets a metadata key-value pair, forwarded to mediated networks that support it. See
+<a href="https://developers.is.com/ironsource-mobile/android/regulation-advanced-settings/#step-4">Regulation Advanced Settings</a>.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_set_metadata(key, value)
+</code></pre></div>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>key</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The metadata key to set.</td>
+</tr>
+<tr>
+<td>value</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The value to assign to the key.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_set_dynamic_user_id">levelplay_set_dynamic_user_id</h1>
+<p>Sets the Dynamic UserID, used by server-side reward callbacks to identify the user. See
+<a href="https://developers.is.com/ironsource-mobile/android/rewarded-video-integration-android-2/#dynamic-userid">Dynamic UserID</a>.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_set_dynamic_user_id(user_id)
+</code></pre></div>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>user_id</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The value to set the Dynamic UserID to.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_launch_test_suite">levelplay_launch_test_suite</h1>
+<p>Launches the LevelPlay integration test suite, which lets you verify platform setup and
+preview ads for your configured networks. Does nothing if the current activity/view controller is
+unavailable. &gt; [!IMPORTANT]</p>
+<blockquote>
+<p>Never ship a build with a call to this left in.</p>
+</blockquote>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_launch_test_suite()
+</code></pre></div>
+</blockquote>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplaycallbackevent">LevelPlayCallbackEvent</h1>
+<p>The lifecycle events an ad callback can fire with. Which subset of these a given ad type uses
+is documented on that type's <code>_callback_subscribe</code> function.</p>
+<p>These constants are referenced by the following functions:</p>
+<ul>
+<li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_callback_subscribe">levelplay_interstitial_callback_subscribe</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_callback_subscribe">levelplay_rewarded_callback_subscribe</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Loaded</code></td>
+<td>The ad finished loading and is ready to show.</td>
+</tr>
+<tr>
+<td><code>LoadFailed</code></td>
+<td>The ad failed to load. <a href="general.html#levelplayresult">LevelPlayResult</a>.success is <code>false</code> for this<br>event.</td>
+</tr>
+<tr>
+<td><code>Displayed</code></td>
+<td>The ad was displayed. Equivalent to an impression.</td>
+</tr>
+<tr>
+<td><code>DisplayFailed</code></td>
+<td>The ad failed to display. <a href="general.html#levelplayresult">LevelPlayResult</a>.success is <code>false</code> for<br>this event.</td>
+</tr>
+<tr>
+<td><code>Closed</code></td>
+<td>The ad view was closed. Interstitial and rewarded video only.</td>
+</tr>
+<tr>
+<td><code>Clicked</code></td>
+<td>The user clicked the ad.</td>
+</tr>
+<tr>
+<td><code>InfoChanged</code></td>
+<td>The ad info was updated - available when another ad has loaded with a higher<br>CPM/rate. Interstitial and rewarded video only.</td>
+</tr>
+<tr>
+<td><code>Rewarded</code></td>
+<td>The user completed watching a rewarded video and should be rewarded.<br><a href="general.html#levelplayreward">LevelPlayReward</a> is populated for this event only. Rewarded video only.</td>
+</tr>
+<tr>
+<td><code>Expanded</code></td>
+<td>The banner was expanded to fullscreen. Banner only.</td>
+</tr>
+<tr>
+<td><code>Collapsed</code></td>
+<td>The banner was restored from fullscreen. Banner only.</td>
+</tr>
+<tr>
+<td><code>LeftApplication</code></td>
+<td>The user clicked the banner and was navigated out of the app. Banner only.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplayerror">LevelPlayError</h1>
+<p>Synchronous error codes returned by most functions in this extension. These describe why a
+call was rejected outright (e.g. before initialization, or with no ad loaded) - a failure reported
+by the SDK itself after a call was accepted instead arrives asynchronously via
+<a href="general.html#levelplayresult">LevelPlayResult</a>.</p>
+<p>These constants are referenced by the following functions:</p>
+<ul>
+<li><a href="banner.html#levelplay_banner_create">levelplay_banner_create</a></li>
+<li><a href="general.html#levelplay_init">levelplay_init</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_load">levelplay_interstitial_load</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_show">levelplay_interstitial_show</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_video_load">levelplay_rewarded_video_load</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_video_show">levelplay_rewarded_video_show</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Ok</code></td>
+<td>The call was accepted.</td>
+</tr>
+<tr>
+<td><code>NotInitialized</code></td>
+<td><a href="general.html#levelplay_init">levelplay_init</a> has not completed successfully yet.</td>
+</tr>
+<tr>
+<td><code>AdNotInitialized</code></td>
+<td>The ad type's <code>_init</code> function has not been called yet, so no ad instance<br>exists.</td>
+</tr>
+<tr>
+<td><code>AdNotReady</code></td>
+<td>The ad has not finished loading yet (or has already been shown).</td>
+</tr>
+<tr>
+<td><code>PlacementCapped</code></td>
+<td>The given placement has reached its daily cap.</td>
+</tr>
+<tr>
+<td><code>ActivityUnavailable</code></td>
+<td>The current Android activity / iOS view controller is not available.</td>
+</tr>
+<tr>
+<td><code>RootViewUnavailable</code></td>
+<td>Banner only - the root view was unavailable when the banner tried to<br>attach itself. Discoverable only after <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a>'s synchronous return, so<br>it is reported through the banner callback instead - see <a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a>.</td>
+</tr>
+<tr>
+<td><code>MissingAppKey</code></td>
+<td>The extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> option is not set for the current<br>platform.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplayresult">LevelPlayResult</h1>
+<p>The uniform success/failure envelope delivered to every async callback in this extension.
+<code>error_message</code> and <code>sdk_error_code</code> are both absent on success. <code>sdk_error_code</code> carries the SDK's
+own ad-error code verbatim when the failure came from a <code>LoadFailed</code>/<code>DisplayFailed</code> ad-lifecycle
+event; it is absent for every other event and for <a href="general.html#levelplay_init">levelplay_init</a>'s own failures.</p>
+<p>This struct is referenced by the following functions:</p>
+<ul>
+<li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
+<li><a href="general.html#levelplay_init">levelplay_init</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_callback_subscribe">levelplay_interstitial_callback_subscribe</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_callback_subscribe">levelplay_rewarded_callback_subscribe</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>success</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Boolean</a></td>
+<td>Whether the operation succeeded.</td>
+</tr>
+<tr>
+<td>error_message</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The SDK's own error message. Only present on failure.</td>
+</tr>
+<tr>
+<td>sdk_error_code</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>The SDK's raw ad-error code. Only present on a <code>LoadFailed</code>/<br><code>DisplayFailed</code> event that carried an SDK error object.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplayadinfo">LevelPlayAdInfo</h1>
+<p>Metadata about a specific ad instance/impression, delivered alongside most
+<a href="general.html#levelplaycallbackevent">LevelPlayCallbackEvent</a> events. Mirrors the LevelPlay SDK's own ad-info object; fields
+the SDK didn't supply for a given event are absent (<code>width</code>/<code>height</code> are <code>0</code> instead, since the SDK
+always reports a size). On a <code>LoadFailed</code> event the SDK provides only the ad unit ID (no full ad-info
+object exists yet) - <code>unit_id</code> is populated from that fallback and every other field is absent.</p>
+<p>This struct is referenced by the following functions:</p>
+<ul>
+<li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
+<li><a href="interstitial.html#levelplay_interstitial_callback_subscribe">levelplay_interstitial_callback_subscribe</a></li>
+<li><a href="rewarded_video.html#levelplay_rewarded_callback_subscribe">levelplay_rewarded_callback_subscribe</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>width</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>The ad's width, in pixels. <code>0</code> if unknown.</td>
+</tr>
+<tr>
+<td>height</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>The ad's height, in pixels. <code>0</code> if unknown.</td>
+</tr>
+<tr>
+<td>format</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The ad format, as reported by the SDK.</td>
+</tr>
+<tr>
+<td>network</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The mediated network that served the ad.</td>
+</tr>
+<tr>
+<td>unit_id</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The ad unit ID.</td>
+</tr>
+<tr>
+<td>unit_name</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The ad unit's display name, as configured on the dashboard.</td>
+</tr>
+<tr>
+<td>placement_name</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The placement name the ad was requested for.</td>
+</tr>
+<tr>
+<td>country</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The country the impression is attributed to.</td>
+</tr>
+<tr>
+<td>precision</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The revenue precision, as reported by the SDK.</td>
+</tr>
+<tr>
+<td>revenue</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>The estimated revenue for this impression.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplayreward">LevelPlayReward</h1>
+<p>The reward earned from a rewarded video ad, delivered with the
+<a href="general.html#levelplaycallbackevent">LevelPlayCallbackEvent</a>.Rewarded event. See <a href="getting_started.html">Getting Started</a>.</p>
+<p>This struct is referenced by the following functions:</p>
+<ul>
+<li><a href="rewarded_video.html#levelplay_rewarded_callback_subscribe">levelplay_rewarded_callback_subscribe</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The reward's name, as configured for the ad unit on the dashboard.</td>
+</tr>
+<tr>
+<td>amount</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
+<td>The reward amount.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="extension_options.html" class="btn btn-neutral float-left" title="Extension Options"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="interstitial.html" class="btn btn-neutral float-right" title="Interstitial">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><p align="center">YoYoGames 2026</p></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/YoYoGames/GMEXT-LevelPlay" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="extension_options.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="interstitial.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/gml.min.js"></script>
+      <script src="assets/js/gmext_script.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

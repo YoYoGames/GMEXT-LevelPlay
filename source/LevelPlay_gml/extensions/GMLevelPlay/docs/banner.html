@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Banner - GMEXT-LevelPlay</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+        <link href="assets/css/gmext_style.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Banner";
+        var mkdocs_page_input_path = "banner.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/gml.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> GMEXT-LevelPlay
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Guides</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="extension_options.html">Extension Options</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Modules</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="general.html">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="interstitial.html">Interstitial</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="rewarded_video.html">Rewarded Video</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Banner</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#functions">Functions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#constants">Constants</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">GMEXT-LevelPlay</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Modules</li>
+      <li class="breadcrumb-item active">Banner</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/YoYoGames/GMEXT-LevelPlay/edit/master/docs/banner.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <p><a id="top"></a></p>
+<h1 id="banner"><strong>Banner</strong></h1>
+<p>Functions for creating and managing a banner ad - a small ad that stays anchored to an edge of
+the screen.</p>
+<h2 id="functions">Functions</h2>
+<p>This module offers a collection of functions designed to address specific tasks and provide utilities for various purposes. Explore the available functions to make the most of the functionalities provided by this module.</p>
+<ul>
+<li><a href="banner.html#levelplay_banner_create">levelplay_banner_create</a></li>
+<li><a href="banner.html#levelplay_banner_move">levelplay_banner_move</a></li>
+<li><a href="banner.html#levelplay_banner_destroy">levelplay_banner_destroy</a></li>
+<li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
+</ul>
+<h2 id="constants">Constants</h2>
+<p>This module includes a set of predefined constants that can be utilized for various purposes. Browse through the available constants to find values relevant to your needs and enhance the efficiency of your code.</p>
+<ul>
+<li><a href="banner.html#levelplaybannersize">LevelPlayBannerSize</a></li>
+<li><a href="banner.html#levelplaybannerhalign">LevelPlayBannerHAlign</a></li>
+<li><a href="banner.html#levelplaybannervalign">LevelPlayBannerVAlign</a></li>
+</ul>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_banner_create">levelplay_banner_create</h1>
+<p>Creates and loads a banner ad. Only one banner exists at a time - calling this again destroys
+and replaces the previous one.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_banner_create(ad_unit_id, size, align_h, align_v)
+</code></pre></div>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ad_unit_id</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
+<td>The banner ad unit ID, from the LevelPlay dashboard.</td>
+</tr>
+<tr>
+<td>size</td>
+<td><a href="banner.html#levelplaybannersize">LevelPlayBannerSize</a></td>
+<td>The banner size to request.</td>
+</tr>
+<tr>
+<td>align_h</td>
+<td><a href="banner.html#levelplaybannerhalign">LevelPlayBannerHAlign</a></td>
+<td>The horizontal alignment of the banner.</td>
+</tr>
+<tr>
+<td>align_v</td>
+<td><a href="banner.html#levelplaybannervalign">LevelPlayBannerVAlign</a></td>
+<td>The vertical alignment of the banner.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p><a href="general.html#levelplayerror">LevelPlayError</a></p>
+</blockquote>
+<p><a href="general.html#levelplayerror">LevelPlayError</a>.Ok if the request was accepted, or one of
+<a href="general.html#levelplayerror">LevelPlayError</a>.NotInitialized/ActivityUnavailable otherwise. &gt; [!NOTE]</p>
+<blockquote>
+<p>The banner is
+created asynchronously after this returns - a root-view-unavailable failure can only be discovered
+at that point, and is reported through <a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a>'s callback as
+a LoadFailed event instead of a synchronous return value.</p>
+</blockquote>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_banner_move">levelplay_banner_move</h1>
+<p>Repositions the current banner without recreating it. Does nothing if no banner exists.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_banner_move(align_h, align_v)
+</code></pre></div>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>align_h</td>
+<td><a href="banner.html#levelplaybannerhalign">LevelPlayBannerHAlign</a></td>
+<td>The horizontal alignment of the banner.</td>
+</tr>
+<tr>
+<td>align_v</td>
+<td><a href="banner.html#levelplaybannervalign">LevelPlayBannerVAlign</a></td>
+<td>The vertical alignment of the banner.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_banner_destroy">levelplay_banner_destroy</h1>
+<p>Destroys the current banner ad, if one exists. Call <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a> again
+to create a new one.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_banner_destroy()
+</code></pre></div>
+</blockquote>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</h1>
+<p>Subscribes to lifecycle callbacks for the banner ad. There is only one subscription at a time
+- calling this again replaces the previous callback. Unlike interstitial/rewarded video, this fires
+repeatedly for as long as the banner exists, not just once per load/show pair.</p>
+<p>This function operates asynchronously, which means that it does not immediately return the requested result. Instead, upon completion of the task, it will trigger the <a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Method_Variables.htm">Callback</a>.</p>
+<p><br></p>
+<p><strong>Syntax:</strong></p>
+<blockquote>
+<div class="highlight"><pre><span></span><code>levelplay_banner_callback_subscribe(callback)
+</code></pre></div>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Argument</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>callback</td>
+<td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Script_Functions.htm">Function</a></td>
+<td>The function to call for every banner lifecycle event.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Returns:</strong></p>
+<blockquote>
+<p>N/A</p>
+</blockquote>
+<p><br></p>
+<p><strong>Triggers:</strong></p>
+<blockquote>
+<p><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Method_Variables.htm">Callback</a></p>
+</blockquote>
+<p>Fires once per lifecycle event: Loaded, LoadFailed, Displayed, DisplayFailed, Clicked,
+Expanded, Collapsed, or LeftApplication.</p>
+<table>
+<thead>
+<tr>
+<th>Key</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>result</td>
+<td><a href="general.html#levelplayresult">LevelPlayResult</a></td>
+<td>The event's result. <code>success</code> is <code>false</code> only for<br>LoadFailed/DisplayFailed.</td>
+</tr>
+<tr>
+<td>type</td>
+<td><a href="general.html#levelplaycallbackevent">LevelPlayCallbackEvent</a></td>
+<td>Which lifecycle event this is.</td>
+</tr>
+<tr>
+<td>ad_info</td>
+<td><a href="general.html#levelplayadinfo">LevelPlayAdInfo</a></td>
+<td>Information about the ad. Absent only if the SDK provided<br>no ad-info object at all for this event.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<p><strong>Example:</strong></p>
+<div class="highlight"><pre><span></span><code>levelplay_banner_callback_subscribe(function(_result, _type, _ad_info)
+{
+    if (_type == LevelPlayCallbackEvent.LoadFailed)
+        show_debug_message($&quot;Banner failed to load: {_result.error_message}&quot;);
+});
+
+levelplay_banner_create(&quot;your_ad_unit_id&quot;, LevelPlayBannerSize.Banner,
+        LevelPlayBannerHAlign.Center, LevelPlayBannerVAlign.Bottom);
+</code></pre></div>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplaybannersize">LevelPlayBannerSize</h1>
+<p>The banner sizes <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a> can request.</p>
+<p>These constants are referenced by the following functions:</p>
+<ul>
+<li><a href="banner.html#levelplay_banner_create">levelplay_banner_create</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Banner</code></td>
+<td>Standard banner, 320 x 50.</td>
+</tr>
+<tr>
+<td><code>Large</code></td>
+<td>Large banner, 320 x 90.</td>
+</tr>
+<tr>
+<td><code>MediumRectangle</code></td>
+<td>Medium rectangular banner (MREC), 300 x 250.</td>
+</tr>
+<tr>
+<td><code>Adaptive</code></td>
+<td>Automatically adjusts size and orientation for the current device.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplaybannerhalign">LevelPlayBannerHAlign</h1>
+<p>Horizontal alignment for a banner ad, used by <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a>/
+<a href="banner.html#levelplay_banner_move">levelplay_banner_move</a>.</p>
+<p>These constants are referenced by the following functions:</p>
+<ul>
+<li><a href="banner.html#levelplay_banner_create">levelplay_banner_create</a></li>
+<li><a href="banner.html#levelplay_banner_move">levelplay_banner_move</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Left</code></td>
+<td>Align to the left edge.</td>
+</tr>
+<tr>
+<td><code>Center</code></td>
+<td>Align horizontally centered.</td>
+</tr>
+<tr>
+<td><code>Right</code></td>
+<td>Align to the right edge.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+<p align="right"><a href="#top">Back To Top</a></p>
+
+<h1 id="levelplaybannervalign">LevelPlayBannerVAlign</h1>
+<p>Vertical alignment for a banner ad, used by <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a>/
+<a href="banner.html#levelplay_banner_move">levelplay_banner_move</a>.</p>
+<p>These constants are referenced by the following functions:</p>
+<ul>
+<li><a href="banner.html#levelplay_banner_create">levelplay_banner_create</a></li>
+<li><a href="banner.html#levelplay_banner_move">levelplay_banner_move</a></li>
+</ul>
+<p><br></p>
+<table>
+<thead>
+<tr>
+<th>Member</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Top</code></td>
+<td>Align to the top edge.</td>
+</tr>
+<tr>
+<td><code>Center</code></td>
+<td>Align vertically centered.</td>
+</tr>
+<tr>
+<td><code>Bottom</code></td>
+<td>Align to the bottom edge.</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
+<hr />
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="rewarded_video.html" class="btn btn-neutral float-left" title="Rewarded Video"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><p align="center">YoYoGames 2026</p></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/YoYoGames/GMEXT-LevelPlay" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="rewarded_video.html" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/gml.min.js"></script>
+      <script src="assets/js/gmext_script.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="img/favicon.ico" />
+    <title>Getting Started - GMEXT-LevelPlay</title>
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+        <link href="assets/css/gmext_style.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Getting Started";
+        var mkdocs_page_input_path = "getting_started.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/gml.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="." class="icon icon-home"> GMEXT-LevelPlay
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Guides</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Getting Started</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#1-initialize">1. Initialize</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-subscribe-to-callbacks">2. Subscribe to callbacks</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-load-and-show-ads">3. Load and show ads</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-handling-callbacks">4. Handling callbacks</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-cleanup">5. Cleanup</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#testing-notes">Testing notes</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="extension_options.html">Extension Options</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Modules</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="general.html">General</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="interstitial.html">Interstitial</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="rewarded_video.html">Rewarded Video</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="banner.html">Banner</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href=".">GMEXT-LevelPlay</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Guides</li>
+      <li class="breadcrumb-item active">Getting Started</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/YoYoGames/GMEXT-LevelPlay/edit/master/docs/getting_started.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="getting-started">Getting Started</h1>
+<p>This guide walks through the recommended call order for the LevelPlay extension, from initialization
+through showing your first ad. See <a href="extension_options.html">Extension Options</a> for what each Extension Option does.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>A Unity LevelPlay (ironSource) account with your app and ad units already created.</li>
+<li>The extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> Extension Options filled in for the platform(s) you
+  target (<a href="extension_options.html">Extension Options</a>).</li>
+<li>If you want to use mediation, import the <code>LevelPlay_&lt;Network&gt;</code> extension(s) for the networks you
+  want (AppLovin, Facebook, Google, HyprMX, InMobi, Liftoff, Pangle, SuperAwesome, Tencent, UnityAds,
+  VK, Yandex) - each ships disabled by default (<code>copyToTargets</code> off) and is enabled per-project. Check
+  each network's own adapter documentation for its minimum supported OS version before enabling it;
+  this extension's own baseline iOS deployment target is 12.0, but individual networks can require
+  higher.</li>
+</ul>
+<h2 id="1-initialize">1. Initialize</h2>
+<div class="highlight"><pre><span></span><code>levelplay_init(function(_result)
+{
+    if (!_result.success)
+    {
+        show_debug_message($&quot;LevelPlay failed to initialize: {_result.error_message}&quot;);
+        return;
+    }
+
+    // Safe to load ads from here on.
+});
+</code></pre></div>
+<p>Every other ad function fails with <a href="general.html#levelplayerror">LevelPlayError</a>.NotInitialized until this callback has
+fired with <code>success == true</code>.</p>
+<h2 id="2-subscribe-to-callbacks">2. Subscribe to callbacks</h2>
+<p>Subscribe once per ad type, before loading - the subscription lasts for as long as your game runs (or
+until you call the <code>_callback_subscribe</code> function again with a different function):</p>
+<div class="highlight"><pre><span></span><code>levelplay_interstitial_callback_subscribe(function(_result, _type, _ad_info)
+{
+    switch (_type)
+    {
+        case LevelPlayCallbackEvent.Loaded:
+            levelplay_interstitial_show(&quot;&quot;);
+            break;
+        case LevelPlayCallbackEvent.LoadFailed:
+            show_debug_message($&quot;Interstitial failed to load: {_result.error_message}&quot;);
+            break;
+    }
+});
+</code></pre></div>
+<p>See <a href="interstitial.html">Interstitial</a>, <a href="rewarded_video.html">Rewarded Video</a>, and <a href="banner.html">Banner</a> for each ad type's full
+callback shape - rewarded video's callback carries an extra <code>reward</code> argument, and banner's fires
+repeatedly for the life of the banner instead of once per load/show pair.</p>
+<h2 id="3-load-and-show-ads">3. Load and show ads</h2>
+<p>Interstitial and rewarded video follow the same init/load/show pattern:</p>
+<div class="highlight"><pre><span></span><code>levelplay_interstitial_init(&quot;your_ad_unit_id&quot;);
+levelplay_interstitial_load();
+
+// ...later, once the Loaded callback has fired...
+
+if (levelplay_interstitial_is_ready())
+    levelplay_interstitial_show(&quot;&quot;);
+</code></pre></div>
+<p>Banner ads are created directly, with no separate load step - see <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a>.</p>
+<h2 id="4-handling-callbacks">4. Handling callbacks</h2>
+<p>Always check <code>result.success</code> first:</p>
+<div class="highlight"><pre><span></span><code>function(_result, _type, _ad_info)
+{
+    if (!_result.success)
+    {
+        show_debug_message($&quot;Failed: {_result.error_message}&quot;);
+        return;
+    }
+    // handle _type
+}
+</code></pre></div>
+<p>Synchronous failures (e.g. calling <code>_show</code> before an ad is ready) are reported immediately through
+each function's <a href="general.html#levelplayerror">LevelPlayError</a> return value instead - see <a href="general.html">General</a>.</p>
+<h2 id="5-cleanup">5. Cleanup</h2>
+<p>Destroy an active banner with <a href="banner.html#levelplay_banner_destroy">levelplay_banner_destroy</a> when you're done with it.
+Interstitial and rewarded video have no separate dispose call - calling <code>_init</code> again with a new ad
+unit ID replaces the previous instance.</p>
+<h2 id="testing-notes">Testing notes</h2>
+<p>Call <a href="general.html#levelplay_launch_test_suite">levelplay_launch_test_suite</a> during development to open LevelPlay's integration test
+suite and verify your platform setup. &gt; [!NOTE]</p>
+<blockquote>
+<p>LevelPlay/ironSource does not publish a universal test
+ad unit ID like some other networks - register a real test ad unit on your own dashboard for
+development.</p>
+</blockquote>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="extension_options.html" class="btn btn-neutral float-right" title="Extension Options">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p><p align="center">YoYoGames 2026</p></p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/YoYoGames/GMEXT-LevelPlay" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="extension_options.html" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = ".";</script>
+    <script src="js/theme_extra.js"></script>
+    <script src="js/theme.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/gml.min.js"></script>
+      <script src="assets/js/gmext_script.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
