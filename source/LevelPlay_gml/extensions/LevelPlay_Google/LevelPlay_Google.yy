@@ -37,8 +37,8 @@
   "macsourcedir":"",
   "name":"LevelPlay_Google",
   "options":[
-    {"$GMExtensionOption":"","%Name":"Android_AppID","defaultValue":"","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"5a95d184-c842-45fc-a1c1-41e355fdaa93","hidden":false,"listItems":[],"name":"Android_AppID","optType":2,"resourceType":"GMExtensionOption","resourceVersion":"2.0",},
-    {"$GMExtensionOption":"","%Name":"iOS_AppID","defaultValue":"","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"62feec05-04f1-4aaf-ae7e-cee17939feaf","hidden":false,"listItems":[],"name":"iOS_AppID","optType":2,"resourceType":"GMExtensionOption","resourceVersion":"2.0",},
+    {"$GMExtensionOption":"","%Name":"Android_AppID","defaultValue":"","description":"Your AdMob Application ID for Android, required by Google's LevelPlay mediation adapter (format: ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY).","displayName":"Android AdMob App ID","exportToINI":false,"extensionId":null,"guid":"5a95d184-c842-45fc-a1c1-41e355fdaa93","hidden":false,"listItems":[],"name":"Android_AppID","optType":2,"resourceType":"GMExtensionOption","resourceVersion":"2.0",},
+    {"$GMExtensionOption":"","%Name":"iOS_AppID","defaultValue":"","description":"Your AdMob Application ID for iOS, required by Google's LevelPlay mediation adapter (format: ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY).","displayName":"iOS AdMob App ID","exportToINI":false,"extensionId":null,"guid":"62feec05-04f1-4aaf-ae7e-cee17939feaf","hidden":false,"listItems":[],"name":"iOS_AppID","optType":2,"resourceType":"GMExtensionOption","resourceVersion":"2.0",},
   ],
   "optionsFile":"options.json",
   "packageId":"",

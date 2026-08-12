@@ -25,7 +25,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2026.100.0.1110",
+    "IDEVersion":"2026.100.0.1118",
   },
   "name":"LevelPlay",
   "resources":[
@@ -46,7 +46,6 @@
     {"id":{"name":"fnt_gm_15","path":"fonts/fnt_gm_15/fnt_gm_15.yy",},},
     {"id":{"name":"fnt_gm_20","path":"fonts/fnt_gm_20/fnt_gm_20.yy",},},
     {"id":{"name":"fnt_gm_30","path":"fonts/fnt_gm_30/fnt_gm_30.yy",},},
-    {"id":{"name":"LEVELPLAY_README","path":"notes/LEVELPLAY_README/LEVELPLAY_README.yy",},},
     {"id":{"name":"obj_gm_button","path":"objects/obj_gm_button/obj_gm_button.yy",},},
     {"id":{"name":"obj_gm_text","path":"objects/obj_gm_text/obj_gm_text.yy",},},
     {"id":{"name":"obj_gm_textbox","path":"objects/obj_gm_textbox/obj_gm_textbox.yy",},},

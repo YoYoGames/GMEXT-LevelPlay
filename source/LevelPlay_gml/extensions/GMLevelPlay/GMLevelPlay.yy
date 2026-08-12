@@ -65,8 +65,8 @@
   "macsourcedir":"",
   "name":"GMLevelPlay",
   "options":[
-    {"$GMExtensionOption":"","%Name":"AndroidAppKey","defaultValue":"","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"2c065c87-16f0-4359-801a-dd0f8791369e","hidden":false,"listItems":[],"name":"AndroidAppKey","optType":2,"resourceType":"GMExtensionOption","resourceVersion":"2.0",},
-    {"$GMExtensionOption":"","%Name":"iOSAppKey","defaultValue":"","description":"","displayName":"","exportToINI":false,"extensionId":null,"guid":"35041389-533f-4ec4-9526-7421cbbd3240","hidden":false,"listItems":[],"name":"iOSAppKey","optType":2,"resourceType":"GMExtensionOption","resourceVersion":"2.0",},
+    {"$GMExtensionOption":"","%Name":"AndroidAppKey","defaultValue":"","description":"The LevelPlay (ironSource) App Key for Android, from the LevelPlay dashboard.","displayName":"Android App Key","exportToINI":false,"extensionId":null,"guid":"2c065c87-16f0-4359-801a-dd0f8791369e","hidden":false,"listItems":[],"name":"AndroidAppKey","optType":2,"resourceType":"GMExtensionOption","resourceVersion":"2.0",},
+    {"$GMExtensionOption":"","%Name":"iOSAppKey","defaultValue":"","description":"The LevelPlay (ironSource) App Key for iOS, from the LevelPlay dashboard.","displayName":"iOS App Key","exportToINI":false,"extensionId":null,"guid":"35041389-533f-4ec4-9526-7421cbbd3240","hidden":false,"listItems":[],"name":"iOSAppKey","optType":2,"resourceType":"GMExtensionOption","resourceVersion":"2.0",},
   ],
   "optionsFile":"options.json",
   "packageId":"",

@@ -144,6 +144,69 @@
 <blockquote>
 <p>Without a valid <code>iOSAppKey</code>, <a href="general.html#levelplay_init">levelplay_init</a> will fail to initialise the SDK on iOS.</p>
 </blockquote>
+<h2 id="mediation-network-options">Mediation network options</h2>
+<p>Most <code>LevelPlay_&lt;Network&gt;</code> mediation extensions have no configurable options - enabling the extension is
+enough. The Google mediation extension is the one exception, requiring its own App ID:</p>
+<h3 id="levelplay_google-android_appid">LevelPlay_Google: Android_AppID</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td>String</td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes, if the <code>LevelPlay_Google</code> extension is enabled for Android</td>
+</tr>
+<tr>
+<td><strong>Platform</strong></td>
+<td>Android only</td>
+</tr>
+</tbody>
+</table>
+<p>Your AdMob Application ID for Android, in the form <code>ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY</code>. Found on
+the AdMob dashboard under <strong>App settings</strong>. Injected into the Android manifest's
+<code>com.google.android.gms.ads.APPLICATION_ID</code> meta-data entry.</p>
+<blockquote>
+<p>The Google mediation adapter's manifest merge fails at build time without a valid
+<code>Android_AppID</code> when <code>LevelPlay_Google</code> is enabled for Android.</p>
+</blockquote>
+<h3 id="levelplay_google-ios_appid">LevelPlay_Google: iOS_AppID</h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Type</strong></td>
+<td>String</td>
+</tr>
+<tr>
+<td><strong>Required</strong></td>
+<td>Yes, if the <code>LevelPlay_Google</code> extension is enabled for iOS</td>
+</tr>
+<tr>
+<td><strong>Platform</strong></td>
+<td>iOS only</td>
+</tr>
+</tbody>
+</table>
+<p>Your AdMob Application ID for iOS, in the form <code>ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY</code>. Found on the
+AdMob dashboard under <strong>App settings</strong>. Injected into the compiled <code>Info.plist</code>'s
+<code>GADApplicationIdentifier</code> key.</p>
+<blockquote>
+<p>Google's Mobile Ads SDK crashes on the first ad request without a valid <code>iOS_AppID</code> when
+<code>LevelPlay_Google</code> is enabled for iOS.</p>
+</blockquote>
               
             </div>
           </div><footer>
