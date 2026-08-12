@@ -14,13 +14,6 @@
 extern UIViewController *g_controller;
 extern UIView *g_glView;
 
-/*
-extern "C" void AudioPauseAll(bool bSuspend);
-extern "C" void AudioResumeAll(void);
-extern "C" void Audio_DevicePause(void);
-extern "C" void Audio_DeviceResume(void);
-*/
-
 static NSString *NSStringFromStringView(std::string_view value)
 {
     NSString *result = [[NSString alloc] initWithBytes:value.data()
@@ -117,6 +110,8 @@ static NSString *LevelPlayAppKey(void)
                                   alignV:(gm_enums::LevelPlayBannerVAlign)align_v;
 
 - (gm_structs::LevelPlayAdInfo)adInfoStream:(LPMAdInfo *)adInfo;
+- (std::optional<gm_structs::LevelPlayAdInfo>)adInfoOptional:(LPMAdInfo *)adInfo
+                                               fallbackUnitId:(NSString *)fallbackUnitId;
 - (gm_structs::LevelPlayReward)rewardStream:(LPMReward *)reward;
 - (gm_structs::LevelPlayResult)resultStream:(bool)success message:(NSString *)message;
 - (gm_structs::LevelPlayResult)resultStream:(gm_enums::LevelPlayCallbackEvent)type error:(NSError *)error;
@@ -125,14 +120,32 @@ static NSString *LevelPlayAppKey(void)
                   adInfo:(LPMAdInfo *)adInfo
                    error:(NSError *)error;
 
+// fallbackUnitId lets a LoadFailed path (whose SDK delegate hands back an adUnitId but no LPMAdInfo)
+// carry that one piece of data through as a partial LevelPlayAdInfo instead of dropping it.
+- (void)sendBannerEvent:(gm_enums::LevelPlayCallbackEvent)type
+                  adInfo:(LPMAdInfo *)adInfo
+                   error:(NSError *)error
+          fallbackUnitId:(NSString *)fallbackUnitId;
+
 - (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
                         adInfo:(LPMAdInfo *)adInfo
                          error:(NSError *)error;
+
+- (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
+                        adInfo:(LPMAdInfo *)adInfo
+                         error:(NSError *)error
+                fallbackUnitId:(NSString *)fallbackUnitId;
 
 - (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
                     adInfo:(LPMAdInfo *)adInfo
                      error:(NSError *)error
                     reward:(LPMReward *)reward;
+
+- (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
+                    adInfo:(LPMAdInfo *)adInfo
+                     error:(NSError *)error
+                    reward:(LPMReward *)reward
+            fallbackUnitId:(NSString *)fallbackUnitId;
 
 // The one deliberate exception to "guard failures skip the callback" -- see
 // levelplay_banner_create's root-view-unavailable path.
@@ -158,7 +171,10 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)didFailToLoadAdWithAdUnitId:(NSString *)adUnitId error:(NSError *)error
 {
-    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed adInfo:nil error:error];
+    [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed
+                                adInfo:nil
+                                 error:error
+                        fallbackUnitId:adUnitId];
 }
 
 - (void)didDisplayAdWithAdInfo:(LPMAdInfo *)adInfo
@@ -169,16 +185,10 @@ static NSString *LevelPlayAppKey(void)
 - (void)didFailToDisplayAdWithAdInfo:(LPMAdInfo *)adInfo error:(NSError *)error
 {
     [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error];
-
-    //Audio_DeviceResume();
-    //AudioResumeAll();
 }
 
 - (void)didCloseAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    //Audio_DeviceResume();
-    //AudioResumeAll();
-
     [self.owner sendInterstitialEvent:gm_enums::LevelPlayCallbackEvent::Closed adInfo:adInfo error:nil];
 }
 
@@ -212,7 +222,11 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)didFailToLoadAdWithAdUnitId:(NSString *)adUnitId error:(NSError *)error
 {
-    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed adInfo:nil error:error reward:nil];
+    [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed
+                            adInfo:nil
+                             error:error
+                            reward:nil
+                    fallbackUnitId:adUnitId];
 }
 
 - (void)didDisplayAdWithAdInfo:(LPMAdInfo *)adInfo
@@ -223,16 +237,10 @@ static NSString *LevelPlayAppKey(void)
 - (void)didFailToDisplayAdWithAdInfo:(LPMAdInfo *)adInfo error:(NSError *)error
 {
     [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::DisplayFailed adInfo:adInfo error:error reward:nil];
-
-    //Audio_DeviceResume();
-    //AudioResumeAll();
 }
 
 - (void)didCloseAdWithAdInfo:(LPMAdInfo *)adInfo
 {
-    //Audio_DeviceResume();
-    //AudioResumeAll();
-
     [self.owner sendRewardedEvent:gm_enums::LevelPlayCallbackEvent::Closed adInfo:adInfo error:nil reward:nil];
 }
 
@@ -271,7 +279,10 @@ static NSString *LevelPlayAppKey(void)
 
 - (void)didFailToLoadAdWithAdUnitId:(NSString *)adUnitId error:(NSError *)error
 {
-    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed adInfo:nil error:error];
+    [self.owner sendBannerEvent:gm_enums::LevelPlayCallbackEvent::LoadFailed
+                          adInfo:nil
+                           error:error
+                  fallbackUnitId:adUnitId];
 }
 
 - (void)didDisplayAdWithAdInfo:(LPMAdInfo *)adInfo
@@ -543,9 +554,6 @@ static NSString *LevelPlayAppKey(void)
         return gm_enums::LevelPlayError::PlacementCapped;
     }
 
-    //AudioPauseAll(false);
-    //Audio_DevicePause();
-
     [self.interstitialAd showAdWithViewController:controller
                                     placementName:placement.length > 0 ? placement : nil];
 
@@ -612,9 +620,6 @@ static NSString *LevelPlayAppKey(void)
     if (placement.length > 0 && [LPMRewardedAd isPlacementCapped:placement]) {
         return gm_enums::LevelPlayError::PlacementCapped;
     }
-
-    //AudioPauseAll(false);
-    //Audio_DevicePause();
 
     [self.rewardedAd showAdWithViewController:controller
                                 placementName:placement.length > 0 ? placement : nil];
@@ -847,6 +852,22 @@ static NSString *LevelPlayAppKey(void)
     return info;
 }
 
+- (std::optional<gm_structs::LevelPlayAdInfo>)adInfoOptional:(LPMAdInfo *)adInfo
+                                               fallbackUnitId:(NSString *)fallbackUnitId
+{
+    if (adInfo != nil) {
+        return std::optional<gm_structs::LevelPlayAdInfo>([self adInfoStream:adInfo]);
+    }
+
+    if (fallbackUnitId != nil && fallbackUnitId.length > 0) {
+        gm_structs::LevelPlayAdInfo info{};
+        info.unit_id = StringFromNSString(fallbackUnitId);
+        return std::optional<gm_structs::LevelPlayAdInfo>(info);
+    }
+
+    return std::nullopt;
+}
+
 - (gm_structs::LevelPlayReward)rewardStream:(LPMReward *)reward
 {
     gm_structs::LevelPlayReward r{};
@@ -894,11 +915,20 @@ static NSString *LevelPlayAppKey(void)
                   adInfo:(LPMAdInfo *)adInfo
                    error:(NSError *)error
 {
+    [self sendBannerEvent:type adInfo:adInfo error:error fallbackUnitId:nil];
+}
+
+- (void)sendBannerEvent:(gm_enums::LevelPlayCallbackEvent)type
+                  adInfo:(LPMAdInfo *)adInfo
+                   error:(NSError *)error
+          fallbackUnitId:(NSString *)fallbackUnitId
+{
     if (![NSThread isMainThread]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self sendBannerEvent:type
                             adInfo:adInfo
-                             error:error];
+                             error:error
+                    fallbackUnitId:fallbackUnitId];
         });
         return;
     }
@@ -908,8 +938,7 @@ static NSString *LevelPlayAppKey(void)
     }
 
     gm_structs::LevelPlayResult result = [self resultStream:type error:error];
-    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt =
-        adInfo != nil ? std::optional<gm_structs::LevelPlayAdInfo>([self adInfoStream:adInfo]) : std::nullopt;
+    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt = [self adInfoOptional:adInfo fallbackUnitId:fallbackUnitId];
 
     mBannerCallback.call(result, type, adInfoOpt);
 }
@@ -918,11 +947,20 @@ static NSString *LevelPlayAppKey(void)
                         adInfo:(LPMAdInfo *)adInfo
                          error:(NSError *)error
 {
+    [self sendInterstitialEvent:type adInfo:adInfo error:error fallbackUnitId:nil];
+}
+
+- (void)sendInterstitialEvent:(gm_enums::LevelPlayCallbackEvent)type
+                        adInfo:(LPMAdInfo *)adInfo
+                         error:(NSError *)error
+                fallbackUnitId:(NSString *)fallbackUnitId
+{
     if (![NSThread isMainThread]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self sendInterstitialEvent:type
                                   adInfo:adInfo
-                                   error:error];
+                                   error:error
+                          fallbackUnitId:fallbackUnitId];
         });
         return;
     }
@@ -932,8 +970,7 @@ static NSString *LevelPlayAppKey(void)
     }
 
     gm_structs::LevelPlayResult result = [self resultStream:type error:error];
-    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt =
-        adInfo != nil ? std::optional<gm_structs::LevelPlayAdInfo>([self adInfoStream:adInfo]) : std::nullopt;
+    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt = [self adInfoOptional:adInfo fallbackUnitId:fallbackUnitId];
 
     mInterstitialCallback.call(result, type, adInfoOpt);
 }
@@ -943,12 +980,22 @@ static NSString *LevelPlayAppKey(void)
                      error:(NSError *)error
                     reward:(LPMReward *)reward
 {
+    [self sendRewardedEvent:type adInfo:adInfo error:error reward:reward fallbackUnitId:nil];
+}
+
+- (void)sendRewardedEvent:(gm_enums::LevelPlayCallbackEvent)type
+                    adInfo:(LPMAdInfo *)adInfo
+                     error:(NSError *)error
+                    reward:(LPMReward *)reward
+            fallbackUnitId:(NSString *)fallbackUnitId
+{
     if (![NSThread isMainThread]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             [self sendRewardedEvent:type
                               adInfo:adInfo
                                error:error
-                              reward:reward];
+                              reward:reward
+                      fallbackUnitId:fallbackUnitId];
         });
         return;
     }
@@ -958,8 +1005,7 @@ static NSString *LevelPlayAppKey(void)
     }
 
     gm_structs::LevelPlayResult result = [self resultStream:type error:error];
-    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt =
-        adInfo != nil ? std::optional<gm_structs::LevelPlayAdInfo>([self adInfoStream:adInfo]) : std::nullopt;
+    std::optional<gm_structs::LevelPlayAdInfo> adInfoOpt = [self adInfoOptional:adInfo fallbackUnitId:fallbackUnitId];
     std::optional<gm_structs::LevelPlayReward> rewardOpt =
         reward != nil ? std::optional<gm_structs::LevelPlayReward>([self rewardStream:reward]) : std::nullopt;
 
