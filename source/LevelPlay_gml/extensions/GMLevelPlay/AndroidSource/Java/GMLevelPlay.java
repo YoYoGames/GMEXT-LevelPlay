@@ -170,7 +170,7 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
     }
 
     public boolean levelplay_interstitial_is_placement_capped(String placement_id) {
-        if (mInterstitialAd == null) return false;
+        if (placement_id == null || placement_id.isEmpty()) return false;
         return LevelPlayInterstitialAd.isPlacementCapped(placement_id);
     }
 
@@ -185,7 +185,7 @@ public class GMLevelPlay extends GMLevelPlayInternal implements LevelPlayInitLis
         if (!mInterstitialAd.isAdReady()) {
             return LevelPlayError.AdNotReady;
         }
-        if (LevelPlayInterstitialAd.isPlacementCapped(placement_id)) {
+        if (placement_id != null && !placement_id.isEmpty() && LevelPlayInterstitialAd.isPlacementCapped(placement_id)) {
             return LevelPlayError.PlacementCapped;
         }
 

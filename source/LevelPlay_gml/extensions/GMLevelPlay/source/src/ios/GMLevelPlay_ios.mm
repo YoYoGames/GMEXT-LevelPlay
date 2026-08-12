@@ -514,13 +514,11 @@ static NSString *LevelPlayAppKey(void)
 
 - (bool)levelplay_interstitial_is_placement_capped:(std::string_view)placement_id
 {
-    NSString *placement = NSStringFromStringView(placement_id);
-
-    if (placement.length == 0) {
+    if (placement_id.empty()) {
         return false;
     }
 
-    return [LPMInterstitialAd isPlacementCapped:placement];
+    return [LPMInterstitialAd isPlacementCapped:NSStringFromStringView(placement_id)];
 }
 
 - (gm_enums::LevelPlayError)levelplay_interstitial_show:(std::string_view)placement_id
@@ -586,13 +584,11 @@ static NSString *LevelPlayAppKey(void)
 
 - (bool)levelplay_rewarded_video_is_placement_capped:(std::string_view)placement_id
 {
-    NSString *placement = NSStringFromStringView(placement_id);
-
-    if (placement.length == 0) {
+    if (placement_id.empty()) {
         return false;
     }
 
-    return [LPMRewardedAd isPlacementCapped:placement];
+    return [LPMRewardedAd isPlacementCapped:NSStringFromStringView(placement_id)];
 }
 
 - (gm_enums::LevelPlayError)levelplay_rewarded_video_show:(std::string_view)placement_id
