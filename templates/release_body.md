@@ -3,10 +3,6 @@
 - This extension is to be used with GM 2022.9 and future releases.
 - Works with **Android** and **iOS**.
 
-## CHANGES SINCE ${releaseOldVersion}
-
-https://github.com/YoYoGames/GMEXT-LevelPlay/compare/${releaseOldVersion}...${releaseNewVersion}
-
 ## DESCRIPTION
 
 This extension wraps Unity's LevelPlay (ironSource) ad mediation SDK, allowing users to add and control Interstitial, Rewarded Video and Banner ads inside their application/game.
