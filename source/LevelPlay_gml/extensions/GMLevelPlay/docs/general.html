@@ -91,10 +91,10 @@
               
                 <p><a id="top"></a></p>
 <h1 id="general"><strong>General</strong></h1>
-<p>Initialization, privacy/regulation settings, and the shared result/data types every ad
-module's callbacks use.</p>
+<p>Initialisation, the privacy and regulation settings, and the shared result and data types
+that the callbacks of every ad module use.</p>
 <h2 id="functions">Functions</h2>
-<p>Initialization and cross-ad-type functions.</p>
+<p>Initialisation and the functions that are shared across the ad types.</p>
 <ul>
 <li><a href="general.html#levelplay_init">levelplay_init</a></li>
 <li><a href="general.html#levelplay_is_initialized">levelplay_is_initialized</a></li>
@@ -104,7 +104,7 @@ module's callbacks use.</p>
 <li><a href="general.html#levelplay_launch_test_suite">levelplay_launch_test_suite</a></li>
 </ul>
 <h2 id="structs">Structs</h2>
-<p>Shared data types used across every ad module.</p>
+<p>The shared data types that are used across every ad module.</p>
 <ul>
 <li><a href="general.html#levelplayresult">LevelPlayResult</a></li>
 <li><a href="general.html#levelplayadinfo">LevelPlayAdInfo</a></li>
@@ -121,9 +121,9 @@ module's callbacks use.</p>
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplay_init">levelplay_init</h1>
-<p>Initializes the LevelPlay SDK. Call this once, before any other LevelPlay function. Requires
-the extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> option to be set for the current platform (see
-<a href="extension_options.html">Extension Options</a>).</p>
+<p>This function initialises the LevelPlay SDK. You should call it once, before any other
+LevelPlay function. It requires the <code>AndroidAppKey</code> or the <code>iOSAppKey</code> option of the extension to
+be set for the current platform. See <a href="extension_options.html">Extension Options</a>.</p>
 <p>This function operates asynchronously, which means that it does not immediately return the requested result. Instead, upon completion of the task, it will trigger the <a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Method_Variables.htm">Callback</a>.</p>
 <p><br></p>
 <p><strong>Syntax:</strong></p>
@@ -143,7 +143,7 @@ the extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> option to be s
 <tr>
 <td>callback</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Script_Functions.htm">Function</a></td>
-<td>The function to call once initialization completes or fails.</td>
+<td>The function to call once the initialisation completes or fails.</td>
 </tr>
 </tbody>
 </table>
@@ -152,15 +152,15 @@ the extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> option to be s
 <blockquote>
 <p><a href="general.html#levelplayerror">LevelPlayError</a></p>
 </blockquote>
-<p><a href="general.html#levelplayerror">LevelPlayError</a>.Ok if the initialization request was
-accepted, an error code if it was rejected outright (e.g. a missing app key) - in the rejected case
-<code>callback</code> is never invoked.</p>
+<p><a href="general.html#levelplayerror">LevelPlayError</a>.Ok if the initialisation request was
+accepted, or an error code if it was rejected outright, for example because the app key is
+missing. In that rejected case <code>callback</code> is never called.</p>
 <p><br></p>
 <p><strong>Triggers:</strong></p>
 <blockquote>
 <p><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Method_Variables.htm">Callback</a></p>
 </blockquote>
-<p>Fires once, when the SDK finishes starting up (or fails to). Not fired if
+<p>Called once, when the SDK finishes starting up or fails to do so. It is not called if
 <a href="general.html#levelplay_init">levelplay_init</a> itself returned an error synchronously.</p>
 <table>
 <thead>
@@ -174,7 +174,7 @@ accepted, an error code if it was rejected outright (e.g. a missing app key) - i
 <tr>
 <td>result</td>
 <td><a href="general.html#levelplayresult">LevelPlayResult</a></td>
-<td>The initialization outcome.</td>
+<td>The outcome of the initialisation.</td>
 </tr>
 </tbody>
 </table>
@@ -183,9 +183,9 @@ accepted, an error code if it was rejected outright (e.g. a missing app key) - i
 <div class="highlight"><pre><span></span><code>levelplay_init(function(_result)
 {
     if (_result.success)
-        show_debug_message(&quot;LevelPlay initialized&quot;);
+        show_debug_message("LevelPlay initialized");
     else
-        show_debug_message($&quot;LevelPlay failed to initialize: {_result.error_message}&quot;);
+        show_debug_message($"LevelPlay failed to initialize: {_result.error_message}");
 });
 </code></pre></div>
 <p><br></p>
@@ -193,7 +193,7 @@ accepted, an error code if it was rejected outright (e.g. a missing app key) - i
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplay_is_initialized">levelplay_is_initialized</h1>
-<p>Returns whether <a href="general.html#levelplay_init">levelplay_init</a> has completed successfully.</p>
+<p>This function returns whether <a href="general.html#levelplay_init">levelplay_init</a> has completed successfully.</p>
 <p><br></p>
 <p><strong>Syntax:</strong></p>
 <blockquote>
@@ -210,8 +210,9 @@ accepted, an error code if it was rejected outright (e.g. a missing app key) - i
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplay_set_consent">levelplay_set_consent</h1>
-<p>Sets whether the user provided consent, communicated to every mediated network that supports
-it. See <a href="https://developers.is.com/ironsource-mobile/android/regulation-advanced-settings/#step-4">Regulation Advanced Settings</a>.</p>
+<p>This function sets whether the user has provided consent, which is communicated to every
+mediated network that supports it. See
+<a href="https://developers.is.com/ironsource-mobile/android/regulation-advanced-settings/#step-4">Regulation Advanced Settings</a>.</p>
 <p><br></p>
 <p><strong>Syntax:</strong></p>
 <blockquote>
@@ -230,7 +231,7 @@ it. See <a href="https://developers.is.com/ironsource-mobile/android/regulation-
 <tr>
 <td>enable</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Boolean</a></td>
-<td>Whether the user provided consent.</td>
+<td>Whether the user has provided consent.</td>
 </tr>
 </tbody>
 </table>
@@ -244,7 +245,8 @@ it. See <a href="https://developers.is.com/ironsource-mobile/android/regulation-
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplay_set_metadata">levelplay_set_metadata</h1>
-<p>Sets a metadata key-value pair, forwarded to mediated networks that support it. See
+<p>This function sets a metadata key and value pair, which is forwarded to the mediated
+networks that support it. See
 <a href="https://developers.is.com/ironsource-mobile/android/regulation-advanced-settings/#step-4">Regulation Advanced Settings</a>.</p>
 <p><br></p>
 <p><strong>Syntax:</strong></p>
@@ -283,7 +285,8 @@ it. See <a href="https://developers.is.com/ironsource-mobile/android/regulation-
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplay_set_dynamic_user_id">levelplay_set_dynamic_user_id</h1>
-<p>Sets the Dynamic UserID, used by server-side reward callbacks to identify the user. See
+<p>This function sets the Dynamic UserID, which is used by server-side reward callbacks to
+identify the user. See
 <a href="https://developers.is.com/ironsource-mobile/android/rewarded-video-integration-android-2/#dynamic-userid">Dynamic UserID</a>.</p>
 <p><br></p>
 <p><strong>Syntax:</strong></p>
@@ -317,11 +320,12 @@ it. See <a href="https://developers.is.com/ironsource-mobile/android/regulation-
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplay_launch_test_suite">levelplay_launch_test_suite</h1>
-<p>Launches the LevelPlay integration test suite, which lets you verify platform setup and
-preview ads for your configured networks. Does nothing if the current activity/view controller is
-unavailable. &gt; [!IMPORTANT]</p>
+<p>This function launches the LevelPlay integration test suite, which lets you verify the setup
+of your platform and preview ads for the networks that you have configured. It does nothing if the
+current activity or view controller is unavailable. &gt; [!IMPORTANT]</p>
 <blockquote>
-<p>Never ship a build with a call to this left in.</p>
+<p>You should never ship a build
+that still contains a call to this function.</p>
 </blockquote>
 <p><br></p>
 <p><strong>Syntax:</strong></p>
@@ -339,8 +343,9 @@ unavailable. &gt; [!IMPORTANT]</p>
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplaycallbackevent">LevelPlayCallbackEvent</h1>
-<p>The lifecycle events an ad callback can fire with. Which subset of these a given ad type uses
-is documented on that type's <code>_load</code> function (banner: <code>_callback_subscribe</code>).</p>
+<p>The lifecycle events that an ad callback can be called with. Which subset of these a given
+ad type uses is documented on the <code>_load</code> function of that type, or on <code>_callback_subscribe</code> for a
+banner.</p>
 <p>These constants are referenced by the following functions:</p>
 <ul>
 <li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
@@ -358,7 +363,7 @@ is documented on that type's <code>_load</code> function (banner: <code>_callbac
 <tbody>
 <tr>
 <td><code>Loaded</code></td>
-<td>The ad finished loading and is ready to show.</td>
+<td>The ad finished loading and is ready to be shown.</td>
 </tr>
 <tr>
 <td><code>LoadFailed</code></td>
@@ -366,7 +371,7 @@ is documented on that type's <code>_load</code> function (banner: <code>_callbac
 </tr>
 <tr>
 <td><code>Displayed</code></td>
-<td>The ad was displayed. Equivalent to an impression.</td>
+<td>The ad was displayed, which is the equivalent of an impression.</td>
 </tr>
 <tr>
 <td><code>DisplayFailed</code></td>
@@ -382,11 +387,11 @@ is documented on that type's <code>_load</code> function (banner: <code>_callbac
 </tr>
 <tr>
 <td><code>InfoChanged</code></td>
-<td>The ad info was updated - available when another ad has loaded with a higher<br>CPM/rate. Interstitial and rewarded video only.</td>
+<td>The ad info was updated, which happens when another ad has loaded with a<br>higher CPM or rate. Interstitial and rewarded video only.</td>
 </tr>
 <tr>
 <td><code>Rewarded</code></td>
-<td>The user completed watching a rewarded video and should be rewarded.<br><a href="general.html#levelplayreward">LevelPlayReward</a> is populated for this event only. Rewarded video only.</td>
+<td>The user finished watching a rewarded video and should be rewarded.<br><a href="general.html#levelplayreward">LevelPlayReward</a> is only populated for this event. Rewarded video only.</td>
 </tr>
 <tr>
 <td><code>Expanded</code></td>
@@ -407,10 +412,10 @@ is documented on that type's <code>_load</code> function (banner: <code>_callbac
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplayerror">LevelPlayError</h1>
-<p>Synchronous error codes returned by most functions in this extension. These describe why a
-call was rejected outright (e.g. before initialization, or with no ad loaded) - a failure reported
-by the SDK itself after a call was accepted instead arrives asynchronously via
-<a href="general.html#levelplayresult">LevelPlayResult</a>.</p>
+<p>The synchronous error codes that are returned by most functions in this extension. They
+describe why a call was rejected outright, for example because it was made before the
+initialisation completed, or with no ad loaded. A failure that is reported by the SDK itself after
+a call was accepted arrives asynchronously through a <a href="general.html#levelplayresult">LevelPlayResult</a> instead.</p>
 <p>These constants are referenced by the following functions:</p>
 <ul>
 <li><a href="banner.html#levelplay_banner_create">levelplay_banner_create</a></li>
@@ -441,7 +446,7 @@ by the SDK itself after a call was accepted instead arrives asynchronously via
 </tr>
 <tr>
 <td><code>AdNotReady</code></td>
-<td>The ad has not finished loading yet (or has already been shown).</td>
+<td>The ad has not finished loading yet, or it has already been shown.</td>
 </tr>
 <tr>
 <td><code>PlacementCapped</code></td>
@@ -449,19 +454,19 @@ by the SDK itself after a call was accepted instead arrives asynchronously via
 </tr>
 <tr>
 <td><code>ActivityUnavailable</code></td>
-<td>The current Android activity / iOS view controller is not available.</td>
+<td>The current Android activity or iOS view controller is not available.</td>
 </tr>
 <tr>
 <td><code>RootViewUnavailable</code></td>
-<td>Banner only - the root view was unavailable when the banner tried to<br>attach itself. Discoverable only after <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a>'s synchronous return, so<br>it is reported through the banner callback instead - see <a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a>.</td>
+<td>Banner only. The root view was unavailable when the banner tried to<br>attach itself. No function ever returns this value, as the failure that it describes can only be<br>discovered after <a href="banner.html#levelplay_banner_create">levelplay_banner_create</a> has already returned. It is reported as a<br>LoadFailed event through the banner callback instead, and the reason is given in<br><code>result.error_message</code>. See <a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a>.</td>
 </tr>
 <tr>
 <td><code>MissingAppKey</code></td>
-<td>The extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> option is not set for the current<br>platform.</td>
+<td>The <code>AndroidAppKey</code> or the <code>iOSAppKey</code> option of the extension is not set<br>for the current platform.</td>
 </tr>
 <tr>
 <td><code>InvalidHandle</code></td>
-<td>Interstitial/rewarded video only - <code>handle</code> is not a live handle from the<br>matching <code>_create</code> function (or has already been destroyed).</td>
+<td>Interstitial and rewarded video only. The <code>handle</code> is not a live handle from<br>the matching <code>_create</code> function, or it has already been destroyed.</td>
 </tr>
 </tbody>
 </table>
@@ -470,10 +475,11 @@ by the SDK itself after a call was accepted instead arrives asynchronously via
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplayresult">LevelPlayResult</h1>
-<p>The uniform success/failure envelope delivered to every async callback in this extension.
-<code>error_message</code> and <code>sdk_error_code</code> are both absent on success. <code>sdk_error_code</code> carries the SDK's
-own ad-error code verbatim when the failure came from a <code>LoadFailed</code>/<code>DisplayFailed</code> ad-lifecycle
-event; it is absent for every other event and for <a href="general.html#levelplay_init">levelplay_init</a>'s own failures.</p>
+<p>The uniform success or failure envelope that is given to every asynchronous callback in this
+extension. Both <code>error_message</code> and <code>sdk_error_code</code> are absent when the operation succeeded. The
+<code>sdk_error_code</code> member carries the ad error code of the SDK itself, and it is only present when
+the failure came from a <code>LoadFailed</code> or a <code>DisplayFailed</code> ad lifecycle event, which means that it
+is absent for every other event and for the failures of <a href="general.html#levelplay_init">levelplay_init</a>.</p>
 <p>This struct is referenced by the following functions:</p>
 <ul>
 <li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
@@ -499,12 +505,12 @@ event; it is absent for every other event and for <a href="general.html#levelpla
 <tr>
 <td>error_message</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
-<td>The SDK's own error message. Only present on failure.</td>
+<td>The error message of the SDK itself. This is only present on a<br>failure.</td>
 </tr>
 <tr>
 <td>sdk_error_code</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
-<td>The SDK's raw ad-error code. Only present on a <code>LoadFailed</code>/<br><code>DisplayFailed</code> event that carried an SDK error object.</td>
+<td>The raw ad error code of the SDK. This is only present on a<br><code>LoadFailed</code> or a <code>DisplayFailed</code> event that carried an error object from the SDK.</td>
 </tr>
 </tbody>
 </table>
@@ -513,11 +519,19 @@ event; it is absent for every other event and for <a href="general.html#levelpla
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplayadinfo">LevelPlayAdInfo</h1>
-<p>Metadata about a specific ad instance/impression, delivered alongside most
-<a href="general.html#levelplaycallbackevent">LevelPlayCallbackEvent</a> events. Mirrors the LevelPlay SDK's own ad-info object; fields
-the SDK didn't supply for a given event are absent (<code>width</code>/<code>height</code> are <code>0</code> instead, since the SDK
-always reports a size). On a <code>LoadFailed</code> event the SDK provides only the ad unit ID (no full ad-info
-object exists yet) - <code>unit_id</code> is populated from that fallback and every other field is absent.</p>
+<p>Information about a specific ad instance or impression, which is given alongside most
+<a href="general.html#levelplaycallbackevent">LevelPlayCallbackEvent</a> events. It mirrors the ad info object of the LevelPlay SDK
+itself, and any field that the SDK did not supply for a given event is absent. The <code>width</code> and
+<code>height</code> members are the exception, as they are <code>0</code> rather than absent whenever the SDK reported
+no size for the ad.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A <code>LoadFailed</code> event carries no ad info object from the SDK at all, and the two platforms
+differ in what they pass in its place. On iOS the ad unit ID that the SDK reports separately is
+carried through as a partial struct, so <code>unit_id</code> is present, <code>width</code> and <code>height</code> are <code>0</code> and
+every other field is absent. On Android the whole <code>ad_info</code> argument is <code>undefined</code> for that
+event, so you should test it with <code>is_undefined</code> before you read anything from it.</p>
+</div>
 <p>This struct is referenced by the following functions:</p>
 <ul>
 <li><a href="banner.html#levelplay_banner_callback_subscribe">levelplay_banner_callback_subscribe</a></li>
@@ -537,12 +551,12 @@ object exists yet) - <code>unit_id</code> is populated from that fallback and ev
 <tr>
 <td>width</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
-<td>The ad's width, in pixels. <code>0</code> if unknown.</td>
+<td>The width of the ad, in pixels. This is <code>0</code> if the width is unknown.</td>
 </tr>
 <tr>
 <td>height</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
-<td>The ad's height, in pixels. <code>0</code> if unknown.</td>
+<td>The height of the ad, in pixels. This is <code>0</code> if the height is unknown.</td>
 </tr>
 <tr>
 <td>format</td>
@@ -562,17 +576,17 @@ object exists yet) - <code>unit_id</code> is populated from that fallback and ev
 <tr>
 <td>unit_name</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
-<td>The ad unit's display name, as configured on the dashboard.</td>
+<td>The display name of the ad unit, as it is configured on the<br>dashboard.</td>
 </tr>
 <tr>
 <td>placement_name</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
-<td>The placement name the ad was requested for.</td>
+<td>The name of the placement that the ad was requested for.</td>
 </tr>
 <tr>
 <td>country</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
-<td>The country the impression is attributed to.</td>
+<td>The country that the impression is attributed to.</td>
 </tr>
 <tr>
 <td>precision</td>
@@ -591,7 +605,7 @@ object exists yet) - <code>unit_id</code> is populated from that fallback and ev
 <p align="right"><a href="#top">Back To Top</a></p>
 
 <h1 id="levelplayreward">LevelPlayReward</h1>
-<p>The reward earned from a rewarded video ad, delivered with the
+<p>The reward that was earned from a rewarded video ad, which is given with the
 <a href="general.html#levelplaycallbackevent">LevelPlayCallbackEvent</a>.Rewarded event. See <a href="getting_started.html">Getting Started</a>.</p>
 <p>This struct is referenced by the following functions:</p>
 <ul>
@@ -610,12 +624,12 @@ object exists yet) - <code>unit_id</code> is populated from that fallback and ev
 <tr>
 <td>name</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Reference/Strings/Strings.htm">String</a></td>
-<td>The reward's name, as configured for the ad unit on the dashboard.</td>
+<td>The name of the reward, as it is configured for the ad unit on the<br>dashboard.</td>
 </tr>
 <tr>
 <td>amount</td>
 <td><a href="https://manual.gamemaker.io/monthly/en/GameMaker_Language/GML_Overview/Data_Types.htm">Real</a></td>
-<td>The reward amount.</td>
+<td>The amount of the reward.</td>
 </tr>
 </tbody>
 </table>
@@ -633,7 +647,7 @@ object exists yet) - <code>unit_id</code> is populated from that fallback and ev
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-      <p><p align="center">YoYoGames 2026</p></p>
+      <p><p align="center">GameMaker 2026</p></p>
   </div>
 
   Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.

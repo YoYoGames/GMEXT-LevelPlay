@@ -44,9 +44,9 @@
     <ul class="current">
     <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#1-initialize">1. Initialize</a>
+    <li class="toctree-l2"><a class="reference internal" href="#1-initialise">1. Initialise</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#2-create-load-and-show-ads">2. Create, load, and show ads</a>
+    <li class="toctree-l2"><a class="reference internal" href="#2-create-load-and-show-ads">2. Create, load and show ads</a>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#3-handling-callbacks">3. Handling callbacks</a>
     </li>
@@ -96,38 +96,44 @@
             <div class="section" itemprop="articleBody">
               
                 <h1 id="getting-started">Getting Started</h1>
-<p>This guide walks through the recommended call order for the LevelPlay extension, from initialization
-through showing your first ad. See <a href="extension_options.html">Extension Options</a> for what each Extension Option does.</p>
+<p>This guide walks you through the recommended order in which to call the functions of the LevelPlay
+extension, from the initialisation through to showing your first ad. See <a href="extension_options.html">Extension Options</a>
+for what each of the Extension Options does.</p>
 <h2 id="prerequisites">Prerequisites</h2>
 <ul>
-<li>A Unity LevelPlay (ironSource) account with your app and ad units already created.</li>
-<li>The extension's <code>AndroidAppKey</code>/<code>iOSAppKey</code> Extension Options filled in for the platform(s) you
-  target (<a href="extension_options.html">Extension Options</a>).</li>
-<li>If you want to use mediation, import the <code>LevelPlay_&lt;Network&gt;</code> extension(s) for the networks you
-  want (AppLovin, Facebook, Google, HyprMX, InMobi, Liftoff, Pangle, SuperAwesome, Tencent, UnityAds,
-  VK, Yandex) - each ships disabled by default (<code>copyToTargets</code> off) and is enabled per-project. Check
-  each network's own adapter documentation for its minimum supported OS version before enabling it;
-  this extension's own baseline iOS deployment target is 12.0, but individual networks can require
-  higher.</li>
+<li>A Unity LevelPlay (ironSource) account, with your app and your ad units already created.</li>
+<li>The <code>AndroidAppKey</code> or the <code>iOSAppKey</code> Extension Option of the extension filled in for the
+  platforms that you target (<a href="extension_options.html">Extension Options</a>).</li>
+<li>If you want to use mediation, import the <code>LevelPlay_&lt;Network&gt;</code> extension for each of the networks
+  that you want, which are AppLovin, Facebook, Google, HyprMX, InMobi, Liftoff, Pangle, SuperAwesome,
+  Tencent, UnityAds, VK and Yandex. Each of these ships disabled by default, with <code>Copies To</code>
+  targets disabled. You should check the adapter documentation of each
+  network for its minimum supported OS version before you enable it, as the baseline iOS deployment
+  target of this extension is 12.0 but an individual network can require a higher one.</li>
 </ul>
-<h2 id="1-initialize">1. Initialize</h2>
+<h2 id="1-initialise">1. Initialise</h2>
 <div class="highlight"><pre><span></span><code>levelplay_init(function(_result)
 {
     if (!_result.success)
     {
-        show_debug_message($&quot;LevelPlay failed to initialize: {_result.error_message}&quot;);
+        show_debug_message($"LevelPlay failed to initialize: {_result.error_message}");
         return;
     }
 
     // Safe to load ads from here on.
 });
 </code></pre></div>
-<p>Every other ad function fails with <a href="general.html#levelplayerror">LevelPlayError</a>.NotInitialized until this callback has
-fired with <code>success == true</code>.</p>
-<h2 id="2-create-load-and-show-ads">2. Create, load, and show ads</h2>
-<p>Interstitial and rewarded video are handle-based: <code>_create</code> builds a reusable ad instance and attaches
-<code>callback</code> as its listener for the handle's whole lifetime, then <code>_load</code> (re)loads it using that same
-callback - you only specify the callback once, not on every reload:</p>
+<p>The code above initialises the SDK and only starts using it once the callback has reported success.
+<a href="interstitial.html#levelplay_interstitial_load">levelplay_interstitial_load</a>, <a href="rewarded_video.html#levelplay_rewarded_video_load">levelplay_rewarded_video_load</a> and
+<a href="banner.html#levelplay_banner_create">levelplay_banner_create</a> fail with <a href="general.html#levelplayerror">LevelPlayError</a>.NotInitialized until that
+callback has been called with <code>success</code> set to <code>true</code>. The remaining functions do not test the
+initialisation state at all, so they report whatever is wrong at their own level instead, which for
+<code>_show</code> means <a href="general.html#levelplayerror">LevelPlayError</a>.AdNotReady, given that nothing can have loaded yet.</p>
+<h2 id="2-create-load-and-show-ads">2. Create, load and show ads</h2>
+<p>Interstitial and rewarded video ads are handle-based. The <code>_create</code> function builds a reusable ad
+instance and attaches <code>callback</code> as its listener for the whole lifetime of the handle, and <code>_load</code>
+then loads, or reloads, that instance using the same callback, which means that you only specify the
+callback once and not on every reload:</p>
 <div class="highlight"><pre><span></span><code>on_interstitial_event = function(_result, _type, _ad_info)
 {
     switch (_type)
@@ -136,7 +142,7 @@ callback - you only specify the callback once, not on every reload:</p>
             levelplay_interstitial_show(handle);
             break;
         case LevelPlayCallbackEvent.LoadFailed:
-            show_debug_message($&quot;Interstitial failed to load: {_result.error_message}&quot;);
+            show_debug_message($"Interstitial failed to load: {_result.error_message}");
             break;
         case LevelPlayCallbackEvent.Closed:
             levelplay_interstitial_load(handle); // reload for next time, same callback
@@ -144,44 +150,50 @@ callback - you only specify the callback once, not on every reload:</p>
     }
 };
 
-handle = levelplay_interstitial_create(&quot;your_ad_unit_id&quot;, on_interstitial_event);
+handle = levelplay_interstitial_create("your_ad_unit_id", on_interstitial_event);
 levelplay_interstitial_load(handle);
 </code></pre></div>
-<p>Hold onto as many handles as you want - each is independent. Only call
-<a href="interstitial.html#levelplay_interstitial_set_callback">levelplay_interstitial_set_callback</a>/<a href="rewarded_video.html#levelplay_rewarded_video_set_callback">levelplay_rewarded_video_set_callback</a> if
-you actually want to swap a handle's callback for a different one; most usage never needs it. See
-<a href="interstitial.html">Interstitial</a> and <a href="rewarded_video.html">Rewarded Video</a> for the full callback shape (rewarded video's
-callback carries an extra <code>reward</code> argument).</p>
-<p>Banner ads are different: there is only ever one instance, created directly with no separate load
-step, and its own <code>_callback_subscribe</code> function fires repeatedly for the life of the banner instead
-of once per load/show pair - see <a href="banner.html">Banner</a>.</p>
+<p>The code above creates a single interstitial handle and keeps it loaded, showing the ad as soon as
+it is ready and reloading it once the player has closed it. You can hold as many handles as you
+want, as each one of them is independent.</p>
+<p>You should only call <a href="interstitial.html#levelplay_interstitial_set_callback">levelplay_interstitial_set_callback</a> or
+<a href="rewarded_video.html#levelplay_rewarded_video_set_callback">levelplay_rewarded_video_set_callback</a> if you actually want to swap the callback of a
+handle for a different one, which most usage never needs. See <a href="interstitial.html">Interstitial</a> and
+<a href="rewarded_video.html">Rewarded Video</a> for the full shape of the callback, as the one for rewarded video carries
+an extra <code>reward</code> argument.</p>
+<p>Banner ads work differently. Only one banner instance ever exists, it is created directly with no
+separate load step, and its own <code>_callback_subscribe</code> function is called repeatedly for the life of
+the banner instead of once per load and show pair. See <a href="banner.html">Banner</a>.</p>
 <h2 id="3-handling-callbacks">3. Handling callbacks</h2>
-<p>Always check <code>result.success</code> first:</p>
+<p>You should always check <code>result.success</code> first:</p>
 <div class="highlight"><pre><span></span><code>function(_result, _type, _ad_info)
 {
     if (!_result.success)
     {
-        show_debug_message($&quot;Failed: {_result.error_message}&quot;);
+        show_debug_message($"Failed: {_result.error_message}");
         return;
     }
     // handle _type
 }
 </code></pre></div>
-<p>Synchronous failures (e.g. calling <code>_show</code> before an ad is ready) are reported immediately through
-each function's <a href="general.html#levelplayerror">LevelPlayError</a> return value instead - see <a href="general.html">General</a>.</p>
+<p>The code above rejects a failed event before it reads anything else from the payload. A synchronous
+failure, which is what you get when you call <code>_show</code> before an ad is ready, for example, is reported
+immediately through the <a href="general.html#levelplayerror">LevelPlayError</a> return value of each function instead. See
+<a href="general.html">General</a>.</p>
 <h2 id="4-cleanup">4. Cleanup</h2>
-<p>Destroy an active banner with <a href="banner.html#levelplay_banner_destroy">levelplay_banner_destroy</a> when you're done with it. Call
-<a href="interstitial.html#levelplay_interstitial_destroy">levelplay_interstitial_destroy</a>/<a href="rewarded_video.html#levelplay_rewarded_video_destroy">levelplay_rewarded_video_destroy</a> when you're
-truly done with an interstitial/rewarded handle - both are no-ops on an already-invalid handle. A
-handle you intend to keep reusing doesn't need destroying between shows, just reloading.</p>
+<p>You should destroy an active banner with <a href="banner.html#levelplay_banner_destroy">levelplay_banner_destroy</a> once you are done with
+it. You should call <a href="interstitial.html#levelplay_interstitial_destroy">levelplay_interstitial_destroy</a> or
+<a href="rewarded_video.html#levelplay_rewarded_video_destroy">levelplay_rewarded_video_destroy</a> once you are truly done with an interstitial or a
+rewarded video handle, and both of them have no effect on a handle that is already invalid. A handle
+that you intend to keep reusing does not need to be destroyed between shows, only reloaded.</p>
 <h2 id="testing-notes">Testing notes</h2>
-<p>Call <a href="general.html#levelplay_launch_test_suite">levelplay_launch_test_suite</a> during development to open LevelPlay's integration test
-suite and verify your platform setup. &gt; [!NOTE]</p>
-<blockquote>
-<p>LevelPlay/ironSource does not publish a universal test
-ad unit ID like some other networks - register a real test ad unit on your own dashboard for
-development.</p>
-</blockquote>
+<p>You should call <a href="general.html#levelplay_launch_test_suite">levelplay_launch_test_suite</a> during development to open the integration
+test suite of LevelPlay and verify the setup of your platform.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LevelPlay and ironSource do not publish a universal test ad unit ID like some other networks
+do, so you should register a real test ad unit on your own dashboard for development.</p>
+</div>
               
             </div>
           </div><footer>
@@ -193,7 +205,7 @@ development.</p>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-      <p><p align="center">YoYoGames 2026</p></p>
+      <p><p align="center">GameMaker 2026</p></p>
   </div>
 
   Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.

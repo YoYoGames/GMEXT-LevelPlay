@@ -84,25 +84,28 @@
 <h1 id="levelplay"><strong>LevelPlay</strong></h1>
 <h2 id="extensions-features">Extension's Features</h2>
 <ul>
-<li>Initialize the Unity LevelPlay (ironSource) mediation SDK</li>
-<li>Show interstitial, rewarded video, and banner ads</li>
-<li>Route ad requests through any of 12 supported mediation networks via separate, optional
-  sub-extensions</li>
-<li>Set consent, metadata, and Dynamic UserID for regulation/reward-verification purposes</li>
+<li>Initialise the Unity LevelPlay (ironSource) mediation SDK</li>
+<li>Show interstitial, rewarded video and banner ads</li>
+<li>Route ad requests through any of the 12 supported mediation networks, using separate and
+  optional sub-extensions</li>
+<li>Set the consent, the metadata and the Dynamic UserID that are used for regulation and for
+  reward verification</li>
 </ul>
 <h2 id="introduction">Introduction</h2>
-<p>This extension wraps Unity's <a href="https://developers.is.com/ironsource-mobile/">LevelPlay</a> (formerly
-ironSource) ad mediation SDK for <strong>Android and iOS</strong>. Call <a href="general.html#levelplay_init">levelplay_init</a> once, before
-any other function. Every function that talks to the SDK asynchronously reports its outcome through
-a callback carrying a <a href="general.html#levelplayresult">LevelPlayResult</a> - check <code>result.success</code> before trusting the rest of
-the payload.</p>
-<p>Interstitial and rewarded video ads are handle-based: <code>_create</code> constructs a reusable ad instance,
-returns a handle, and attaches the callback that will receive every lifecycle event for that
-handle's whole lifetime; <code>_load</code>/<code>_show</code>/<code>_destroy</code> then all operate on the handle, with <code>_load</code>
-reusing the same callback on every reload (swap it explicitly with <code>_set_callback</code> if you ever need
-to). Hold onto as many handles as you want at once - see
-<a href="interstitial.html">Interstitial</a>/<a href="rewarded_video.html">Rewarded Video</a>. Banner stays a single mutable instance (there is
-only ever one banner view) with its own <code>_callback_subscribe</code> function - see <a href="banner.html">Banner</a>.</p>
+<p>This extension wraps the <a href="https://developers.is.com/ironsource-mobile/">LevelPlay</a> ad mediation
+SDK from Unity, which was formerly known as ironSource, for <strong>Android and iOS</strong>. You should call
+<a href="general.html#levelplay_init">levelplay_init</a> once, before any other function of this extension. Every function that
+talks to the SDK asynchronously reports its outcome through a callback that carries a
+<a href="general.html#levelplayresult">LevelPlayResult</a>, and you should always check <code>result.success</code> before you trust the rest
+of the payload.</p>
+<p>Interstitial and rewarded video ads are handle-based. The <code>_create</code> function builds a reusable ad
+instance, returns a handle to it and attaches the callback that receives every lifecycle event
+for the whole lifetime of that handle. The <code>_load</code>, <code>_show</code> and <code>_destroy</code> functions then all
+operate on that handle, and <code>_load</code> reuses the same callback on every reload, which you can swap
+explicitly with <code>_set_callback</code> if you ever need to. You can hold as many handles as you want at
+the same time. See <a href="interstitial.html">Interstitial</a> and <a href="rewarded_video.html">Rewarded Video</a>.</p>
+<p>A banner works differently, as it is a single mutable instance, given that only one banner view
+ever exists, and it has a <code>_callback_subscribe</code> function of its own. See <a href="banner.html">Banner</a>.</p>
 <h2 id="guides">Guides</h2>
 <p>Guides for the LevelPlay extension.</p>
 <ul>
@@ -127,7 +130,7 @@ only ever one banner view) with its own <code>_callback_subscribe</code> functio
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-      <p><p align="center">YoYoGames 2026</p></p>
+      <p><p align="center">GameMaker 2026</p></p>
   </div>
 
   Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.

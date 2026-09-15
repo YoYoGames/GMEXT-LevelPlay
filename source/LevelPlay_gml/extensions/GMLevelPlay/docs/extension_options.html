@@ -44,9 +44,21 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="#">Extension Options</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#androidappkey">AndroidAppKey</a>
+    <li class="toctree-l2"><a class="reference internal" href="#options">Options</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#androidappkey">AndroidAppKey</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#iosappkey">iOSAppKey</a>
+    <li class="toctree-l3"><a class="reference internal" href="#iosappkey">iOSAppKey</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mediation-network-options">Mediation network options</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#levelplay_google-android_appid">LevelPlay_Google: Android_AppID</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#levelplay_google-ios_appid">LevelPlay_Google: iOS_AppID</a>
+    </li>
+        </ul>
     </li>
     </ul>
                   </li>
@@ -87,7 +99,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <p>You can access the Extension Options by navigating to the <strong>GMLevelPlay</strong> extension asset in the <a href="https://manual.gamemaker.io/monthly/en/Introduction/The_Asset_Browser.htm">Asset Browser</a> and double-clicking it.</p>
+                <h1 id="extension-options">Extension Options</h1>
+<p>You can access the Extension Options by navigating to the <strong>GMLevelPlay</strong> extension asset in the <a href="https://manual.gamemaker.io/monthly/en/Introduction/The_Asset_Browser.htm">Asset Browser</a> and double-clicking it.</p>
 <p><img alt="LevelPlay Extension Options" src="assets/levelplay_ext_options.png" /></p>
 <h2 id="options">Options</h2>
 <h3 id="androidappkey">AndroidAppKey</h3>
@@ -113,9 +126,9 @@
 </tr>
 </tbody>
 </table>
-<p>The App Key for your app, used to initialise the LevelPlay SDK on Android. Found on the Unity LevelPlay (ironSource) dashboard under your app's Android platform settings.</p>
+<p>The App Key for your app, which is used to initialise the LevelPlay SDK on Android. You can find it on the Unity LevelPlay (ironSource) dashboard, under the Android platform settings of your app.</p>
 <blockquote>
-<p>Without a valid <code>AndroidAppKey</code>, <a href="general.html#levelplay_init">levelplay_init</a> will fail to initialise the SDK on Android.</p>
+<p>Without a valid <code>AndroidAppKey</code>, <a href="general.html#levelplay_init">levelplay_init</a> fails to initialise the SDK on Android.</p>
 </blockquote>
 <h3 id="iosappkey">iOSAppKey</h3>
 <table>
@@ -140,13 +153,14 @@
 </tr>
 </tbody>
 </table>
-<p>The App Key for your app, used to initialise the LevelPlay SDK on iOS. Found on the Unity LevelPlay (ironSource) dashboard under your app's iOS platform settings.</p>
+<p>The App Key for your app, which is used to initialise the LevelPlay SDK on iOS. You can find it on the Unity LevelPlay (ironSource) dashboard, under the iOS platform settings of your app.</p>
 <blockquote>
-<p>Without a valid <code>iOSAppKey</code>, <a href="general.html#levelplay_init">levelplay_init</a> will fail to initialise the SDK on iOS.</p>
+<p>Without a valid <code>iOSAppKey</code>, <a href="general.html#levelplay_init">levelplay_init</a> fails to initialise the SDK on iOS.</p>
 </blockquote>
 <h2 id="mediation-network-options">Mediation network options</h2>
-<p>Most <code>LevelPlay_&lt;Network&gt;</code> mediation extensions have no configurable options - enabling the extension is
-enough. The Google mediation extension is the one exception, requiring its own App ID:</p>
+<p>Most of the <code>LevelPlay_&lt;Network&gt;</code> mediation extensions have no configurable options at all, as
+enabling the extension is enough. The Google mediation extension is the one exception, as it
+requires an App ID of its own:</p>
 <h3 id="levelplay_google-android_appid">LevelPlay_Google: Android_AppID</h3>
 <table>
 <thead>
@@ -170,12 +184,12 @@ enough. The Google mediation extension is the one exception, requiring its own A
 </tr>
 </tbody>
 </table>
-<p>Your AdMob Application ID for Android, in the form <code>ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY</code>. Found on
-the AdMob dashboard under <strong>App settings</strong>. Injected into the Android manifest's
-<code>com.google.android.gms.ads.APPLICATION_ID</code> meta-data entry.</p>
+<p>Your AdMob Application ID for Android, in the form <code>ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY</code>. You can
+find it on the AdMob dashboard, under <strong>App settings</strong>. It is injected into the
+<code>com.google.android.gms.ads.APPLICATION_ID</code> meta-data entry of the Android manifest.</p>
 <blockquote>
-<p>The Google mediation adapter's manifest merge fails at build time without a valid
-<code>Android_AppID</code> when <code>LevelPlay_Google</code> is enabled for Android.</p>
+<p>The manifest merge of the Google mediation adapter fails at build time without a valid
+<code>Android_AppID</code>, when <code>LevelPlay_Google</code> is enabled for Android.</p>
 </blockquote>
 <h3 id="levelplay_google-ios_appid">LevelPlay_Google: iOS_AppID</h3>
 <table>
@@ -200,12 +214,12 @@ the AdMob dashboard under <strong>App settings</strong>. Injected into the Andro
 </tr>
 </tbody>
 </table>
-<p>Your AdMob Application ID for iOS, in the form <code>ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY</code>. Found on the
-AdMob dashboard under <strong>App settings</strong>. Injected into the compiled <code>Info.plist</code>'s
-<code>GADApplicationIdentifier</code> key.</p>
+<p>Your AdMob Application ID for iOS, in the form <code>ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY</code>. You can find
+it on the AdMob dashboard, under <strong>App settings</strong>. It is injected into the
+<code>GADApplicationIdentifier</code> key of the compiled <code>Info.plist</code>.</p>
 <blockquote>
-<p>Google's Mobile Ads SDK crashes on the first ad request without a valid <code>iOS_AppID</code> when
-<code>LevelPlay_Google</code> is enabled for iOS.</p>
+<p>The Mobile Ads SDK from Google crashes on the first ad request without a valid
+<code>iOS_AppID</code>, when <code>LevelPlay_Google</code> is enabled for iOS.</p>
 </blockquote>
               
             </div>
@@ -219,7 +233,7 @@ AdMob dashboard under <strong>App settings</strong>. Injected into the compiled 
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-      <p><p align="center">YoYoGames 2026</p></p>
+      <p><p align="center">GameMaker 2026</p></p>
   </div>
 
   Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
